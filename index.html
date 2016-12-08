@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: 데이터 과학 – 기초 통계</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-59802572-17', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <h1 class="title">데이터 과학 – 기초 통계</h1>
+          <aside class="callout panel panel-info">
+<div class="panel-heading">
+<h3 id="ai-is-a-superpower"><span class="glyphicon glyphicon-pushpin"></span>AI is a Superpower</h3>
+</div>
+<div class="panel-body">
+<p>“AI is a superpower!!!”, 인공지능을 체득하면 슈퍼파워를 손에 쥘 것이다. <a href="https://twitter.com/andrewyng/status/728986380638916609">Andrew Ng</a></p>
+<p>금수저, 은수저 슈퍼파워를 받은 사람과 기계학습을 통달한 흑수저들간의 무한경쟁이 드뎌 시작되었다. 물론, 금수저를 입에 물고 기계학습을 통달한 사람이 가장 유리한 출발을 시작한 것도 사실이다.</p>
+</div>
+</aside>
+<p>통계는 과거 통계 팩키지(SAS, SPSS, 미니탭 등)에 데이터를 넣어 돌리고 결과를 해석하는 학문으로 쉽게 생각하기도 한다. 수학적인 면에서 보면, 인문학도가 보면 어려운 수학이지만 수학을 전통으로 하는 분들이 보면 쉽게 보이는 것도 사실이다. 하지만, 통계는 데이터에 기반해서 귀납적 사고방식을 확률로 표현하는 어찌보면 쟈넷윙 박사가 정의한 <strong>컴퓨팅 사고(Computational Thinking)</strong> 에 따르면 <strong>수학적 사고(Mathematical Thinking)</strong> 와 더불어 인간 사고체계의 큰 기둥을 이루고 있는 <strong>실험적 사고(Experimental Thinking)</strong> 체계다.</p>
+<p>2차 산업혁명 제조업의 토대가 수학을 기반으로 깔고 물리와 화학을 그 위에 올렸다면, 3차 산업혁명 금융/서비스업 정보화를 넘어, 4차 산업혁명의 기본적인 토양은 통계학과 컴퓨터공학이다. 수학 전공자가 수학적 사고를 통달하는만큼 실험적/통계적 사고를 통달하는 것은 쉬운 일이 아니다. 하지만 잊지 말아야 할 것은 컴퓨팅 사고도 성큼 다가와 있고, 선진국에서도 일부 사람들만이 하는 이 사고 체계를 하루 빨리 내재화하는 것이 정말 중요한 핵심 역량이다.</p>
+<h2 id="학습목차">학습목차</h2>
+<ol style="list-style-type: decimal">
+<li><a href="stat-coursera-doe.html">실험 유형 구분</a>
+<ul>
+<li><a href="stat-testing.html">자주 사용하는 검정</a></li>
+<li><a href="stat-coursear-prop-test.html">단일 표본 비율검정 – 웹사이트 선호도 분석</a></li>
+<li><a href="stat-ab-testing.html">A/B 검정(A/B Testing)</a></li>
+<li><a href="stat-measurement.html">측정 척도(Scales of Measurement)</a></li>
+</ul></li>
+<li><a href="stat-chatting-log.html">채팅 로그</a></li>
+<li><a href="stat-bayes.html">베이즈 정리</a></li>
+<li><a href="stat-gold-farming.html">디지털 경제와 작업장(Gold Farming)</a>
+<ul>
+<li><a href="stat-gold-farming-detection.html">작업장 탐지</a></li>
+</ul></li>
+</ol>
+<h3 id="xwmooc-오픈-교재"><a href="https://statkclee.github.io/xwMOOC/">xwMOOC 오픈 교재</a></h3>
+<ul>
+<li><a href="http://unplugged.xwmooc.org">컴퓨터 과학 언플러그드</a><br />
+</li>
+<li><a href="http://reeborg.xwmooc.org">리보그</a>
+<ul>
+<li><a href="http://rur-ple.xwmooc.org">러플</a><br />
+</li>
+</ul></li>
+<li><a href="http://swcarpentry.github.io/python-novice-turtles/index-kr.html">파이썬 거북이</a><br />
+</li>
+<li><a href="http://python.xwmooc.org">정보과학을 위한 파이썬</a><br />
+</li>
+<li><a href="http://swcarpentry.xwmooc.org">소프트웨어 카펜트리 5.3</a></li>
+<li><a href="http://raspberry-pi.xwmooc.org/">IoT 오픈 하드웨어(라즈베리 파이)</a>
+<ul>
+<li><a href="http://computer.xwmooc.org/">$100 오픈 컴퓨터</a><br />
+</li>
+<li><a href="http://computers.xwmooc.org/">$100 오픈 슈퍼컴퓨터</a></li>
+</ul></li>
+<li><strong>데이터 과학</strong>
+<ul>
+<li><a href="http://data-science.xwmooc.org/">R 데이터과학</a></li>
+<li><a href="http://r-pkgs.xwmooc.org/">R 팩키지</a></li>
+<li><a href="http://statkclee.github.io/r-docker/">R 도커</a></li>
+<li><a href="http://think-stat.xwmooc.org/">통계적 사고</a></li>
+<li><a href="http://parallel.xwmooc.org/">R 병렬 컴퓨팅</a><br />
+</li>
+<li><a href="https://statkclee.github.io/ds-authoring/">데이터 과학을 위한 저작도구</a></li>
+</ul></li>
+<li><strong>기계학습, 딥러닝, 인공지능</strong>
+<ul>
+<li><a href="http://statkclee.github.io/ml">기계학습</a></li>
+<li><a href="http://statkclee.github.io/trilobite">고생대 프로젝트</a></li>
+</ul></li>
+<li><a href="http://sympy.xwmooc.org/">기호 수학(Symbolic Math)</a></li>
+<li><a href="http://politics.xwmooc.org/">선거와 투표</a></li>
+</ul>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

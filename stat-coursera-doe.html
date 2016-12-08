@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: 데이터 과학 – 기초 통계</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-59802572-17', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
+          <h2 class="subtitle">실험 유형 구분</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>실험 유형을 구분한다.</li>
+</ul>
+</div>
+</section>
+<h3 id="실험-유형-coursear-doe">1. 실험 유형 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<h4 id="비율-검정">1.1. 비율 검정</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">표본</th>
+<th align="left">반응 범주</th>
+<th align="left">검정</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">단일 표본 <span class="math inline">\(\chi^2\)</span> 검정, 이항 검정(Binomial Test)</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">2 이상</td>
+<td align="left">단일 표본 <span class="math inline">\(\chi^2\)</span> 검정, 다항 검정(multinomial Test)</td>
+</tr>
+<tr class="odd">
+<td align="left">1이상</td>
+<td align="left">2 이상</td>
+<td align="left"><span class="math inline">\(N\)</span> 표본 <span class="math inline">\(\chi^2\)</span> 검정, G-검정, 피셔의 정확검정</td>
+</tr>
+</tbody>
+</table>
+<h4 id="분산-분석과-일반화-선형모형">2. 분산 분석과 일반화 선형모형</h4>
+<table>
+<colgroup>
+<col width="8%" />
+<col width="10%" />
+<col width="12%" />
+<col width="28%" />
+<col width="40%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">요인</th>
+<th align="left">수준</th>
+<th align="left">군간(B)/군내(W)</th>
+<th align="left">모수 검정</th>
+<th align="left">비모수 검정</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">군간(B)</td>
+<td align="left">독립표본 <span class="math inline">\(t-\)</span>검정</td>
+<td align="left">만-위트니 <span class="math inline">\(U\)</span> 검정(Mann-Whitney)</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">2 이상</td>
+<td align="left">군간(B)</td>
+<td align="left">일원 분산분석</td>
+<td align="left">크루스칼-왈리스 검정(Kruskal-Wallis)</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">군간(W)</td>
+<td align="left">쌍체 <span class="math inline">\(t-\)</span> 검정</td>
+<td align="left">윌콕슨 부호순위 검정(Wilcoxon signed-rank test)</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">2 이상</td>
+<td align="left">군간(W)</td>
+<td align="left">일원 반복측정 분산분석</td>
+<td align="left">프리드만의 검정 (Friedman’s test)</td>
+</tr>
+<tr class="odd">
+<td align="left">1이상</td>
+<td align="left">2 이상</td>
+<td align="left">군간(B)</td>
+<td align="left">요인 분산분석, 선형모형</td>
+<td align="left">Aligned Rank Transform(ART), 일반화선형모형(GLM)</td>
+</tr>
+<tr class="even">
+<td align="left">1이상</td>
+<td align="left">2 이상</td>
+<td align="left">군간(W)</td>
+<td align="left">요인 반복측정 분산분석, 선형혼합모형</td>
+<td align="left">Aligned Rank Transform(ART), 일반화선형혼합모형(GLMM)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="비율-검정-1">2. 비율 검정</h3>
+<h4 id="사용자-선호도user-preference">2.1. 사용자 선호도(User Preference)</h4>
+<ul>
+<li>단일 표본 비율 검정(One-Sample Test of Proportions)</li>
+<li>단일표본 비율검정 (More One-Sample Tests of Proportions)</li>
+<li>이표본 비율검정(Two-Sample Tests of Proportions)</li>
+</ul>
+<h4 id="ab-테스트-t-검정">A/B 테스트 – <span class="math inline">\(t-\)</span>검정</h4>
+<ul>
+<li><span class="math inline">\(t-\)</span>검정</li>
+</ul>
+<h4 id="작업-완수-시간-분산분석">작업 완수 시간 – 분산분석</h4>
+<ul>
+<li>일원 분산분석 (One-way Analysis of Variance)
+<ul>
+<li>군간(Between) 요인 분석</li>
+</ul></li>
+</ul>
+<h4 id="사용자-검색-반복-측정">사용자 검색 – 반복 측정</h4>
+<ul>
+<li>반복측정 분산분석(Repeated Measures ANOVA)
+<ul>
+<li>군내(Within) 요인 분석</li>
+</ul></li>
+</ul>
+<h4 id="핸드폰-자판-입력-요인-실험-설계">핸드폰 자판 입력 – 요인 실험 설계</h4>
+<ul>
+<li>요인 실험 설계 (Factorial Design of Experiment)
+<ul>
+<li>한가지 이상 요인에 대한 실험 설계</li>
+</ul></li>
+</ul>
+<h4 id="일반화-선형-혼합-모형">일반화 선형 (혼합) 모형</h4>
+<ul>
+<li>일반화 선형 모형(Generalized Linear Models, GLM)</li>
+<li>일반화 선형 혼합 모형(Generalized Linear Mixed Models, GLMM)</li>
+</ul>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://www.coursera.org/learn/designexperiments">Designing, Running, and Analyzing Experiments</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

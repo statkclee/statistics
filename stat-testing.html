@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: </title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-59802572-17', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <h1 class="title"></h1>
+          <h1 id="데이터-과학-기초-통계">데이터 과학 – 기초 통계</h1>
+<section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>실무에서 자주 사용하는 검정에 대해 살펴본다.</li>
+</ul>
+</div>
+</section>
+<h3 id="언제-z-검정과-t-검정을-사용해야-할까">1. 언제 <span class="math inline">\(z-\)</span>검정과 <span class="math inline">\(t-\)</span>검정을 사용해야 할까?</h3>
+<p>표본평균과 모평균을 비교할 때 <span class="math inline">\(z-\)</span>검정과 <span class="math inline">\(t-\)</span>검정을 사용하지만 결정적인 차이는 모집단 표준편차(SD)를 아느냐 모르냐에 따라 달라진다. 일반적인 경우 모집단 표준편차를 알지 못한다.</p>
+<h2 id="가지-검정-비교">1.1. 4가지 검정 비교</h2>
+<p><span class="math inline">\(z-\)</span>검정, 단일 표본 <span class="math inline">\(t-\)</span>검정, 쌍체 <span class="math inline">\(t-\)</span> 검정, 독립 <span class="math inline">\(t-\)</span>검정 이 네가지 검정은 평균을 비교하는데 많이 사용되는 통계적 검정이다. 데이터에서 관측값(Observed)을 얻고, 기대값(Expected)을 빼고 이를 표준오차로 나누어서 평균 비교작업을 수행한다.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">관측값</th>
+<th align="left">기대값</th>
+<th align="left">표준오차</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span class="math inline">\(z-\)</span>검정</td>
+<td align="left">표본 평균</td>
+<td align="left">모평균</td>
+<td align="left">평균 표준오차</td>
+</tr>
+<tr class="even">
+<td align="left">단일 표본 <span class="math inline">\(t-\)</span>검정</td>
+<td align="left">표본 평균</td>
+<td align="left">모평균</td>
+<td align="left">평균 표준오차</td>
+</tr>
+<tr class="odd">
+<td align="left">쌍체 <span class="math inline">\(t-\)</span> 검정</td>
+<td align="left">점수 차이 표본 평균</td>
+<td align="left">점수 차이 모평균</td>
+<td align="left">평균차이 표준오차</td>
+</tr>
+<tr class="even">
+<td align="left">독립 <span class="math inline">\(t-\)</span>검정</td>
+<td align="left">두 표본평균 차이</td>
+<td align="left">두 표본평균 차이</td>
+<td align="left">평균간 차이 표준오차</td>
+</tr>
+</tbody>
+</table>
+<h3 id="표집-분포">1.2. 표집 분포</h3>
+<p>요약 통계량에 대한 가설분포를 표집 분포라고 부른다. <span class="math inline">\(z-\)</span>검정의 경우 표집분포의 평균은 근사적으로 모평균과 같고, 표집분포의 표준편차는 표준오차가 된다. 중심극한정리에 따라 표본크기가 증가함에 따라 표준오차는 감소한다.</p>
+<p>귀무가설 유의성검정(Null Hypothesis Significance Testing, NHST) 얼개에 따르면, 귀무가설은 효과가 없다가 된다. 표준오차는 표본크기가 증가함에 따라 감소하게 된다.</p>
+<p><span class="math inline">\(\textrm{표준오차}\downarrow = \frac{\textrm{모 표준편차}}{\sqrt{\textrm{표본 크기}\uparrow}}\)</span></p>
+<p><span class="math inline">\(p-\)</span>값은 확률값(Probability Value)를 줄인 것으로 귀무가설이 참일 때 조건부 확률값이 된다. 표준오차는 우연에 의한 차이로 볼 수 있는데, 우연의 차이가 아닌 유의성을 주장하려면 적어도 <strong><span class="math inline">\(2 \times\)</span> 표준편차</strong> 보다 차이가 나야 된다.</p>
+<h3 id="독립-t-검정">1.3. 독립 <span class="math inline">\(t-\)</span>검정</h3>
+<p>신규 기능이 소프트웨어에 추가되었는데 이에 대해 매출 효과가 발생했는지 측정하는데 있어, 한 사용자 집단은 기존 방식대로 기능을 제공하여 매출을 측정하고, 다른 사용자 집단은 신규 기능이 추가된 소프트웨어를 제공하여 유의적인 매출 증대효과가 있는지 검증할 때 독립 이표본 <span class="math inline">\(t-\)</span>검정을 사용한다.</p>
+<p><span class="math inline">\(t-\textrm{값} = \frac {\textrm{관측값} - \textrm{기대값}}{\textrm{표준오차}}\)</span></p>
+<p><span class="math inline">\(t = \frac{\bar {X}_1 - \bar{X}_2}{s_{X_1X_2} \cdot \sqrt{\frac{2}{n}}}\)</span></p>
+<p>여기서 <span class="math inline">\(s_{X_1X_2} = \sqrt{\frac{s_{X_1}^2+s_{X_2}^2}{2}}\)</span></p>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h3 id="t--검정-편향-문제"><span class="glyphicon glyphicon-pushpin"></span><span class="math inline">\(t-\)</span> 검정 편향 문제</h3>
+</div>
+<div class="panel-body">
+<p><span class="math inline">\(t-\)</span>검정은 표본 크기에 따라 편향되는 문제가 있어 코헨-d (Cohen d)가 일반적인 효과크기 추정치가 된다.</p>
+<p>코헨-d는 다음과 같이 정의된다.</p>
+<p><span class="math inline">\(d = \frac{\bar{x}_1 - \bar{x}_2}{s}\)</span></p>
+<p>여기서, <span class="math inline">\(s = \sqrt{\frac{(n_1-1)s^2_1 + (n_2-1)s^2_2}{n_1+n_2 - 2}}\)</span>는 두 표준편차를 합동하여 합친 것이 된다.</p>
+</div>
+</aside>
+<p>두 집단간 평균의 차이를 검증할 때 또 확인해야 되는 사항이 등분산성 검정이다. 두 집단의 분산이 동일해야 여기에서 추론하는 결론이 유의미할 수 있다. 등분산성 가정을 검정하는 방법이 <a href="https://en.wikipedia.org/wiki/Levene%27s_test">레빈 검정(Levene’s test)</a>이다. 따라서 독립 <span class="math inline">\(t-\)</span>검정을 시작하기 전에 레빈 검정을 통해 등분산성이 만족되는지 사전에 확인하고 이게 충족되면 <span class="math inline">\(t-\)</span>검정 혹은 분산분석으로 넘어가고 그렇지 않는 경우 비모수 검정이나 일반화된 웰치 <span class="math inline">\(t-\)</span>검정(Welch’s <span class="math inline">\(t-\)</span>test)로 넘어간다. 웰치 <span class="math inline">\(t-\)</span>검정의 또다른 이름은 이분산(unequal variance) <span class="math inline">\(t-\)</span> 검정으로 <span class="math inline">\(t-\)</span> 검정을 일반화한 것이다.</p>
+<p>즉, 등분산성 가정이 만족되지 않고, 두집단간 표본크기가 불균형된 경우 웰치 <span class="math inline">\(t-\)</span>검정을 우선 검토한다.</p>
+<p><span class="math inline">\(W = \frac{(N-k)}{(k-1)} \frac{\sum_{i=1}^k N_i (Z_{i\cdot}-Z_{\cdot\cdot})^2} {\sum_{i=1}^k \sum_{j=1}^{N_i} (Z_{ij}-Z_{i\cdot})^2}\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(readr))
+t.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/t-test-data.csv&quot;</span>, <span class="dt">col_names =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre class="output"><code>Parsed with column specification:
+cols(
+  cond = col_character(),
+  pre = col_integer(),
+  post = col_integer(),
+  gain = col_integer(),
+  train = col_integer()
+)
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 레빈 등분산 검정</span>
+<span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(car))
+<span class="kw">levene.test</span>(t.dat$gain, t.dat$cond)</code></pre></div>
+<pre class="error"><code>Warning: &#39;levene.test&#39; is deprecated.
+Use &#39;leveneTest&#39; instead.
+See help(&quot;Deprecated&quot;) and help(&quot;car-deprecated&quot;).
+</code></pre>
+<pre class="error"><code>Warning in leveneTest.default(...): t.dat$cond coerced to factor.
+</code></pre>
+<pre class="output"><code>Levene&#39;s Test for Homogeneity of Variance (center = median)
+      Df F value Pr(&gt;F)
+group  1  2.5024  0.122
+      38               
+</code></pre>
+<p><span class="math inline">\(t-\)</span>검정을 R에서 수행하는 방법은 <code>t.test</code> 함수를 사용하고 인자로 <code>var.equal</code>을 설정하여 명시적으로 수행한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 독립 t-검정</span>
+<span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(dplyr))
+t.dat.t08 &lt;-<span class="st"> </span>t.dat %&gt;%<span class="st"> </span><span class="kw">filter</span>(cond ==<span class="st"> &quot;t08&quot;</span>)
+t.dat.t19 &lt;-<span class="st"> </span>t.dat %&gt;%<span class="st"> </span><span class="kw">filter</span>(cond ==<span class="st"> &quot;t19&quot;</span>)
+
+<span class="kw">t.test</span>(t.dat.t08$gain, t.dat.t19$gain, <span class="dt">var.equal =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre class="output"><code>
+    Two Sample t-test
+
+data:  t.dat.t08$gain and t.dat.t19$gain
+t = -8.9677, df = 38, p-value = 6.443e-11
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -5.209412 -3.290588
+sample estimates:
+mean of x mean of y 
+     1.35      5.60 
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 코헨 d</span>
+<span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(lsr))
+<span class="kw">cohensD</span>(t.dat.t08$gain, t.dat.t19$gain, <span class="dt">method =</span> <span class="st">&quot;pooled&quot;</span>)</code></pre></div>
+<pre class="output"><code>[1] 2.835822
+</code></pre>
+<h3 id="쌍체-t-검정">1.4. 쌍체 <span class="math inline">\(t-\)</span>검정</h3>
+<p>독립 <span class="math inline">\(t-\)</span>검정과 비교하여 종속 <span class="math inline">\(t-\)</span>검정이라고 하고 동일한 사용자가 반복해서 특정 요인에 차이가 있는지 검정할 때 사용된다. 각 사용자마다 전후 평균 차이를 검정한다.</p>
+<p>유의성 검정은 표본 크기에 따라 편향이 발생하게 된다. 표본 크기가 커지게 되면 표준오차가 작아지게 된다. 표본 크기가 클 때, 관측된 작은 차이도 “통계적 유의성”을 갖게 된다. <strong>효과크기(effect size)</strong>는 효과의 크기를 추정한다.</p>
+<p><strong>코헨 d</strong> 는 표준오차가 아닌 표준 편차로 나눈다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 쌍체 t-검정</span>
+<span class="kw">t.test</span>(t.dat$post, t.dat$pre, <span class="dt">paired =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<pre class="output"><code>
+    Paired t-test
+
+data:  t.dat$post and t.dat$pre
+t = 8.4158, df = 39, p-value = 2.662e-10
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 2.639805 4.310195
+sample estimates:
+mean of the differences 
+                  3.475 
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 코헨 d t-검정</span>
+<span class="kw">cohensD</span>(t.dat$post, t.dat$pre, <span class="dt">method =</span> <span class="st">&quot;paired&quot;</span>)</code></pre></div>
+<pre class="output"><code>[1] 1.330659
+</code></pre>
+<h2 id="ab검정에-활용되는-일반적-통계량">2. A/B검정에 활용되는 일반적 통계량</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">가정한 분포</th>
+<th align="left">사례</th>
+<th align="left">일반적 검정</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">정규 분포</td>
+<td align="left">구매고객 평균 매출</td>
+<td align="left">웰치 <span class="math inline">\(t-\)</span>검정</td>
+</tr>
+<tr class="even">
+<td align="left">이항 분포</td>
+<td align="left">클릭율(CTR)</td>
+<td align="left">피셔의 정확검정</td>
+</tr>
+<tr class="odd">
+<td align="left">포아송 분포</td>
+<td align="left">구매고객 평균 매매량</td>
+<td align="left">E-검정</td>
+</tr>
+<tr class="even">
+<td align="left">다항 분포</td>
+<td align="left">제품별 구매 수량</td>
+<td align="left">카이 제곱 검정</td>
+</tr>
+<tr class="odd">
+<td align="left">분포 가정 없음</td>
+<td align="left"></td>
+<td align="left">만-위트니 U 검정</td>
+</tr>
+</tbody>
+</table>
+<h3 id="피셔의-정확검정을-통한-광고-연결률-효과-분석-fisher-exact-ctr">2.1. 피셔의 정확검정을 통한 광고 연결률 효과 분석 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<p>광고 A <a href="http://terms.naver.com/entry.nhn?docId=819411&amp;cid=42344&amp;categoryId=42344">광고 연결률(CTR, click through rates)</a>이 1.1%, 광고 B 클릭율이 1.3% 으로 나왔다면 1.3% &gt; 1.1% 로직으로 광고 A가 더 좋을까? 그럴수도 그렇지 않을 수도 있다.</p>
+<p>사용자 1,000명 대상 광고 효과를 A/B 검정하면 유의적이지 않지만, 100,000 명 대상으로 광고효과를 검정하면 유의적으로 파악된다. 동일한 1.3%, 1.1% 광고 연결률이지만 사용대상자 숫자에 따라 통계적 추론을 달라진다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 1. 피셔의 정확검정(Fisher&#39;s exact test)--------------------------</span>
+## 1,000 번 사례
+ad_1000 &lt;-<span class="st">  </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">11</span>, <span class="dv">13</span>, <span class="dv">989</span>, <span class="dv">987</span>), <span class="dt">nrow =</span> <span class="dv">2</span>,
+                  <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="dt">ads   =</span> <span class="kw">c</span>(<span class="st">&quot;Ad A&quot;</span>, <span class="st">&quot;Ad B&quot;</span>),
+                                  <span class="dt">click =</span> <span class="kw">c</span>(<span class="st">&quot;Click&quot;</span>, <span class="st">&quot;No Click&quot;</span>)))
+ad_1000</code></pre></div>
+<pre class="output"><code>      click
+ads    Click No Click
+  Ad A    11      989
+  Ad B    13      987
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">fisher.test</span>(ad_1000, <span class="dt">alternative =</span> <span class="st">&quot;two.sided&quot;</span>)</code></pre></div>
+<pre class="output"><code>
+    Fisher&#39;s Exact Test for Count Data
+
+data:  ad_1000
+p-value = 0.8378
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+ 0.3407936 2.0539927
+sample estimates:
+odds ratio 
+  0.844515 
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 100,000 번 사례
+ad_100000 &lt;-<span class="st">  </span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1100</span>, <span class="dv">1300</span>, <span class="dv">98900</span>, <span class="dv">98700</span>), <span class="dt">nrow =</span> <span class="dv">2</span>,
+                  <span class="dt">dimnames =</span> <span class="kw">list</span>(<span class="dt">ads   =</span> <span class="kw">c</span>(<span class="st">&quot;Ad A&quot;</span>, <span class="st">&quot;Ad B&quot;</span>),
+                                  <span class="dt">click =</span> <span class="kw">c</span>(<span class="st">&quot;Click&quot;</span>, <span class="st">&quot;No Click&quot;</span>)))
+ad_100000</code></pre></div>
+<pre class="output"><code>      click
+ads    Click No Click
+  Ad A  1100    98900
+  Ad B  1300    98700
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">fisher.test</span>(ad_100000, <span class="dt">alternative =</span> <span class="st">&quot;two.sided&quot;</span>)</code></pre></div>
+<pre class="output"><code>
+    Fisher&#39;s Exact Test for Count Data
+
+data:  ad_100000
+p-value = 4.335e-05
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+ 0.7782170 0.9162075
+sample estimates:
+odds ratio 
+ 0.8444445 
+</code></pre>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="http://www.lunametrics.com/blog/2014/07/01/statistical-significance-test/">The Only* Statistical Significance Test You Need</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

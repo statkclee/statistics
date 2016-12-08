@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: </title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-59802572-17', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <h1 class="title"></h1>
+          <h1 id="데이터-과학-기초-통계">데이터 과학 – 기초 통계</h1>
+<section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>A/B 검정(A/B Testing)이 필요한 사유를 살펴본다.</li>
+<li>A/B 검정의 이론적 토대를 살펴본다.</li>
+<li>A/B 검정 사례를 살펴본다.</li>
+</ul>
+</div>
+</section>
+<h2 id="ab-검정">1. A/B 검정</h2>
+<p>A/B 검정은 통계 가설 검정을 상업적 영역으로 확대한 것으로 구글에 의해 일반화 되었고, 2011년 기준 구글에서 7,000 가지가 넘는 A/B 검정을 돌리는 것으로 보고되고 있다.</p>
+<p>웹사이트를 개발할 때, 두가지 실험군(treatment)과 대조군(control)으로 나눠 실험군에는 대조군과 한가지만 다른 설정을 하고 유입되는 고객을 임의로 예를 들어 50:50으로 나눠 배치한다. 그리고 나서 CTR(Click-Through-Rate)을 비교하여 광고 연결률의 유의미한 차이를 검정한다.</p>
+<p><img src="fig/A-B-testing-example.png" alt="A/B 검정 사례" width="37%" /></p>
+<h3 id="ab-검정-주제-선정-ab-testing-objectives">1.1. A/B 검정 주제 선정 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<p>A/B 검정을 통한 전통적인 주제는 다음과 같다.</p>
+<ul>
+<li>상품 종류, 가격, 위치 등 최적화</li>
+<li>전자우편 메시지나 푸시 메시지의 제목/본문 등 설정 최적화</li>
+<li>회원가입 양식, 주문 양식 등 각종 항목 순서 등 배치 최적화</li>
+<li>웹사이트 네비게이션 UI 배치와 문구 등 설치 최적화</li>
+<li>회원 가입, 구매 버튼의 위치, 색상, 문구 등 설정 최적화</li>
+</ul>
+<p><img src="fig/stat-ab-testing-banner.png" alt="A/B 검정 배너 사례" width="37%" /></p>
+<p>게임에 있어 A/B 검정 최적화 주제로 검토가능한 것은 다음과 같다.</p>
+<ul>
+<li>MMORPG 게임에서 특정 재화를 투여할 경우 인플레이션이 발생할까?</li>
+<li>적절한 아이템 드랍률은 얼마인가?</li>
+<li>광고홍보 무료 아이템의 성능의 성능은 적절한가?</li>
+<li>게임 스테이지별로 적절하게 난이도가 증가하고 있는가?</li>
+<li>특정 던젼의 난이도는 다른 던젼과 비교하여 높은가?</li>
+<li>레벨 설계에 고려되었던 특정 요소가 잘 반영되어 기대한 게임 패턴이 관측되는가?</li>
+<li>매크로 지능이 설계한 것처럼 게임맵에서 동작하고 있는가?</li>
+<li>게임 사용자 실력 평가 알고리즘이 적절한가?</li>
+<li>PvP 매칭 알고리즘이 적절한가?</li>
+</ul>
+<h2 id="ab-검정-효과-분석-google-causal-impact-google-causal-impact-paper">2. A/B 검정 효과 분석 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></h2>
+<p>A/B 검정의 효과를 베이지안 시계열 팩키지를 활용하여 계량화한다. <a href="https://github.com/google/CausalImpact">CausalImpact</a> 팩키지에 나온 예제는 ARIMA 모형에서 표본을 추출하여 ‘2014-01-01’ 이후 100일을 기간으로 놓고, 70 일을 사전 기간, 30 일을 사후 기간을 비교하여 <code>CausalImpact</code> 함수에 넣어 A/B 검정 사전,사후 기간 효과를 시각화하고 보고서로 요약한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정----------------------------------------------</span>
+<span class="co"># install.packages(&quot;BoomSpikeSlab&quot;) # CausalImpact 의존성으로 사전 설치</span>
+<span class="co"># devtools::install_github(&quot;google/CausalImpact&quot;)</span>
+<span class="co"># suppressPackageStartupMessages(library(CausalImpact))</span>
+<span class="co"># suppressPackageStartupMessages(library(xts)) # 시계열 분석</span>
+
+<span class="co"># 1. 데이터 생성----------------------------------------------</span>
+<span class="kw">set.seed</span>(<span class="dv">1</span>)
+x1 &lt;-<span class="st"> </span><span class="dv">100</span> +<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">ar =</span> <span class="fl">0.999</span>), <span class="dt">n =</span> <span class="dv">100</span>)
+y &lt;-<span class="st"> </span><span class="fl">1.2</span> *<span class="st"> </span>x1 +<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>)
+y[<span class="dv">71</span>:<span class="dv">100</span>] &lt;-<span class="st"> </span>y[<span class="dv">71</span>:<span class="dv">100</span>] +<span class="st"> </span><span class="dv">10</span>
+data &lt;-<span class="st"> </span><span class="kw">cbind</span>(y, x1)
+
+time_points &lt;-<span class="st"> </span><span class="kw">seq.Date</span>(<span class="kw">as.Date</span>(<span class="st">&quot;2014-01-01&quot;</span>), <span class="dt">by =</span> <span class="dv">1</span>, <span class="dt">length.out =</span> <span class="dv">100</span>)
+data_zoo &lt;-<span class="st"> </span><span class="kw">zoo</span>(data, time_points)
+
+<span class="kw">head</span>(data_zoo)</code></pre></div>
+<pre class="output"><code>                  y       x1
+2014-01-01 105.2950 88.21513
+2014-01-02 105.8943 88.48415
+2014-01-03 106.6209 87.87684
+2014-01-04 106.1572 86.77954
+2014-01-05 101.2812 84.62243
+2014-01-06 101.4484 84.60650
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 2. A/B 검정 기간 설정----------------------------------------------</span>
+pre_period &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span class="kw">c</span>(<span class="st">&quot;2014-01-01&quot;</span>, <span class="st">&quot;2014-03-11&quot;</span>))
+post_period &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span class="kw">c</span>(<span class="st">&quot;2014-03-12&quot;</span>, <span class="st">&quot;2014-04-10&quot;</span>))
+
+<span class="co"># 3. A/B 검정 효과 분석----------------------------------------------</span>
+impact &lt;-<span class="st"> </span><span class="kw">CausalImpact</span>(data_zoo, pre_period, post_period)
+<span class="kw">plot</span>(impact)</code></pre></div>
+<pre class="error"><code>Warning: Removed 100 rows containing missing values (geom_path).
+</code></pre>
+<pre class="error"><code>Warning: Removed 200 rows containing missing values (geom_path).
+</code></pre>
+<p><img src="fig/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(impact, <span class="st">&quot;report&quot;</span>)</code></pre></div>
+<pre class="output"><code>Analysis report {CausalImpact}
+
+
+During the post-intervention period, the response variable had an average value of approx. 117.05. By contrast, in the absence of an intervention, we would have expected an average response of 106.54. The 95% interval of this counterfactual prediction is [105.83, 107.25]. Subtracting this prediction from the observed response yields an estimate of the causal effect the intervention had on the response variable. This effect is 10.51 with a 95% interval of [9.80, 11.22]. For a discussion of the significance of this effect, see below.
+
+Summing up the individual data points during the post-intervention period (which can only sometimes be meaningfully interpreted), the response variable had an overall value of 3.51K. By contrast, had the intervention not taken place, we would have expected a sum of 3.20K. The 95% interval of this prediction is [3.17K, 3.22K].
+
+The above results are given in terms of absolute numbers. In relative terms, the response variable showed an increase of +10%. The 95% interval of this percentage is [+9%, +11%].
+
+This means that the positive effect observed during the intervention period is statistically significant and unlikely to be due to random fluctuations. It should be noted, however, that the question of whether this increase also bears substantive significance can only be answered by comparing the absolute effect (10.51) to the original goal of the underlying intervention.
+
+The probability of obtaining this effect by chance is very small (Bayesian one-sided tail-area probability p = 0.001). This means the causal effect can be considered statistically significant. 
+</code></pre>
+<h2 id="ab-검정-모형">3. A/B 검정 모형</h2>
+<p>A/B 검정을 구성하는 요소는 다음과 같다.</p>
+<ul>
+<li>측정단위: 사용자, 점포, 도시 등</li>
+<li>표본추출: 독립 임의화[랜덤화,확률화] 블록 설계를 통한 <span class="math inline">\(t-\)</span> 검정, 쌍체 <span class="math inline">\(t-\)</span> 검정
+<ul>
+<li>실험군(50%)과 대조군(50%)</li>
+</ul></li>
+<li>종속변수: 매출액, 광고 연결률 등 실험에서 확인하고자 하는 목표</li>
+<li>독립변수: 종속변수에 영향을 주는 요인
+<ul>
+<li>실험변수: 실험의 핵심 변수로 대조군에는 적용하지 않고, 실험군에만 적용되는 변수</li>
+<li>통제변수: 실험의 대표성을 높이기 위해 인구통제학적인, 환경적인 요인을 유사하게 맞춰주는 변수</li>
+<li>교략변수(Lurking, Confounding Varaible): 독립변수와 종속변수 모두 상관되는 외생 변수로, 아이스크림 판매량과 익사하는 사람수 관계(온도), 출생 순서와 다운증후군 연관성(산모 나이)을 예로 들 수 있다.</li>
+</ul></li>
+</ul>
+<h2 id="ab-검정-기본-변수">3. A/B 검정 기본 변수</h2>
+<h3 id="데이터-기본-변수-ctr-prediction">3.1. 데이터 기본 변수 <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h3>
+<p>광고 연결률(CTR, click through rates)을 예측하는데 디바이스, 날짜/시간, 웹사이트, 네트워크 연결, 배너 배치, 앱 정보등을 수집하여 이를 바탕으로 광고 클릭을 연결과 실패로 구분하여 예측한다.</p>
+<p><img src="fig/stat-ab-testing-overview.png" alt="A/B 검정 개요" width="77%" /></p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="http://boxnwhis.kr/2015/01/29/a_b_testing_online_games.html">온라인 게임에서의 A/B 테스팅</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="http://google.github.io/CausalImpact/CausalImpact.html">CausalImpact</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="http://research.google.com/pubs/pub41854.html">Inferring causal impact using Bayesian structural time-series models</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p><a href="http://www.montis.pmf.ac.me/vol32/15.pdf">CLICK-THROUGH RATE PREDICTION – TOP-5 SOLUTION FOR THE AVAZU CONTEST</a><a href="#fnref4">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>
