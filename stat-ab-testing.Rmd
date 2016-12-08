@@ -129,3 +129,17 @@ A/B 검정을 구성하는 요소는 다음과 같다.
 
 <img src="fig/stat-ab-testing-overview.png" alt="A/B 검정 개요" width="77%" />
 
+## 4. 광고 최적화 A/B 검정
+
+효과적인 광고집행을 통해 사업목표 달성에 추진력을 갖을 수 있다. 온라인 사업분야에서 광고를 활용할 수 있는 도구는 단계별로 구분되어진다.
+
+1. 노출횟수(Impression): 노출횟수를 늘려 브랜드를 각인시킨다. 다양한 조합을 통한 브랜드 각인 효과를 A/B 검정을 통해 확인한다.
+1. 광고연계율(Click Trhough Ratio, CTR): 클릭율을 높일 수 있는 메시지 및 콘텐츠 최적화를 위해 A/B 검정을 수행한다.
+1. 행동/설치 비용(Cost Per Action/Install, CPA/CPI): 클릭을 통해 유입된 고객의 전환율(Conversion Rate)을 높이기 위해 다양한 A/B 검정을 수행한다.
+1. 광고비용 최적화: 주어진 전환율에 대한 광고집행 비용 최소화도 함께 진행한다.
+1. 고객생애가치(Lifetime Value, LTV): 사용자로 등록되는 순간 고객생애가치를 극대화한다.
+
+$LTV = \begin{equation}	\sum_{t=1}^{N} \frac{(R_t -C_t) \times r_t}{(1+i)^t} -\text{AC}	\end{equation}$
+
+<img src="fig/stat-ab-testing-ads.png" alt="광고 A/B 검정 활용" width="77%" />
+
