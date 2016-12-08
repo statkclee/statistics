@@ -16,15 +16,7 @@ mainfont: NanumGothic
 ---
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-library(tidyverse)
-library(CausalImpact)
-library(xts)
-library(stringr)
-library(ggplot2)
-library(scales)
-```
+
 
 > ## 학습 목표 {.objectives}
 >
@@ -80,7 +72,8 @@ A/B 검정의 효과를 베이지안 시계열 팩키지를 활용하여 계량�
 A/B 검정 사전,사후 기간 효과를 시각화하고 보고서로 요약한다.
 
 
-``` {r}
+
+~~~
 # 0. 환경설정----------------------------------------------
 # install.packages("BoomSpikeSlab") # CausalImpact 의존성으로 사전 설치
 # devtools::install_github("google/CausalImpact")
@@ -98,7 +91,25 @@ time_points <- seq.Date(as.Date("2014-01-01"), by = 1, length.out = 100)
 data_zoo <- zoo(data, time_points)
 
 head(data_zoo)
+~~~
+{: .r}
 
+
+
+~~~
+                  y       x1
+2014-01-01 105.2950 88.21513
+2014-01-02 105.8943 88.48415
+2014-01-03 106.6209 87.87684
+2014-01-04 106.1572 86.77954
+2014-01-05 101.2812 84.62243
+2014-01-06 101.4484 84.60650
+~~~
+{: .output}
+
+
+
+~~~
 # 2. A/B 검정 기간 설정----------------------------------------------
 pre_period <- as.Date(c("2014-01-01", "2014-03-11"))
 post_period <- as.Date(c("2014-03-12", "2014-04-10"))
@@ -106,9 +117,47 @@ post_period <- as.Date(c("2014-03-12", "2014-04-10"))
 # 3. A/B 검정 효과 분석----------------------------------------------
 impact <- CausalImpact(data_zoo, pre_period, post_period)
 plot(impact)
+~~~
+{: .r}
 
+
+
+~~~
+Warning: Removed 100 rows containing missing values (geom_path).
+~~~
+{: .error}
+
+
+
+~~~
+Warning: Removed 200 rows containing missing values (geom_path).
+~~~
+{: .error}
+
+<img src="../fig/rmd-unnamed-chunk-2-1.png" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;" />
+
+~~~
 summary(impact, "report")
-```
+~~~
+{: .r}
+
+
+
+~~~
+Analysis report {CausalImpact}
+
+
+During the post-intervention period, the response variable had an average value of approx. 117.05. By contrast, in the absence of an intervention, we would have expected an average response of 106.54. The 95% interval of this counterfactual prediction is [105.83, 107.25]. Subtracting this prediction from the observed response yields an estimate of the causal effect the intervention had on the response variable. This effect is 10.51 with a 95% interval of [9.80, 11.22]. For a discussion of the significance of this effect, see below.
+
+Summing up the individual data points during the post-intervention period (which can only sometimes be meaningfully interpreted), the response variable had an overall value of 3.51K. By contrast, had the intervention not taken place, we would have expected a sum of 3.20K. The 95% interval of this prediction is [3.17K, 3.22K].
+
+The above results are given in terms of absolute numbers. In relative terms, the response variable showed an increase of +10%. The 95% interval of this percentage is [+9%, +11%].
+
+This means that the positive effect observed during the intervention period is statistically significant and unlikely to be due to random fluctuations. It should be noted, however, that the question of whether this increase also bears substantive significance can only be answered by comparing the absolute effect (10.51) to the original goal of the underlying intervention.
+
+The probability of obtaining this effect by chance is very small (Bayesian one-sided tail-area probability p = 0.001). This means the causal effect can be considered statistically significant. 
+~~~
+{: .output}
 
 ## 3. A/B 검정 모형
 
