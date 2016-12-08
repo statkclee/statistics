@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="generator" content="pandoc">
-    <title>Software Carpentry: </title>
+    <title>Software Carpentry: 데이터 과학 – 기초 통계</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
@@ -37,9 +37,9 @@
       <article>
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
-                    <h1 class="title"></h1>
-          <h1 id="데이터-과학-기초-통계">데이터 과학 – 기초 통계</h1>
-<section class="objectives panel panel-warning">
+                    <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
+          <h2 class="subtitle">A/B 검정(A/B Testing)</h2>
+          <section class="objectives panel panel-warning">
 <div class="panel-heading">
 <h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
 </div>
@@ -111,11 +111,11 @@ post_period &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span 
 <span class="co"># 3. A/B 검정 효과 분석----------------------------------------------</span>
 impact &lt;-<span class="st"> </span><span class="kw">CausalImpact</span>(data_zoo, pre_period, post_period)
 <span class="kw">plot</span>(impact)</code></pre></div>
-<pre class="error"><code>Warning: Removed 100 rows containing missing values (geom_path).
+<pre class="output"><code>Warning: Removed 100 rows containing missing values (geom_path).
 </code></pre>
-<pre class="error"><code>Warning: Removed 200 rows containing missing values (geom_path).
+<pre class="output"><code>Warning: Removed 200 rows containing missing values (geom_path).
 </code></pre>
-<p><img src="fig/unnamed-chunk-2-1.png" style="display: block; margin: auto;" /></p>
+<p><img src="fig/unnamed-chunk-2-1.png" title="plot of chunk unnamed-chunk-2" alt="plot of chunk unnamed-chunk-2" style="display: block; margin: auto;" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(impact, <span class="st">&quot;report&quot;</span>)</code></pre></div>
 <pre class="output"><code>Analysis report {CausalImpact}
 
@@ -150,6 +150,17 @@ The probability of obtaining this effect by chance is very small (Bayesian one-s
 <h3 id="데이터-기본-변수-ctr-prediction">3.1. 데이터 기본 변수 <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h3>
 <p>광고 연결률(CTR, click through rates)을 예측하는데 디바이스, 날짜/시간, 웹사이트, 네트워크 연결, 배너 배치, 앱 정보등을 수집하여 이를 바탕으로 광고 클릭을 연결과 실패로 구분하여 예측한다.</p>
 <p><img src="fig/stat-ab-testing-overview.png" alt="A/B 검정 개요" width="77%" /></p>
+<h2 id="광고-최적화-ab-검정">4. 광고 최적화 A/B 검정</h2>
+<p>효과적인 광고집행을 통해 사업목표 달성에 추진력을 갖을 수 있다. 온라인 사업분야에서 광고를 활용할 수 있는 도구는 단계별로 구분되어진다.</p>
+<ol style="list-style-type: decimal">
+<li>노출횟수(Impression): 노출횟수를 늘려 브랜드를 각인시킨다. 다양한 조합을 통한 브랜드 각인 효과를 A/B 검정을 통해 확인한다.</li>
+<li>광고연계율(Click Trhough Ratio, CTR): 클릭율을 높일 수 있는 메시지 및 콘텐츠 최적화를 위해 A/B 검정을 수행한다.</li>
+<li>행동/설치 비용(Cost Per Action/Install, CPA/CPI): 클릭을 통해 유입된 고객의 전환율(Conversion Rate)을 높이기 위해 다양한 A/B 검정을 수행한다.</li>
+<li>광고비용 최적화: 주어진 전환율에 대한 광고집행 비용 최소화도 함께 진행한다.</li>
+<li>고객생애가치(Lifetime Value, LTV): 사용자로 등록되는 순간 고객생애가치를 극대화한다.</li>
+</ol>
+<p><span class="math inline">\(LTV = \begin{equation} \sum_{t=1}^{N} \frac{(R_t -C_t) \times r_t}{(1+i)^t} -\text{AC} \end{equation}\)</span></p>
+<p><img src="fig/stat-ab-testing-ads.png" alt="광고 A/B 검정 활용" width="77%" /></p>
 <div class="footnotes">
 <hr />
 <ol>

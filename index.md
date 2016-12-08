@@ -25,7 +25,7 @@ title: 데이터 과학 -- 기초 통계
 
 1. [실험 유형 구분](stat-coursera-doe.html)
     * [자주 사용하는 검정](stat-testing.html)
-    * [단일 표본 비율검정 -- 웹사이트 선호도 분석](stat-coursear-prop-test.html)
+    * [단일 표본 비율검정 -- 웹사이트 선호도 분석](stat-coursera-prop-test.html)
     * [A/B 검정(A/B Testing)](stat-ab-testing.html)
     * [측정 척도(Scales of Measurement)](stat-measurement.html)
 1. [채팅 로그](stat-chatting-log.html)
