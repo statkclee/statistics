@@ -24,10 +24,10 @@ title: 데이터 과학 -- 기초 통계
 ## 학습목차 
 
 1. [실험 유형 구분](stat-coursera-doe.html)
-    * [자주 사용하는 검정](stat-testing.html)
-    * [단일 표본 비율검정 -- 웹사이트 선호도 분석](stat-coursera-prop-test.html)
-    * [A/B 검정(A/B Testing)](stat-ab-testing.html)
-    * [측정 척도(Scales of Measurement)](stat-measurement.html)
+    - [측정 척도(Scales of Measurement)](stat-measurement.html)
+    - [A/B 검정(A/B Testing)](stat-ab-testing.html)
+    - [실무에서 자주 활용되는 검정($t$-검정)](stat-testing.html)
+    - [단일 표본 비율검정 -- 웹사이트 선호도 분석](stat-coursera-prop-test.html)
 1. [채팅 로그](stat-chatting-log.html)
 1. [베이즈 정리](stat-bayes.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
