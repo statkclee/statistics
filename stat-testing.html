@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="generator" content="pandoc">
-    <title>Software Carpentry: </title>
+    <title>Software Carpentry: 데이터 과학 – 기초 통계</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
@@ -37,21 +37,23 @@
       <article>
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
-                    <h1 class="title"></h1>
-          <h1 id="데이터-과학-기초-통계">데이터 과학 – 기초 통계</h1>
-<section class="objectives panel panel-warning">
+                    <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
+          <h2 class="subtitle">실무에서 자주 활용되는 검정(<span class="math inline">\(t\)</span>-검정)</h2>
+          <section class="objectives panel panel-warning">
 <div class="panel-heading">
 <h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
 </div>
 <div class="panel-body">
 <ul>
 <li>실무에서 자주 사용하는 검정에 대해 살펴본다.</li>
+<li>세가지 <span class="math inline">\(t-\)</span>검정에 대해 이해하고 단계별 확인사항을 점검한다.</li>
+<li><span class="math inline">\(t-\)</span>검정과 A/B 검정의 연결점을 파앟ㄱ한다.</li>
 </ul>
 </div>
 </section>
-<h3 id="언제-z-검정과-t-검정을-사용해야-할까">1. 언제 <span class="math inline">\(z-\)</span>검정과 <span class="math inline">\(t-\)</span>검정을 사용해야 할까?</h3>
+<h2 id="언제-z-검정과-t-검정을-사용해야-할까">1. 언제 <span class="math inline">\(z-\)</span>검정과 <span class="math inline">\(t-\)</span>검정을 사용해야 할까?</h2>
 <p>표본평균과 모평균을 비교할 때 <span class="math inline">\(z-\)</span>검정과 <span class="math inline">\(t-\)</span>검정을 사용하지만 결정적인 차이는 모집단 표준편차(SD)를 아느냐 모르냐에 따라 달라진다. 일반적인 경우 모집단 표준편차를 알지 못한다.</p>
-<h2 id="가지-검정-비교">1.1. 4가지 검정 비교</h2>
+<h3 id="가지-검정-비교">1.1. 4가지 검정 비교</h3>
 <p><span class="math inline">\(z-\)</span>검정, 단일 표본 <span class="math inline">\(t-\)</span>검정, 쌍체 <span class="math inline">\(t-\)</span> 검정, 독립 <span class="math inline">\(t-\)</span>검정 이 네가지 검정은 평균을 비교하는데 많이 사용되는 통계적 검정이다. 데이터에서 관측값(Observed)을 얻고, 기대값(Expected)을 빼고 이를 표준오차로 나누어서 평균 비교작업을 수행한다.</p>
 <table>
 <thead>
@@ -94,7 +96,106 @@
 <p>귀무가설 유의성검정(Null Hypothesis Significance Testing, NHST) 얼개에 따르면, 귀무가설은 효과가 없다가 된다. 표준오차는 표본크기가 증가함에 따라 감소하게 된다.</p>
 <p><span class="math inline">\(\textrm{표준오차}\downarrow = \frac{\textrm{모 표준편차}}{\sqrt{\textrm{표본 크기}\uparrow}}\)</span></p>
 <p><span class="math inline">\(p-\)</span>값은 확률값(Probability Value)를 줄인 것으로 귀무가설이 참일 때 조건부 확률값이 된다. 표준오차는 우연에 의한 차이로 볼 수 있는데, 우연의 차이가 아닌 유의성을 주장하려면 적어도 <strong><span class="math inline">\(2 \times\)</span> 표준편차</strong> 보다 차이가 나야 된다.</p>
-<h3 id="독립-t-검정">1.3. 독립 <span class="math inline">\(t-\)</span>검정</h3>
+<h2 id="t-검정">2. <span class="math inline">\(t-\)</span>검정</h2>
+<h3 id="일표본-t-검정-one-sample-t-test-raccoon">2.1. 일표본 <span class="math inline">\(t-\)</span>검정 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<p>모집단 모수 (<span class="math inline">\(\mu\)</span>)를 알고 있는 경우, 데이터를 통해 모수가 변경되었는지를 통계적 검정을 수행한다.</p>
+<p>이론적 화학 반응온도가 180도임을 알고 있는데, 정말 반응온도가 180도인가를 데이터를 통해 검정한다. <code>qdata</code> 팩키지에서 <code>reaction</code> 데이터를 뽑아낸다. 그리고, 기술통계량과 기본 시각화를 통해 데이터를 이해한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># devtools::install_github(repo = &quot;quantide/qdata&quot;)</span>
+
+<span class="kw">require</span>(ggplot2)
+<span class="kw">require</span>(dplyr)
+<span class="kw">require</span>(gridExtra)
+<span class="kw">require</span>(tidyr)
+<span class="kw">require</span>(qdata)</code></pre></div>
+<pre class="output"><code>Loading required package: qdata
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">require</span>(lsr)
+<span class="kw">require</span>(nortest)
+<span class="kw">require</span>(car) 
+
+<span class="kw">data</span>(reaction) 
+
+<span class="co"># 1. t-검정---------------------------------------</span>
+<span class="co"># 목적: 화학반응이 180도 인지 검정</span>
+<span class="kw">data</span>(reaction)
+<span class="kw">glimpse</span>(reaction)</code></pre></div>
+<pre class="output"><code> num [1:10] 181 179 181 178 180 ...
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1.1. 기술통계량---------------------------------
+reaction &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">reaction=</span>reaction, <span class="dt">index=</span><span class="dv">1</span>:<span class="dv">10</span>)
+
+summary_stat &lt;-<span class="st"> </span>reaction %&gt;%<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">n=</span><span class="kw">n</span>(),
+                                        <span class="dt">min=</span><span class="kw">min</span>(reaction),
+                                        <span class="dt">first_qu=</span><span class="kw">quantile</span>(reaction, <span class="fl">0.25</span>),
+                                        <span class="dt">mean=</span><span class="kw">mean</span>(reaction),
+                                        <span class="dt">median=</span><span class="kw">median</span>(reaction),
+                                        <span class="dt">third_qu=</span><span class="kw">quantile</span>(reaction, <span class="fl">0.75</span>),
+                                        <span class="dt">max=</span><span class="kw">max</span>(reaction),
+                                        <span class="dt">sd=</span><span class="kw">sd</span>(reaction))
+
+<span class="kw">print</span>(summary_stat)</code></pre></div>
+<pre class="output"><code>   n   min first_qu   mean median third_qu   max       sd
+1 10 176.9  178.725 179.49  179.6   180.55 181.3 1.427079
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1.2. 데이터 시각화---------------------------------
+<span class="co"># 인덱스 갖는 시각화</span>
+ggp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> reaction, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">x=</span>index, <span class="dt">y=</span>reaction)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw">ylim</span>(<span class="kw">c</span>(<span class="dv">177</span>,<span class="dv">183</span>)) +
+<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;반응 온도&quot;</span>) +
+<span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;&quot;</span>) +
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="dv">180</span>, <span class="dt">color=</span><span class="st">&quot;red&quot;</span>) +
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept =</span> <span class="kw">mean</span>(reaction$reaction), <span class="dt">color=</span><span class="st">&quot;darkgreen&quot;</span>)
+
+ggp</code></pre></div>
+<p><img src="fig/one-sample-t-test-setup-1.png" title="plot of chunk one-sample-t-test-setup" alt="plot of chunk one-sample-t-test-setup" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 인덱스 없는 시각화</span>
+reaction$index &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>, <span class="dt">times=</span><span class="dv">10</span>)
+ggp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> reaction, <span class="dt">mapping=</span><span class="kw">aes</span>(<span class="dt">x=</span>reaction, <span class="dt">y=</span>index)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span><span class="kw">ylim</span>(<span class="kw">c</span>(-<span class="dv">2</span>,<span class="dv">2</span>)) +
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="dv">180</span>, <span class="dt">color=</span><span class="st">&quot;red&quot;</span>) +
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept =</span> <span class="kw">mean</span>(reaction$reaction), <span class="dt">color=</span><span class="st">&quot;darkgreen&quot;</span>) +
+<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;&quot;</span>) +
+<span class="st">  </span><span class="kw">xlab</span>(<span class="st">&quot;반응 온도&quot;</span>)+
+<span class="st">  </span><span class="kw">theme</span>(<span class="dt">axis.text.y=</span><span class="kw">element_blank</span>(), <span class="dt">axis.ticks=</span><span class="kw">element_blank</span>()) +
+<span class="st">  </span><span class="kw">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;반응온도 평균&quot;</span>, <span class="dt">x =</span> <span class="fl">178.8</span>, <span class="dt">y =</span> <span class="dv">2</span>, <span class="dt">size =</span> <span class="dv">4</span>, <span class="dt">colour =</span> <span class="st">&quot;darkgreen&quot;</span>) +
+<span class="st">  </span><span class="kw">annotate</span>(<span class="st">&quot;text&quot;</span>, <span class="dt">label =</span> <span class="st">&quot;이론 반응온도&quot;</span>, <span class="dt">x =</span> <span class="fl">180.3</span>, <span class="dt">y =</span> <span class="dv">2</span>, <span class="dt">size =</span> <span class="dv">4</span>, <span class="dt">colour =</span> <span class="st">&quot;red&quot;</span>)
+
+ggp</code></pre></div>
+<p><img src="fig/one-sample-t-test-setup-2.png" title="plot of chunk one-sample-t-test-setup" alt="plot of chunk one-sample-t-test-setup" style="display: block; margin: auto;" /></p>
+<p>일표본 <span class="math inline">\(t-\)</span>검정의 가정인 정규성을 앤더슨-다링(Anderson-Darling) 통계량을 활용하여 검정하고 분위수-분위수 그림(quantile-quantile plot, QQ-plot)을 통해 정규성을 확인한다.</p>
+<p>가정이 만족되었기 때문에, t.test() 함수를 활용하여 <code>mu=180</code> 인자를 넣어 가설검정하면, p-값이 0.05보다 크기 때문에 180과 차이는 우연에 의한 것으로 판정되어 이론적 반응온도는 여전히 180도라고 결론낼 수 있다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1.3. 가설검정---------------------------------
+<span class="co"># 정규분포 검정 통계량</span>
+<span class="kw">ad.test</span>(reaction$reaction)</code></pre></div>
+<pre class="output"><code>
+    Anderson-Darling normality test
+
+data:  reaction$reaction
+A = 0.25437, p-value = 0.6473
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 정규분포 QQ-플롯</span>
+ggp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> reaction, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">sample =</span> reaction)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">stat_qq</span>(<span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">intercept=</span><span class="kw">mean</span>(reaction),<span class="dt">slope=</span><span class="kw">sd</span>(reaction)), <span class="dt">color=</span><span class="st">&quot;red&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>)
+ggp</code></pre></div>
+<p><img src="fig/one-sample-t-test-1.png" title="plot of chunk one-sample-t-test" alt="plot of chunk one-sample-t-test" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># t-검정</span>
+
+<span class="kw">t.test</span>(reaction$reaction, <span class="dt">mu =</span> <span class="dv">180</span>)</code></pre></div>
+<pre class="output"><code>
+    One Sample t-test
+
+data:  reaction$reaction
+t = -1.1301, df = 9, p-value = 0.2876
+alternative hypothesis: true mean is not equal to 180
+95 percent confidence interval:
+ 178.4691 180.5109
+sample estimates:
+mean of x 
+   179.49 
+</code></pre>
+<h3 id="독립-t-검정-two-sample-t-test-raccoon">2.2. 독립 <span class="math inline">\(t-\)</span>검정 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></h3>
 <p>신규 기능이 소프트웨어에 추가되었는데 이에 대해 매출 효과가 발생했는지 측정하는데 있어, 한 사용자 집단은 기존 방식대로 기능을 제공하여 매출을 측정하고, 다른 사용자 집단은 신규 기능이 추가된 소프트웨어를 제공하여 유의적인 매출 증대효과가 있는지 검증할 때 독립 이표본 <span class="math inline">\(t-\)</span>검정을 사용한다.</p>
 <p><span class="math inline">\(t-\textrm{값} = \frac {\textrm{관측값} - \textrm{기대값}}{\textrm{표준오차}}\)</span></p>
 <p><span class="math inline">\(t = \frac{\bar {X}_1 - \bar{X}_2}{s_{X_1X_2} \cdot \sqrt{\frac{2}{n}}}\)</span></p>
@@ -110,81 +211,303 @@
 <p>여기서, <span class="math inline">\(s = \sqrt{\frac{(n_1-1)s^2_1 + (n_2-1)s^2_2}{n_1+n_2 - 2}}\)</span>는 두 표준편차를 합동하여 합친 것이 된다.</p>
 </div>
 </aside>
-<p>두 집단간 평균의 차이를 검증할 때 또 확인해야 되는 사항이 등분산성 검정이다. 두 집단의 분산이 동일해야 여기에서 추론하는 결론이 유의미할 수 있다. 등분산성 가정을 검정하는 방법이 <a href="https://en.wikipedia.org/wiki/Levene%27s_test">레빈 검정(Levene’s test)</a>이다. 따라서 독립 <span class="math inline">\(t-\)</span>검정을 시작하기 전에 레빈 검정을 통해 등분산성이 만족되는지 사전에 확인하고 이게 충족되면 <span class="math inline">\(t-\)</span>검정 혹은 분산분석으로 넘어가고 그렇지 않는 경우 비모수 검정이나 일반화된 웰치 <span class="math inline">\(t-\)</span>검정(Welch’s <span class="math inline">\(t-\)</span>test)로 넘어간다. 웰치 <span class="math inline">\(t-\)</span>검정의 또다른 이름은 이분산(unequal variance) <span class="math inline">\(t-\)</span> 검정으로 <span class="math inline">\(t-\)</span> 검정을 일반화한 것이다.</p>
+<p>두 집단간 평균의 차이를 검증할 때 또 확인해야 되는 사항이 등분산성 검정이다. 두 집단의 분산이 동일해야 여기에서 추론하는 결론이 유의미할 수 있다. 등분산성 가정을 검정하는 방법이 <a href="https://en.wikipedia.org/wiki/Levene%27s_test">레빈 검정(Levene test)</a>이다. 따라서 독립 <span class="math inline">\(t-\)</span>검정을 시작하기 전에 레빈 검정을 통해 등분산성이 만족되는지 사전에 확인하고 이게 충족되면 <span class="math inline">\(t-\)</span>검정 혹은 분산분석으로 넘어가고 그렇지 않는 경우 비모수 검정이나 일반화된 웰치 <span class="math inline">\(t-\)</span>검정(Welch <span class="math inline">\(t-\)</span>test)로 넘어간다. 웰치 <span class="math inline">\(t-\)</span>검정의 또다른 이름은 이분산(unequal variance) <span class="math inline">\(t-\)</span> 검정으로 <span class="math inline">\(t-\)</span> 검정을 일반화한 것이다.</p>
 <p>즉, 등분산성 가정이 만족되지 않고, 두집단간 표본크기가 불균형된 경우 웰치 <span class="math inline">\(t-\)</span>검정을 우선 검토한다.</p>
 <p><span class="math inline">\(W = \frac{(N-k)}{(k-1)} \frac{\sum_{i=1}^k N_i (Z_{i\cdot}-Z_{\cdot\cdot})^2} {\sum_{i=1}^k \sum_{j=1}^{N_i} (Z_{ij}-Z_{i\cdot})^2}\)</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(readr))
-t.dat &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;data/t-test-data.csv&quot;</span>, <span class="dt">col_names =</span> <span class="ot">TRUE</span>)</code></pre></div>
-<pre class="output"><code>Parsed with column specification:
-cols(
-  cond = col_character(),
-  pre = col_integer(),
-  post = col_integer(),
-  gain = col_integer(),
-  train = col_integer()
-)
+<h4 id="호르몬이-닭-성장에-미치는-영향">2.2.1. 호르몬이 닭 성장에 미치는 영향</h4>
+<p>두가지 호르몬이 있고 두 호르몬 차이가 닭 성장에 유의적인 영향을 미치는지 검정한다. 기술통계량을 통해 평균, 분산, 분위수 등을 확인하고 바이올린/상자 그림을 통해 호르몬간 닭성장에 차이가 있는지 살펴본다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 1. 이표본 t-검정---------------------------------------</span>
+<span class="co"># 목적: 호르몬이 닭 성장에 미치는 영향 측정</span>
+<span class="kw">data</span>(hormones)
+<span class="kw">glimpse</span>(hormones)</code></pre></div>
+<pre class="output"><code>Observations: 18
+Variables: 2
+$ hormone &lt;fctr&gt; A, A, A, A, A, A, A, A, A, A, B, B, B, B, B, B, B, B
+$ gain    &lt;int&gt; 615, 645, 840, 645, 365, 450, 530, 756, 785, 560, 870,...
 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 레빈 등분산 검정</span>
-<span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(car))
-<span class="kw">levene.test</span>(t.dat$gain, t.dat$cond)</code></pre></div>
-<pre class="error"><code>Warning: &#39;levene.test&#39; is deprecated.
-Use &#39;leveneTest&#39; instead.
-See help(&quot;Deprecated&quot;) and help(&quot;car-deprecated&quot;).
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1.1. 기술통계량 
+
+hormones %&gt;%<span class="st"> </span><span class="kw">group_by</span>(hormone) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">cases =</span> <span class="kw">n</span>(),
+            <span class="dt">min =</span> <span class="kw">min</span>(gain), 
+            <span class="dt">first_qu =</span> <span class="kw">quantile</span>(gain, <span class="fl">0.25</span>),
+            <span class="dt">median =</span> <span class="kw">median</span>(gain),
+            <span class="dt">mean =</span> <span class="kw">mean</span>(gain),
+            <span class="dt">third_qu =</span> <span class="kw">quantile</span>(gain, <span class="fl">0.75</span>),
+            <span class="dt">max =</span> <span class="kw">max</span>(gain),
+            <span class="dt">sd =</span> <span class="kw">sd</span>(gain))</code></pre></div>
+<pre class="output"><code># A tibble: 2 × 9
+  hormone cases   min first_qu median    mean third_qu   max       sd
+   &lt;fctr&gt; &lt;int&gt; &lt;int&gt;    &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt;
+1       A    10   365    537.5  630.0 619.100   728.25   840 149.4482
+2       B     8   560    742.0  827.5 822.625   916.25  1035 154.5574
 </code></pre>
-<pre class="error"><code>Warning in leveneTest.default(...): t.dat$cond coerced to factor.
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1.2. 데이터 시각화
+
+gg_violin &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> hormones, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>hormone, <span class="dt">y=</span>gain, <span class="dt">fill=</span>hormone)) +
+<span class="st">  </span><span class="kw">geom_violin</span>()
+
+gg_boxplot &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> hormones, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>hormone, <span class="dt">y=</span>gain, <span class="dt">fill=</span>hormone)) +
+<span class="st">  </span><span class="kw">geom_boxplot</span>()
+
+<span class="kw">grid.arrange</span>(gg_boxplot, gg_violin, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="fig/two-sample-t-test-setup-1.png" title="plot of chunk two-sample-t-test-setup" alt="plot of chunk two-sample-t-test-setup" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 평균 비교</span>
+
+hormones_mean &lt;-<span class="st"> </span>hormones %&gt;%<span class="st"> </span><span class="kw">group_by</span>(hormone) %&gt;%<span class="st"> </span><span class="kw">summarise</span>(<span class="dt">gain=</span><span class="kw">mean</span>(gain))
+
+ggp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> hormones, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>hormone, <span class="dt">y=</span>gain)) +
+<span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>hormones_mean, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>hormone,<span class="dt">y=</span>gain), <span class="dt">colour=</span><span class="st">&quot;red&quot;</span>, <span class="dt">group=</span><span class="dv">1</span>) +
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data=</span>hormones_mean, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>hormone,<span class="dt">y=</span>gain), <span class="dt">colour=</span><span class="st">&quot;red&quot;</span>, <span class="dt">group=</span><span class="dv">1</span>) 
+
+<span class="kw">print</span>(ggp)   </code></pre></div>
+<p><img src="fig/two-sample-t-test-setup-2.png" title="plot of chunk two-sample-t-test-setup" alt="plot of chunk two-sample-t-test-setup" style="display: block; margin: auto;" /></p>
+<p>호르몬 두가지 성분별로 닭성장 분포가 정규분포를 따르는지, 두 분포의 등분산성이 만족되는지 확인한다.</p>
+<p><strong>코헨 d</strong> 는 표준오차가 아닌 표준 편차로 나눈다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 정규분포 가정사항 확인--------------------------------------------------</span>
+
+<span class="co"># 정규분포 검정 통계량</span>
+<span class="kw">tapply</span>(hormones$gain, hormones$hormone, ad.test)</code></pre></div>
+<pre class="output"><code>$A
+
+    Anderson-Darling normality test
+
+data:  X[[i]]
+A = 0.15886, p-value = 0.926
+
+
+$B
+
+    Anderson-Darling normality test
+
+data:  X[[i]]
+A = 0.13781, p-value = 0.9557
 </code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 등분산 검정</span>
+<span class="kw">var.test</span>(gain ~<span class="st"> </span>hormone, <span class="dt">data =</span> hormones)</code></pre></div>
+<pre class="output"><code>
+    F test to compare two variances
+
+data:  gain by hormone
+F = 0.93498, num df = 9, denom df = 7, p-value = 0.9031
+alternative hypothesis: true ratio of variances is not equal to 1
+95 percent confidence interval:
+ 0.1938497 3.9241513
+sample estimates:
+ratio of variances 
+         0.9349792 
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">bartlett.test</span>(gain ~<span class="st"> </span>hormone,<span class="dt">data=</span>hormones)</code></pre></div>
+<pre class="output"><code>
+    Bartlett test of homogeneity of variances
+
+data:  gain by hormone
+Bartlett&#39;s K-squared = 0.0083868, df = 1, p-value = 0.927
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">leveneTest</span>(gain ~<span class="st"> </span>hormone,<span class="dt">data=</span>hormones)</code></pre></div>
 <pre class="output"><code>Levene&#39;s Test for Homogeneity of Variance (center = median)
       Df F value Pr(&gt;F)
-group  1  2.5024  0.122
-      38               
+group  1  0.0321 0.8601
+      16               
 </code></pre>
-<p><span class="math inline">\(t-\)</span>검정을 R에서 수행하는 방법은 <code>t.test</code> 함수를 사용하고 인자로 <code>var.equal</code>을 설정하여 명시적으로 수행한다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 독립 t-검정</span>
-<span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(dplyr))
-t.dat.t08 &lt;-<span class="st"> </span>t.dat %&gt;%<span class="st"> </span><span class="kw">filter</span>(cond ==<span class="st"> &quot;t08&quot;</span>)
-t.dat.t19 &lt;-<span class="st"> </span>t.dat %&gt;%<span class="st"> </span><span class="kw">filter</span>(cond ==<span class="st"> &quot;t19&quot;</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 정규분포 QQ-플롯</span>
+hormones_a &lt;-<span class="st"> </span>hormones %&gt;%<span class="st"> </span><span class="kw">filter</span>(hormone ==<span class="st">&quot;A&quot;</span>) 
+hormones_b &lt;-<span class="st"> </span>hormones %&gt;%<span class="st"> </span><span class="kw">filter</span>(hormone ==<span class="st">&quot;B&quot;</span>)
 
-<span class="kw">t.test</span>(t.dat.t08$gain, t.dat.t19$gain, <span class="dt">var.equal =</span> <span class="ot">TRUE</span>)</code></pre></div>
+ggp1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> hormones_a, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">sample =</span> gain)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">stat_qq</span>(<span class="dt">color=</span><span class="st">&quot;#F8766D&quot;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">intercept=</span><span class="kw">mean</span>(hormones_a$gain),<span class="dt">slope=</span><span class="kw">sd</span>(hormones_a$gain), <span class="dt">color=</span><span class="st">&quot;red&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;hormone A&quot;</span>) +<span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;q-q plot of hormone A&quot;</span>)
+
+ggp2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> hormones_b, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">sample =</span> gain)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">stat_qq</span>(<span class="dt">color=</span><span class="st">&quot;#00C094&quot;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">intercept=</span><span class="kw">mean</span>(hormones_b$gain),<span class="dt">slope=</span><span class="kw">sd</span>(hormones_b$gain)), <span class="dt">color=</span><span class="st">&quot;red&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">ylab</span>(<span class="st">&quot;hormone B&quot;</span>) +<span class="st"> </span><span class="kw">ggtitle</span>(<span class="st">&quot;q-q plot of hormone B&quot;</span>)
+
+<span class="kw">grid.arrange</span>(ggp1, ggp2, <span class="dt">nrow =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="fig/two-sample-t-test-1.png" title="plot of chunk two-sample-t-test" alt="plot of chunk two-sample-t-test" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># t-검정</span>
+<span class="kw">t.test</span>(gain ~<span class="st"> </span>hormone, <span class="dt">data =</span> hormones, <span class="dt">var.equal =</span> <span class="ot">TRUE</span>) </code></pre></div>
 <pre class="output"><code>
     Two Sample t-test
 
-data:  t.dat.t08$gain and t.dat.t19$gain
-t = -8.9677, df = 38, p-value = 6.443e-11
+data:  gain by hormone
+t = -2.8283, df = 16, p-value = 0.01211
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- -5.209412 -3.290588
+ -356.07303  -50.97697
 sample estimates:
-mean of x mean of y 
-     1.35      5.60 
+mean in group A mean in group B 
+        619.100         822.625 
 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 코헨 d</span>
-<span class="kw">suppressPackageStartupMessages</span>(<span class="kw">library</span>(lsr))
-<span class="kw">cohensD</span>(t.dat.t08$gain, t.dat.t19$gain, <span class="dt">method =</span> <span class="st">&quot;pooled&quot;</span>)</code></pre></div>
-<pre class="output"><code>[1] 2.835822
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lsr::<span class="kw">cohensD</span>(gain ~<span class="st"> </span>hormone, <span class="dt">method =</span> <span class="st">&quot;pooled&quot;</span>, <span class="dt">data=</span>hormones)</code></pre></div>
+<pre class="output"><code>Error in lsr::cohensD(gain ~ hormone, method = &quot;pooled&quot;, data = hormones): 함수 &quot;is&quot;를 찾을 수 없습니다
 </code></pre>
+<p><span class="math inline">\(t-\)</span>검정을 회귀분석이나 분산분석을 통해 효과크기를 측정하는 것도 가능하다. 이를 위해 회귀식을 적용하고 나서 <code>broom</code> 팩키지 <code>tidy</code> 함수와 <code>augment</code> 함수를 통해 <code>tibble</code> 데이터프레임을 통해 일관성을 갖고 편하게 회귀분석에서 나온 결과물을 통한 잔차 분석이 가능하다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 3. 모형--------------------------------------------------
+
+lm_fit &lt;-<span class="st"> </span><span class="kw">lm</span>(gain ~<span class="st"> </span>hormone, <span class="dt">data =</span> hormones) 
+lm_fit</code></pre></div>
+<pre class="output"><code>
+Call:
+lm(formula = gain ~ hormone, data = hormones)
+
+Coefficients:
+(Intercept)     hormoneB  
+      619.1        203.5  
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 모형 검정</span>
+
+lm_fit_tidy &lt;-<span class="st"> </span><span class="kw">tidy</span>(lm_fit)
+lm_fit_tidy_aug &lt;-<span class="st"> </span><span class="kw">augment</span>(lm_fit)
+
+<span class="kw">ad.test</span>(lm_fit_tidy_aug$.resid)</code></pre></div>
+<pre class="output"><code>
+    Anderson-Darling normality test
+
+data:  lm_fit_tidy_aug$.resid
+A = 0.18963, p-value = 0.8859
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ggp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> lm_fit_tidy_aug, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">sample =</span> .resid, <span class="dt">color=</span>hormone)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">stat_qq</span>(<span class="dt">size=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">intercept=</span><span class="kw">mean</span>(.resid), <span class="dt">slope=</span><span class="kw">sd</span>(.resid)), <span class="dt">colour=</span><span class="st">&quot;red&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>)
+
+<span class="kw">print</span>(ggp)</code></pre></div>
+<p><img src="fig/two-sample-t-lm-1.png" title="plot of chunk two-sample-t-lm" alt="plot of chunk two-sample-t-lm" style="display: block; margin: auto;" /></p>
+<ul>
+<li>코헨-d 효과 참조 표</li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th align="left"><code>효과 크기</code></th>
+<th align="left">d</th>
+<th align="left">참고문헌</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Very Small</td>
+<td align="left">0.01</td>
+<td align="left">Sawilowsky, 2009</td>
+</tr>
+<tr class="even">
+<td align="left">Small</td>
+<td align="left">0.20</td>
+<td align="left">Cohen, 1988</td>
+</tr>
+<tr class="odd">
+<td align="left">Medium</td>
+<td align="left">0.50</td>
+<td align="left">Cohen, 1988</td>
+</tr>
+<tr class="even">
+<td align="left">Large</td>
+<td align="left">0.80</td>
+<td align="left">Cohen, 1988</td>
+</tr>
+<tr class="odd">
+<td align="left">Very Large</td>
+<td align="left">1.20</td>
+<td align="left">Sawilowsky, 2009</td>
+</tr>
+<tr class="even">
+<td align="left">Huge</td>
+<td align="left">2.0</td>
+<td align="left">Sawilowsky, 2009</td>
+</tr>
+</tbody>
+</table>
 <h3 id="쌍체-t-검정">1.4. 쌍체 <span class="math inline">\(t-\)</span>검정</h3>
 <p>독립 <span class="math inline">\(t-\)</span>검정과 비교하여 종속 <span class="math inline">\(t-\)</span>검정이라고 하고 동일한 사용자가 반복해서 특정 요인에 차이가 있는지 검정할 때 사용된다. 각 사용자마다 전후 평균 차이를 검정한다.</p>
 <p>유의성 검정은 표본 크기에 따라 편향이 발생하게 된다. 표본 크기가 커지게 되면 표준오차가 작아지게 된다. 표본 크기가 클 때, 관측된 작은 차이도 “통계적 유의성”을 갖게 된다. <strong>효과크기(effect size)</strong>는 효과의 크기를 추정한다.</p>
-<p><strong>코헨 d</strong> 는 표준오차가 아닌 표준 편차로 나눈다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 쌍체 t-검정</span>
-<span class="kw">t.test</span>(t.dat$post, t.dat$pre, <span class="dt">paired =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p>운전자 20명을 뽑아 주차시간을 비교한 것으로 <code>Car_A</code>는 주차보조장치를 지원하고 <code>Car_B</code>는 주차보조장치를 지원하지 않았다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 1. 이표본 t-검정---------------------------------------</span>
+<span class="kw">data</span>(carctl)
+<span class="kw">glimpse</span>(carctl)</code></pre></div>
+<pre class="output"><code>Observations: 20
+Variables: 2
+$ Car_A &lt;dbl&gt; 35.35893, 28.92554, 32.06672, 40.60713, 18.30239, 33.109...
+$ Car_B &lt;dbl&gt; 28.64091, 24.40056, 37.25117, 39.93487, 21.71100, 27.735...
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1.1. 데이터 시각화
+
+carctl &lt;-<span class="st"> </span>carctl %&gt;%<span class="st">  </span><span class="kw">gather</span>(car, value, Car_A, Car_B)
+
+gg_boxplot &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> carctl, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>car, <span class="dt">y=</span>value, <span class="dt">fill=</span>car)) +
+<span class="st">  </span><span class="kw">geom_boxplot</span>()
+
+gg_violin &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> carctl, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>car, <span class="dt">y=</span>value, <span class="dt">fill=</span>car)) +
+<span class="st">  </span><span class="kw">geom_violin</span>()
+
+<span class="kw">grid.arrange</span>(gg_boxplot, gg_violin, <span class="dt">ncol =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="fig/paired-t-test-setup-1.png" title="plot of chunk paired-t-test-setup" alt="plot of chunk paired-t-test-setup" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 평균 비교</span>
+carctl_mean &lt;-<span class="st"> </span>carctl %&gt;%<span class="st"> </span><span class="kw">group_by</span>(car) %&gt;%<span class="st"> </span><span class="kw">summarise</span>(<span class="dt">value=</span><span class="kw">mean</span>(value))
+
+ggp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> carctl, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>car, <span class="dt">y=</span>value)) +
+<span class="st">  </span><span class="kw">geom_jitter</span>(<span class="dt">position =</span> <span class="st">&quot;dodge&quot;</span>, <span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>carctl_mean, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>car,<span class="dt">y=</span>value), <span class="dt">colour=</span><span class="st">&quot;red&quot;</span>, <span class="dt">group=</span><span class="dv">1</span>) +
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data=</span>carctl_mean, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">x=</span>car,<span class="dt">y=</span>value), <span class="dt">colour=</span><span class="st">&quot;red&quot;</span>, <span class="dt">group=</span><span class="dv">1</span>) 
+
+<span class="kw">print</span>(ggp)  </code></pre></div>
+<p><img src="fig/paired-t-test-setup-2.png" title="plot of chunk paired-t-test-setup" alt="plot of chunk paired-t-test-setup" style="display: block; margin: auto;" /></p>
+<p><code>t.test()</code> 함수에 <code>paired=TRUE</code> 인자를 넣어주어 쌍체 <span class="math inline">\(t-\)</span>검정을 설정하여 검정한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 정규분포 가정사항 확인--------------------------------------------------</span>
+<span class="kw">data</span>(carctl)
+carctl &lt;-<span class="st"> </span>carctl %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">car_diff =</span> Car_A -<span class="st"> </span>Car_B)
+
+<span class="co"># 정규분포 검정 통계량</span>
+<span class="kw">ad.test</span>(<span class="dt">x=</span>carctl$car_diff)  </code></pre></div>
+<pre class="output"><code>
+    Anderson-Darling normality test
+
+data:  carctl$car_diff
+A = 0.29177, p-value = 0.5704
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 등분산 검정</span>
+
+<span class="co"># 정규분포 QQ-플롯</span>
+ggp &lt;-<span class="st"> </span><span class="kw">ggplot</span>(<span class="dt">data =</span> carctl, <span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">sample =</span> car_diff)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">stat_qq</span>(<span class="dt">color=</span><span class="st">&quot;darkblue&quot;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">mapping =</span> <span class="kw">aes</span>(<span class="dt">intercept=</span><span class="kw">mean</span>(car_diff), <span class="dt">slope=</span><span class="kw">sd</span>(car_diff)), <span class="dt">colour=</span><span class="st">&quot;red&quot;</span>, <span class="dt">linetype=</span><span class="dv">2</span>)
+
+<span class="kw">print</span>(ggp)</code></pre></div>
+<p><img src="fig/paired-t-test-1.png" title="plot of chunk paired-t-test" alt="plot of chunk paired-t-test" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 쌍체 t-검정: mu = 0 검정</span>
+carctl &lt;-<span class="st"> </span>carctl %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">car_diff =</span> Car_A -<span class="st"> </span>Car_B)
+<span class="kw">t.test</span>(carctl$car_diff, <span class="dt">mu=</span><span class="dv">0</span>)</code></pre></div>
+<pre class="output"><code>
+    One Sample t-test
+
+data:  carctl$car_diff
+t = 3.8735, df = 19, p-value = 0.001023
+alternative hypothesis: true mean is not equal to 0
+95 percent confidence interval:
+ 1.431407 4.796801
+sample estimates:
+mean of x 
+ 3.114104 
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">t.test</span>(<span class="dt">x=</span>carctl$Car_A, <span class="dt">y=</span>carctl$Car_B, <span class="dt">paired=</span><span class="ot">TRUE</span>)</code></pre></div>
 <pre class="output"><code>
     Paired t-test
 
-data:  t.dat$post and t.dat$pre
-t = 8.4158, df = 39, p-value = 2.662e-10
+data:  carctl$Car_A and carctl$Car_B
+t = 3.8735, df = 19, p-value = 0.001023
 alternative hypothesis: true difference in means is not equal to 0
 95 percent confidence interval:
- 2.639805 4.310195
+ 1.431407 4.796801
 sample estimates:
 mean of the differences 
-                  3.475 
+               3.114104 
 </code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 코헨 d t-검정</span>
-<span class="kw">cohensD</span>(t.dat$post, t.dat$pre, <span class="dt">method =</span> <span class="st">&quot;paired&quot;</span>)</code></pre></div>
-<pre class="output"><code>[1] 1.330659
+<span class="kw">cohensD</span>(<span class="dt">x=</span>carctl$Car_A, <span class="dt">y=</span>carctl$Car_B, <span class="dt">method =</span> <span class="st">&quot;paired&quot;</span>)</code></pre></div>
+<pre class="output"><code>Error in cohensD(x = carctl$Car_A, y = carctl$Car_B, method = &quot;paired&quot;): 함수 &quot;is&quot;를 찾을 수 없습니다
 </code></pre>
-<h2 id="ab검정에-활용되는-일반적-통계량">2. A/B검정에 활용되는 일반적 통계량</h2>
+<h2 id="ab검정에-활용되는-일반적-통계량">3. A/B검정에 활용되는 일반적 통계량</h2>
 <table>
 <thead>
 <tr class="header">
@@ -221,7 +544,7 @@ mean of the differences
 </tr>
 </tbody>
 </table>
-<h3 id="피셔의-정확검정을-통한-광고-연결률-효과-분석-fisher-exact-ctr">2.1. 피셔의 정확검정을 통한 광고 연결률 효과 분석 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<h3 id="피셔의-정확검정을-통한-광고-연결률-효과-분석-fisher-exact-ctr">3.1. 피셔의 정확검정을 통한 광고 연결률 효과 분석 <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></h3>
 <p>광고 A <a href="http://terms.naver.com/entry.nhn?docId=819411&amp;cid=42344&amp;categoryId=42344">광고 연결률(CTR, click through rates)</a>이 1.1%, 광고 B 클릭율이 1.3% 으로 나왔다면 1.3% &gt; 1.1% 로직으로 광고 A가 더 좋을까? 그럴수도 그렇지 않을 수도 있다.</p>
 <p>사용자 1,000명 대상 광고 효과를 A/B 검정하면 유의적이지 않지만, 100,000 명 대상으로 광고효과를 검정하면 유의적으로 파악된다. 동일한 1.3%, 1.1% 광고 연결률이지만 사용대상자 숫자에 따라 통계적 추론을 달라진다.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 1. 피셔의 정확검정(Fisher&#39;s exact test)--------------------------</span>
@@ -274,7 +597,9 @@ odds ratio
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="http://www.lunametrics.com/blog/2014/07/01/statistical-significance-test/">The Only* Statistical Significance Test You Need</a><a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p><a href="http://www.quantide.com/raccoon-ch-2-1-1-sample-t-test-with-r/">1-sample t-test</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="http://www.quantide.com/raccoon-ch-2-2-2-sample-t-test-and-paired-t/">2 sample t-test and paired t</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="http://www.lunametrics.com/blog/2014/07/01/statistical-significance-test/">The Only* Statistical Significance Test You Need</a><a href="#fnref3">↩</a></p></li>
 </ol>
 </div>
         </div>

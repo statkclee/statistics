@@ -13,12 +13,15 @@ mainfont: NanumGothic
 
 ```{r, include=FALSE}
 source("tools/chunk-options.R") 
+library(nortest)
 library(tidyverse)
-library(dygraphs)
-library(xts)
 library(stringr)
 library(ggplot2)
 library(scales)
+library(lsr)
+library(gridExtra) 
+library(broom)
+library(car)
 ```
 
 
@@ -76,14 +79,16 @@ $p-$값은 확률값(Probability Value)를 줄인 것으로 귀무가설이 참�
 ``` {r one-sample-t-test-setup, warning=FALSE}
 # devtools::install_github(repo = "quantide/qdata")
 
-require(car)
 require(ggplot2)
 require(dplyr)
 require(gridExtra)
 require(tidyr)
 require(qdata)
 require(lsr)
-data(reaction)
+require(nortest)
+require(car) 
+
+data(reaction) 
 
 # 1. t-검정---------------------------------------
 # 목적: 화학반응이 180도 인지 검정
@@ -353,6 +358,7 @@ print(ggp)
 ``` {r paired-t-test, warning=FALSE}
 # 정규분포 가정사항 확인--------------------------------------------------
 data(carctl)
+carctl <- carctl %>% mutate(car_diff = Car_A - Car_B)
 
 # 정규분포 검정 통계량
 ad.test(x=carctl$car_diff)  
@@ -376,7 +382,6 @@ t.test(x=carctl$Car_A, y=carctl$Car_B, paired=TRUE)
 # 코헨 d t-검정
 cohensD(x=carctl$Car_A, y=carctl$Car_B, method = "paired")
 ```
-
 
 
 ## 3. A/B검정에 활용되는 일반적 통계량 
