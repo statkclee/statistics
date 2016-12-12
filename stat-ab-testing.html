@@ -55,6 +55,8 @@
 <p>A/B 검정은 통계 가설 검정을 상업적 영역으로 확대한 것으로 구글에 의해 일반화 되었고, 2011년 기준 구글에서 7,000 가지가 넘는 A/B 검정을 돌리는 것으로 보고되고 있다.</p>
 <p>웹사이트를 개발할 때, 두가지 실험군(treatment)과 대조군(control)으로 나눠 실험군에는 대조군과 한가지만 다른 설정을 하고 유입되는 고객을 임의로 예를 들어 50:50으로 나눠 배치한다. 그리고 나서 CTR(Click-Through-Rate)을 비교하여 광고 연결률의 유의미한 차이를 검정한다.</p>
 <p><img src="fig/A-B-testing-example.png" alt="A/B 검정 사례" width="37%" /></p>
+<h3 id="왜-검정testing을-할까">1.1. 왜 검정(Testing)을 할까?</h3>
+<p>좀더 나은 웹사이트, 광고 캠페인, 버튼 위치, 매출 전략등 다양한 아이디어가 많고, 특정 아이디어는 다른 아이디어 보다 더 좋다. 그럼 특정 아이디어가 다른 아이디어보다 더 좋다는 것을 어떻게 선별할 수 있을까?</p>
 <h3 id="ab-검정-주제-선정-ab-testing-objectives">1.1. A/B 검정 주제 선정 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
 <p>A/B 검정을 통한 전통적인 주제는 다음과 같다.</p>
 <ul>
@@ -131,6 +133,7 @@ This means that the positive effect observed during the intervention period is s
 The probability of obtaining this effect by chance is very small (Bayesian one-sided tail-area probability p = 0.001). This means the causal effect can be considered statistically significant. 
 </code></pre>
 <h2 id="ab-검정-모형">3. A/B 검정 모형</h2>
+<h3 id="ab-검정-구성요소-ctr-prediction">3.1. A/B 검정 구성요소 <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h3>
 <p>A/B 검정을 구성하는 요소는 다음과 같다.</p>
 <ul>
 <li>측정단위: 사용자, 점포, 도시 등</li>
@@ -146,8 +149,7 @@ The probability of obtaining this effect by chance is very small (Bayesian one-s
 <li>교략변수(Lurking, Confounding Varaible): 독립변수와 종속변수 모두 상관되는 외생 변수로, 아이스크림 판매량과 익사하는 사람수 관계(온도), 출생 순서와 다운증후군 연관성(산모 나이)을 예로 들 수 있다.</li>
 </ul></li>
 </ul>
-<h2 id="ab-검정-기본-변수">3. A/B 검정 기본 변수</h2>
-<h3 id="데이터-기본-변수-ctr-prediction">3.1. 데이터 기본 변수 <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h3>
+<h3 id="ab-검정-변수">3.2. A/B 검정 변수</h3>
 <p>광고 연결률(CTR, click through rates)을 예측하는데 디바이스, 날짜/시간, 웹사이트, 네트워크 연결, 배너 배치, 앱 정보등을 수집하여 이를 바탕으로 광고 클릭을 연결과 실패로 구분하여 예측한다.</p>
 <p><img src="fig/stat-ab-testing-overview.png" alt="A/B 검정 개요" width="77%" /></p>
 <h2 id="광고-최적화-ab-검정">4. 광고 최적화 A/B 검정</h2>
@@ -161,6 +163,19 @@ The probability of obtaining this effect by chance is very small (Bayesian one-s
 </ol>
 <p><span class="math inline">\(LTV = \begin{equation} \sum_{t=1}^{N} \frac{(R_t -C_t) \times r_t}{(1+i)^t} -\text{AC} \end{equation}\)</span></p>
 <p><img src="fig/stat-ab-testing-ads.png" alt="광고 A/B 검정 활용" width="77%" /></p>
+<h2 id="다중-슬롯머신-문제mab-multi-armed-bandit-mab-algorithm-blog-mab-oreilly-google-mab">5. 다중 슬롯머신 문제(MAB, Multi-Armed Bandit) <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a> <a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a> <a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a></h2>
+<p>카지노에 슬롯머신이 쭉 배치되어 있는데, 각 슬롯머신 별로 승률이 달리 정해져 있지만 승률은 알지 못한다. 한정된 예산을 가지고 가장 많은 돈을 벌기 위해서 어떤 전략을 취하면 될까? 결국 탐색과 획득 딜레마(Explore/Exploit Dilemma)를 통해 우선 가장 승률이 좋은 슬롯머신을 찾아내는 과정과 본격적으로 돈을 버는 과정을 거치게 된다. 한정된 탐색과 획득과정 모두 비용과 시간이 들여 가장 많은 돈을 벌게 되는 최적화 문제를 푸는 것으로 귀결된다.</p>
+<h3 id="용어-정의">5.1. 용어 정의</h3>
+<ul>
+<li>Arm: 검정하고자 하는 아이디어 한개</li>
+<li>밴딧(Bandit): 검정하고자 하는 아이디어 묶음</li>
+<li>Pull/Play/Trial: 아이디어 시험 한번</li>
+<li>보상(Reward): 시험 후에 측정되는 결과값</li>
+</ul>
+<p>2차 세계대전 당시 다중 슬롯머신 문제가 매우 중요하지만 수학적으로 어려워서 이 문제를 잘 정리해서 독일에 전달하여 연구자원을 분산시키자고 Peter Whittle이 주장하기도 했다. 하지만, 오프라인에서는 탐색 비용이 매우 커서 비현실적이지만, 온라인 인터넷서비스에서는 상대적으로 비용이 적게 소요되어 <strong>밴딧 알고리즘</strong>이 A/B 검정의 한계를 극복하는 대안으로 구글, 야후 등에서 활발히 활용되고 있다. 밴딧 알고리즘은 실시간 온라인 학습(Online learning) 알고리즘이면서 동시에 강화학습과 같이 액티브 학습(Active Learning) 알고리즘이기도 하다.</p>
+<h3 id="ab-검정과-mab">5.2. A/B 검정과 MAB</h3>
+<p>머릿속으로 그리는 A/B 검정은 기존 A안에 새로운 대안을 넣어 그것이 더 좋은 결과를 얻은 경우 새로운 대안을 취하고, B안이 더 좋지 못한 결과를 얻게 되었을 경우 다시 A안으로 회귀하는 것이지만, A/B 검정 결과 더 좋은 것으로 나온 실험결과가 실제로 적용했을 경우 더 좋지 못한 결과가 되기도 한다. MAB 알고리즘은 A/B 검정과 달리 연속적으로 가장 좋은 대안을 찾아가는 방법론을 제시하고 있다.</p>
+<p><img src="fig/stat-mab-algorithm.png" alt="MAB 알고리즘 배경" width="87%" /></p>
 <div class="footnotes">
 <hr />
 <ol>
@@ -168,6 +183,9 @@ The probability of obtaining this effect by chance is very small (Bayesian one-s
 <li id="fn2"><p><a href="http://google.github.io/CausalImpact/CausalImpact.html">CausalImpact</a><a href="#fnref2">↩</a></p></li>
 <li id="fn3"><p><a href="http://research.google.com/pubs/pub41854.html">Inferring causal impact using Bayesian structural time-series models</a><a href="#fnref3">↩</a></p></li>
 <li id="fn4"><p><a href="http://www.montis.pmf.ac.me/vol32/15.pdf">CLICK-THROUGH RATE PREDICTION – TOP-5 SOLUTION FOR THE AVAZU CONTEST</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p><a href="http://hub.zum.com/kimws/2586">A/B 테스트를 보완하는 Multi-Armed Bandit(MAB) 알고리즘</a><a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p><a href="https://www.youtube.com/watch?v=BIP-VtmW_9M">OReilly Webcasts: Bandit Algorithms for The Web</a><a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p><a href="https://support.google.com/analytics/answer/2844870?hl=ko&amp;ref_topic=1745207">다중 슬롯머신 실험</a><a href="#fnref7">↩</a></p></li>
 </ol>
 </div>
         </div>

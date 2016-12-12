@@ -125,7 +125,7 @@ A/B 검정을 구성하는 요소는 다음과 같다.
     - 교략변수(Lurking, Confounding Varaible): 독립변수와 종속변수 모두 상관되는 외생 변수로, 
     아이스크림 판매량과 익사하는 사람수 관계(온도), 출생 순서와 다운증후군 연관성(산모 나이)을 예로 들 수 있다. 
 
-### 3.2. A/B 검정 변수 [^ctr-prediction]
+### 3.2. A/B 검정 변수 
 
 [^ctr-prediction]: [CLICK-THROUGH RATE PREDICTION – TOP-5 SOLUTION FOR THE AVAZU CONTEST](http://www.montis.pmf.ac.me/vol32/15.pdf)
 
