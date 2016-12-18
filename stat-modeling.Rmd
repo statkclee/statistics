@@ -1,0 +1,47 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 통계 모형(Statistical models)
+output:
+  html_document: 
+    keep_md: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
+
+
+```{r, include=FALSE}
+source("tools/chunk-options.R") 
+library(tidyverse)
+library(CausalImpact)
+library(xts)
+library(stringr)
+library(ggplot2)
+library(scales)
+```
+> ## 학습 목표 {.objectives}
+>
+> * 통계 모형을 이해한다.
+
+
+## 1. 통계모형(Statistical Models)
+
+통계 모형을 사용되는 곳은 다음과 같다.
+
+- 데이터 숨겨진 패턴을 식별한다.
+- 사건을 분류한다.
+- 영향을 미치는 것이 다양한데 이를 풀어낸다.
+- 증거의 강도를 가늠한다.
+
+> ### 통계모형이란? {.callout}
+>
+> 특정 목적을 표현한 것이 모형이다. (A model is a representation for a purpose) [^model-definition]
+> 
+> * 표현(representation) : 현실세계 무언가를 표상한 것.
+> * 목적(Purpose) : 모형에 대한 특별한 사용처.
+
+[^model-definition]: [Starfield, Smith, and Blelock, "How to Model It: Problem Solving for the Computer Age"](https://cran.r-project.org/web/packages/statisticalModeling/vignettes/modeling.html)
+
+
+
