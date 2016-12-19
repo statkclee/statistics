@@ -11,15 +11,7 @@ mainfont: NanumGothic
 ---
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-library(tidyverse)
-library(statisticalModeling)
-library(xts)
-library(stringr)
-library(ggplot2)
-library(scales)
-```
+
 > ## 학습 목표 {.objectives}
 >
 > * 모형, 수학모형, 통계 모형을 이해한다.
@@ -85,9 +77,10 @@ library(scales)
 $\text{가계 소득} = \alpha + \beta \times \text{교육 수준}$이 되고, 가계소득은 교육수준의 함수가 된다, 가계소득은 교육수준으로 설명된다, 
 가계소득은 교육수준으로 모형화되고, 가계소득을 교육수준으로 설명할 수 있다 등등으로 언급된다.
 
-``` {r r-formular-in-plain-english, eval=FALSE}
+
+~~~{.r}
 inc_lm <- lm(income ~ educ, data=income)
-```
+~~~
 
 > ### 공변량(Covariate)? {.callout}
 >
@@ -161,7 +154,8 @@ inc_lm <- lm(income ~ educ, data=income)
 
 $y_i = \beta_0 + \beta_1 X_i + \beta_2 Z_i + \beta_3 W_i + \beta_4 X_i \times Z_i + \beta_5 X_i \times W_i + \beta_6 W_i \times Z_i +\epsilon_i$
 
-``` {r r-model-notation, eval=FALSE}
+
+~~~{.r}
 formula_notation_1 <- 'Y ~ X + Z + W + X:Z + X:W + Z:W'
 formula_notation_2 <- 'Y ~ X * Z * W - X:Z:W'
 formula_notation_3 <- 'Y ~ (X + Z + W)^2'
@@ -169,7 +163,7 @@ formula_notation_3 <- 'Y ~ (X + Z + W)^2'
 income_lm <- lm(formula_notation_1, data=income_df)
 income_lm <- lm(formula_notation_2, data=income_df)
 income_lm <- lm(formula_notation_3, data=income_df)
-```
+~~~
 
 ## 3. 집값 예측 사례
 
@@ -177,23 +171,42 @@ income_lm <- lm(formula_notation_3, data=income_df)
 벽난로 숫자와 평수간의 교호작용도 추가하고, 땅값(`land_value`)도 추가하고, 
 침실숫자(`bedrooms`)도 넣어가며 좀더 정밀한 집값 예측모형을 이해하면서 만들어 나간다.
 
-``` {r house-prediction, message=FALSE, warning=FALSE}
+
+~~~{.r}
 library(statisticalModeling)
 data(Houses_for_sale)
 
 house_mod <- lm(price ~ fireplaces, data = Houses_for_sale)
 gmodel(house_mod)
+~~~
 
+<img src="fig/house-prediction-1.png" title="plot of chunk house-prediction" alt="plot of chunk house-prediction" style="display: block; margin: auto;" />
+
+~~~{.r}
 house_mod <- lm(price ~ fireplaces + living_area, data = Houses_for_sale)
 gmodel(house_mod)
+~~~
 
+<img src="fig/house-prediction-2.png" title="plot of chunk house-prediction" alt="plot of chunk house-prediction" style="display: block; margin: auto;" />
+
+~~~{.r}
 house_mod <- lm(price ~ fireplaces * living_area, data = Houses_for_sale)
 gmodel(house_mod)
+~~~
 
+<img src="fig/house-prediction-3.png" title="plot of chunk house-prediction" alt="plot of chunk house-prediction" style="display: block; margin: auto;" />
+
+~~~{.r}
 house_mod <- lm(price ~ fireplaces * living_area + land_value, data = Houses_for_sale)
 gmodel(house_mod)
+~~~
 
+<img src="fig/house-prediction-4.png" title="plot of chunk house-prediction" alt="plot of chunk house-prediction" style="display: block; margin: auto;" />
+
+~~~{.r}
 house_mod <- lm(price ~ fireplaces * living_area + land_value + bedrooms, data = Houses_for_sale)
 gmodel(house_mod)
-```
+~~~
+
+<img src="fig/house-prediction-5.png" title="plot of chunk house-prediction" alt="plot of chunk house-prediction" style="display: block; margin: auto;" />
 
