@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: 데이터 과학 – 기초 통계</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-59802572-17', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
+          <h2 class="subtitle">시계열 모형 - 기초</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>시계열 데이터를 이해한다.</li>
+<li>시계열 데이터 분석 기본 모형을 살펴본다.</li>
+</ul>
+</div>
+</section>
+<h2 id="시계열-데이터">1. 시계열 데이터</h2>
+<p>시계열 데이터(time series)는 시간 순서로 배열된 데이터의 한 종류로 시간에 걸쳐 순차적으로 기록된다. 시계열 데이터는 널려있다고 해도 과언은 아니다. 주식수익률 데이터를 포함한 재무데이터, 인플레이션, 소비자 물가를 포함한 각종 경제 관련 데이터 및 시간순으로 정당 지지율도 대표적인 시계열 데이터가 된다.</p>
+<h3 id="시계열-데이터-자료구조-eric-zivot-time-series">1.1. 시계열 데이터 자료구조 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">팩키지</th>
+<th align="left">시계열 객체</th>
+<th align="left">상세 설명</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">fts</td>
+<td align="left"><code>fts</code></td>
+<td align="left">C++ 시계열 라이브러리 <code>tslib</code>에 대한 R 인터페이스</td>
+</tr>
+<tr class="even">
+<td align="left">its</td>
+<td align="left"><code>its</code></td>
+<td align="left">불규칙 시계열 데이터를 처리하는 S4 클래스</td>
+</tr>
+<tr class="odd">
+<td align="left">tseries</td>
+<td align="left"><code>irts</code></td>
+<td align="left">“POSIXct” 색인을 갖는 불규칙 시계열 객체</td>
+</tr>
+<tr class="even">
+<td align="left">timeSeries</td>
+<td align="left"><code>timeSeries</code></td>
+<td align="left">Rmetrics 팩키지 시계열 유틸리티</td>
+</tr>
+<tr class="odd">
+<td align="left">tis</td>
+<td align="left"><code>tis</code></td>
+<td align="left">시간 색인과 시계열 데이터를 위한 S3 함수와 클래스</td>
+</tr>
+<tr class="even">
+<td align="left">stats</td>
+<td align="left"><code>ts</code>, <code>mts</code></td>
+<td align="left">일정한 시간 간격을 갖는 시계열 객체</td>
+</tr>
+<tr class="odd">
+<td align="left">zoo</td>
+<td align="left"><code>zoo</code></td>
+<td align="left">불규칙 시계열을 포함하고 전체 관측점을 시계열 순으로 색인한 S3 클래스</td>
+</tr>
+<tr class="even">
+<td align="left">xts</td>
+<td align="left"><code>xts</code></td>
+<td align="left">zoo 클래스 확장</td>
+</tr>
+</tbody>
+</table>
+<p>시계열 데이터를 R에서 담아내는 객체는 다양하다. C++ <code>tslib</code>을 R로 가져온 것부터 가장 최근 <code>xts</code> 팩키지까지 다양한 방식이 동원된다. 시계열 데이터를 자료구조로 이해할 경우 먼저 등간격을 갖는 일정한 시간 데이터인지, 불규칙한 시간 데이터인지 판단을 해야하고, 그 다음으로 색인여부가 속도와 연관되어 시계열 데이터를 이해하는 중요한 기준이 될 수 있다.</p>
+<p>Base 팩키지에 포함된 <code>ts</code> 함수를 사용하면 간단한 시계열 데이터를 생성시킬 수 있다. 특히 <code>window</code> 함수를 활용하여 특정 기간 데이터도 쉽게 뽑아낼 수 있다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 0. 환경설정 --------------------------------------------------------------</span>
+<span class="kw">library</span>(tidyverse)
+<span class="kw">library</span>(lubridate)
+<span class="kw">library</span>(xts)
+
+<span class="co"># 1. 시계열 데이터 --------------------------------------------------------------</span>
+## 1.1. 처음부터 생성------------------------------------------------------------
+dat &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">7</span>,<span class="dv">5</span>,<span class="dv">3</span>,<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>)
+dat_ts &lt;-<span class="st"> </span><span class="kw">as.ts</span>(dat)
+dat_ts</code></pre></div>
+<pre class="output"><code>Time Series:
+Start = 1 
+End = 7 
+Frequency = 1 
+[1] 7 5 3 1 3 5 7
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat_1987_ts &lt;-<span class="st"> </span><span class="kw">ts</span>(dat, <span class="dt">start=</span><span class="dv">1987</span>)
+dat_1987_ts</code></pre></div>
+<pre class="output"><code>Time Series:
+Start = 1987 
+End = 1993 
+Frequency = 1 
+[1] 7 5 3 1 3 5 7
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dat_quarter_ts &lt;-<span class="st"> </span><span class="kw">ts</span>(dat, <span class="dt">start=</span><span class="kw">c</span>(<span class="dv">1987</span>,<span class="dv">3</span>), <span class="dt">frequency=</span><span class="dv">4</span>)
+dat_quarter_ts</code></pre></div>
+<pre class="output"><code>     Qtr1 Qtr2 Qtr3 Qtr4
+1987              7    5
+1988    3    1    3    5
+1989    7               
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 특정기간 뽑아내기</span>
+<span class="kw">window</span>(dat_quarter_ts, <span class="dt">start=</span><span class="kw">c</span>(<span class="dv">1987</span>,<span class="dv">3</span>), <span class="dt">end=</span><span class="kw">c</span>(<span class="dv">1988</span>,<span class="dv">4</span>))</code></pre></div>
+<pre class="output"><code>     Qtr1 Qtr2 Qtr3 Qtr4
+1987              7    5
+1988    3    1    3    5
+</code></pre>
+<p><strong>시계열 자료구조를 활용하는 이유</strong></p>
+<p>시계열 자료구조를 활용하는 이유는 다음 맥주생산량 데이터를 통해 이해하면 쉽다. 시계열 자료구조가 아닌 경우 <code>plot</code> 함수에 던지게 되면 산점도를 찍게 되지만, 시계열 자료구조를 갖는 경우 각 관측점을 연결한 시각화 산출물을 생성시킨다.</p>
+<p><code>xts</code> 팩키지를 활용하면 불규칙, 규칙 시계열 데이터를 자체 색인을 통해 빠르게 접근하고 다양한 시계열 데이터를 자유로이 다룰 수 있는 도구상자를 지원한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">## 1.2. 데이터셋에서 불러오기----------------------------------------------------
+<span class="co"># 맥주생산량 데이터</span>
+beer_df &lt;-<span class="st"> </span><span class="kw">read_csv</span>(<span class="st">&quot;https://raw.githubusercontent.com/jamesrobertlloyd/gp-structure-search/master/data/raw/TSDL/monthly-beer-production-in-austr.csv&quot;</span>) 
+<span class="kw">names</span>(beer_df) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;dtime&quot;</span>, <span class="st">&quot;beer&quot;</span>)
+
+beer_df &lt;-<span class="st"> </span>beer_df %&gt;%<span class="st"> </span>dplyr::<span class="kw">filter</span>(!<span class="kw">is.na</span>(beer)) %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">dtime=</span><span class="kw">ymd</span>(<span class="kw">paste0</span>(dtime,<span class="st">&quot;-01&quot;</span>)))
+
+<span class="co"># ts 변환</span>
+<span class="kw">head</span>(beer_df)</code></pre></div>
+<pre class="output"><code># A tibble: 6 × 2
+       dtime  beer
+      &lt;date&gt; &lt;dbl&gt;
+1 1956-01-01  93.2
+2 1956-02-01  96.0
+3 1956-03-01  95.2
+4 1956-04-01  77.1
+5 1956-05-01  70.9
+6 1956-06-01  64.8
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tail</span>(beer_df)</code></pre></div>
+<pre class="output"><code># A tibble: 6 × 2
+       dtime  beer
+      &lt;date&gt; &lt;dbl&gt;
+1 1995-03-01   152
+2 1995-04-01   127
+3 1995-05-01   151
+4 1995-06-01   130
+5 1995-07-01   119
+6 1995-08-01   153
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">beer_ts &lt;-<span class="st"> </span><span class="kw">ts</span>(beer_df[,-<span class="dv">1</span>], <span class="dt">start=</span><span class="kw">c</span>(<span class="dv">1956</span>,<span class="dv">01</span>), <span class="dt">frequency=</span><span class="dv">12</span>)
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">plot</span>(beer_df, <span class="dt">main=</span><span class="st">&quot;시계열 정보 활용 못함&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;맥주생산량&quot;</span>)
+<span class="kw">plot</span>(beer_ts, <span class="dt">main=</span><span class="st">&quot;시계열 정보 활용 직선으로 연결함&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;맥주생산량&quot;</span>)</code></pre></div>
+<p><img src="fig/time-series-data-import-1.png" title="plot of chunk time-series-data-import" alt="plot of chunk time-series-data-import" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># xts 변환</span>
+beer_xts &lt;-<span class="st"> </span><span class="kw">as.xts</span>(beer_df[,-<span class="dv">1</span>], <span class="dt">order.by=</span>beer_df$dtime)
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))
+<span class="kw">plot</span>(beer_xts)</code></pre></div>
+<p><img src="fig/time-series-data-import-2.png" title="plot of chunk time-series-data-import" alt="plot of chunk time-series-data-import" style="display: block; margin: auto;" /></p>
+<h3 id="시계열-데이터-시각화-time-series-sunsplot">1.2. 시계열 데이터 시각화 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></h3>
+<p>시계열 데이터를 시각화할 경우 시계열 시간이 항상 시계열 관측값보다 긴 것이 좋다. 태양의 흑점수(sunspot)를 관측한 데이터의 특징은 흑점개수가 빠르게 증가하고 느리게 감소하는 경향이 있는데 상단 그래프(시간축이 관측축보다 긴 경우)는 이런 경향이 잘 관찰되지만, 하단 그래프(시간축과 관측축이 동일한 경우)는 이런 경향을 확인하기 상대적으로 쉽지 않다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 2. 시각화----------------------------------------------------</span>
+<span class="kw">require</span>(graphics)
+<span class="kw">data</span>(sunspot.year)
+<span class="kw">layout</span>(<span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>:<span class="dv">2</span>, <span class="dv">1</span>:<span class="dv">2</span>), <span class="dt">ncol=</span><span class="dv">2</span>), <span class="dt">height=</span><span class="kw">c</span>(.<span class="dv">2</span>,.<span class="dv">8</span>))
+
+<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(.<span class="dv">2</span>,<span class="fl">3.5</span>,<span class="dv">0</span>,.<span class="dv">5</span>), <span class="dt">oma=</span><span class="kw">c</span>(<span class="fl">3.5</span>,<span class="dv">0</span>,.<span class="dv">5</span>,<span class="dv">0</span>), <span class="dt">mgp=</span><span class="kw">c</span>(<span class="dv">2</span>,.<span class="dv">6</span>,<span class="dv">0</span>), <span class="dt">tcl=</span>-.<span class="dv">3</span>, <span class="dt">las=</span><span class="dv">1</span>)
+
+<span class="kw">plot</span>(sunspot.year, <span class="dt">type=</span><span class="st">&#39;n&#39;</span>, <span class="dt">xaxt=</span><span class="st">&#39;no&#39;</span>, <span class="dt">ylab=</span><span class="st">&#39;&#39;</span>)
+  <span class="kw">grid</span>(<span class="dt">lty=</span><span class="dv">1</span>, <span class="dt">col=</span><span class="kw">gray</span>(.<span class="dv">9</span>))
+  <span class="kw">lines</span>(sunspot.year)
+  
+<span class="kw">plot</span>(sunspots, <span class="dt">type=</span><span class="st">&#39;n&#39;</span>, <span class="dt">ylab=</span><span class="st">&#39;&#39;</span>)
+  <span class="kw">grid</span>(<span class="dt">lty=</span><span class="dv">1</span>, <span class="dt">col=</span><span class="kw">gray</span>(.<span class="dv">9</span>))
+  <span class="kw">lines</span>(sunspot.year)
+
+<span class="kw">title</span>(<span class="dt">xlab=</span><span class="st">&quot;시간&quot;</span>, <span class="dt">outer=</span><span class="ot">TRUE</span>, <span class="dt">cex.lab=</span><span class="fl">1.2</span>)
+<span class="kw">mtext</span>(<span class="dt">side=</span><span class="dv">2</span>, <span class="st">&quot;태양의 흑점개수&quot;</span>, <span class="dt">line=</span><span class="dv">2</span>, <span class="dt">las=</span><span class="dv">0</span>, <span class="dt">adj=</span>.<span class="dv">75</span>)</code></pre></div>
+<p><img src="fig/time-series-warning-1.png" title="plot of chunk time-series-warning" alt="plot of chunk time-series-warning" style="display: block; margin: auto;" /></p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf">Eric Zivot(2014), “Working with Financial Time Series Data in R”</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="http://www.stat.pitt.edu/stoffer/tsa4/tsaEZ.pdf">The sunspot numbers plotted in different-sized boxes, demonstrating that the dimensions of the graphic matters when displaying time series data</a><a href="#fnref2">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

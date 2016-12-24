@@ -11,15 +11,7 @@ mainfont: NanumGothic
 ---
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-library(tidyverse)
-library(statisticalModeling)
-library(xts)
-library(stringr)
-library(ggplot2)
-library(scales)
-```
+
 > ## 학습 목표 {.objectives}
 >
 > * 시계열 데이터를 이해한다.
@@ -56,7 +48,8 @@ library(scales)
 Base 팩키지에 포함된 `ts` 함수를 사용하면 간단한 시계열 데이터를 생성시킬 수 있다.
 특히 `window` 함수를 활용하여 특정 기간 데이터도 쉽게 뽑아낼 수 있다.
 
-``` {r time-series-data-input, message=FALSE, warning=FALSE}
+
+~~~{.r}
 # 0. 환경설정 --------------------------------------------------------------
 library(tidyverse)
 library(lubridate)
@@ -67,16 +60,69 @@ library(xts)
 dat <- c(7,5,3,1,3,5,7)
 dat_ts <- as.ts(dat)
 dat_ts
+~~~
 
+
+
+~~~{.output}
+Time Series:
+Start = 1 
+End = 7 
+Frequency = 1 
+[1] 7 5 3 1 3 5 7
+
+~~~
+
+
+
+~~~{.r}
 dat_1987_ts <- ts(dat, start=1987)
 dat_1987_ts
+~~~
 
+
+
+~~~{.output}
+Time Series:
+Start = 1987 
+End = 1993 
+Frequency = 1 
+[1] 7 5 3 1 3 5 7
+
+~~~
+
+
+
+~~~{.r}
 dat_quarter_ts <- ts(dat, start=c(1987,3), frequency=4)
 dat_quarter_ts
+~~~
 
+
+
+~~~{.output}
+     Qtr1 Qtr2 Qtr3 Qtr4
+1987              7    5
+1988    3    1    3    5
+1989    7               
+
+~~~
+
+
+
+~~~{.r}
 # 특정기간 뽑아내기
 window(dat_quarter_ts, start=c(1987,3), end=c(1988,4))
-```
+~~~
+
+
+
+~~~{.output}
+     Qtr1 Qtr2 Qtr3 Qtr4
+1987              7    5
+1988    3    1    3    5
+
+~~~
 
 **시계열 자료구조를 활용하는 이유**  
 
@@ -87,7 +133,8 @@ window(dat_quarter_ts, start=c(1987,3), end=c(1988,4))
 `xts` 팩키지를 활용하면 불규칙, 규칙 시계열 데이터를 자체 색인을 통해 빠르게 접근하고 
 다양한 시계열 데이터를 자유로이 다룰 수 있는 도구상자를 지원한다.
 
-``` {r time-series-data-import, message=FALSE, warning=FALSE}
+
+~~~{.r}
 ## 1.2. 데이터셋에서 불러오기----------------------------------------------------
 # 맥주생산량 데이터
 beer_df <- read_csv("https://raw.githubusercontent.com/jamesrobertlloyd/gp-structure-search/master/data/raw/TSDL/monthly-beer-production-in-austr.csv") 
@@ -97,19 +144,65 @@ beer_df <- beer_df %>% dplyr::filter(!is.na(beer)) %>% mutate(dtime=ymd(paste0(d
 
 # ts 변환
 head(beer_df)
+~~~
+
+
+
+~~~{.output}
+# A tibble: 6 × 2
+       dtime  beer
+      <date> <dbl>
+1 1956-01-01  93.2
+2 1956-02-01  96.0
+3 1956-03-01  95.2
+4 1956-04-01  77.1
+5 1956-05-01  70.9
+6 1956-06-01  64.8
+
+~~~
+
+
+
+~~~{.r}
 tail(beer_df)
+~~~
+
+
+
+~~~{.output}
+# A tibble: 6 × 2
+       dtime  beer
+      <date> <dbl>
+1 1995-03-01   152
+2 1995-04-01   127
+3 1995-05-01   151
+4 1995-06-01   130
+5 1995-07-01   119
+6 1995-08-01   153
+
+~~~
+
+
+
+~~~{.r}
 beer_ts <- ts(beer_df[,-1], start=c(1956,01), frequency=12)
 
 par(mfrow=c(1,2))
 plot(beer_df, main="시계열 정보 활용 못함", xlab="", ylab="맥주생산량")
 plot(beer_ts, main="시계열 정보 활용 직선으로 연결함", xlab="", ylab="맥주생산량")
+~~~
 
+<img src="fig/time-series-data-import-1.png" title="plot of chunk time-series-data-import" alt="plot of chunk time-series-data-import" style="display: block; margin: auto;" />
+
+~~~{.r}
 # xts 변환
 beer_xts <- as.xts(beer_df[,-1], order.by=beer_df$dtime)
 
 par(mfrow=c(1,1))
 plot(beer_xts)
-```
+~~~
+
+<img src="fig/time-series-data-import-2.png" title="plot of chunk time-series-data-import" alt="plot of chunk time-series-data-import" style="display: block; margin: auto;" />
 
 ### 1.2. 시계열 데이터 시각화 [^time-series-sunsplot]
 
@@ -121,7 +214,8 @@ the graphic matters when displaying time series data](http://www.stat.pitt.edu/s
 상단 그래프(시간축이 관측축보다 긴 경우)는 이런 경향이 잘 관찰되지만, 
 하단 그래프(시간축과 관측축이 동일한 경우)는 이런 경향을 확인하기 상대적으로 쉽지 않다.
 
-``` {r time-series-warning, message=FALSE, warning=FALSE}
+
+~~~{.r}
 # 2. 시각화----------------------------------------------------
 require(graphics)
 data(sunspot.year)
@@ -139,4 +233,6 @@ plot(sunspots, type='n', ylab='')
 
 title(xlab="시간", outer=TRUE, cex.lab=1.2)
 mtext(side=2, "태양의 흑점개수", line=2, las=0, adj=.75)
-```
+~~~
+
+<img src="fig/time-series-warning-1.png" title="plot of chunk time-series-warning" alt="plot of chunk time-series-warning" style="display: block; margin: auto;" />
