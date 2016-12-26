@@ -30,6 +30,7 @@ title: 데이터 과학 -- 기초 통계
     - [단일 표본 비율검정 -- 웹사이트 선호도 분석](stat-coursera-prop-test.html)
 1. [통계 모형(Statistical models)](stat-modeling.html)
     - [시계열 모형 - 기초](stat-time-series-basics.html)    
+    - [탐색적 시계열 데이터 분석](stat-time-series-eda.html)
 1. [채팅 로그](stat-chatting-log.html)
 1. [베이즈 정리](stat-bayes.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
