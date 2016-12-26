@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: 데이터 과학 – 기초 통계</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-59802572-17', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
+          <h2 class="subtitle">탐색적 시계열 데이터 분석</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>시계열 데이터 유형을 파악한다.</li>
+<li>주요 시계열 모형 및 기본 가정을 살펴본다.</li>
+</ul>
+</div>
+</section>
+<h2 id="시계열-데이터-종류">시계열 데이터 종류</h2>
+<p>시계열 데이터의 종류는 크게 보면 두가지 구체적으로 세가지 유형이 있다.</p>
+<ul>
+<li>등간격 규칙을 갖는 시계열 데이터</li>
+<li>불규칙 간격을 갖는 시계열 데이터</li>
+<li>등간격 규칙을 갖으나 결측값이 포함된 시계열 데이터</li>
+</ul>
+<p>다음에 나와 있는 시계열 데이터는 이를 특성을 잘 나타내고 있다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(zoo)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))
+
+<span class="co"># 규칙을 갖는 시계열 데이터 ---------------------------------</span>
+reg_ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(<span class="kw">sample</span>(<span class="dv">20</span>), <span class="dt">frequency =</span> <span class="dv">4</span> , <span class="dt">start=</span> <span class="dv">1998</span>)
+reg_ts_dat</code></pre></div>
+<pre class="output"><code>     Qtr1 Qtr2 Qtr3 Qtr4
+1998   20   18   12   16
+1999    7   13   15    1
+2000    8    4   19   17
+2001    2    9   11    3
+2002    5   10   14    6
+</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(reg_ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.8</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)
+
+<span class="co"># 불규칙 시계열 데이터 --------------------------------------</span>
+## 불균등 관측점을 갖는 시계열 데이터 -----------------------
+dat_date &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;2016-12-05&quot;</span>, <span class="st">&quot;2016-11-30&quot;</span>, <span class="st">&quot;2016-12-7&quot;</span> ,<span class="st">&quot;2016-12-17&quot;</span> ,<span class="st">&quot;2016-11-15&quot;</span>, <span class="st">&quot;2016-12-31&quot;</span>, <span class="st">&quot;2016-12-28&quot;</span>)
+dat_value &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">7</span>)
+dat_zoo &lt;-<span class="st"> </span><span class="kw">zoo</span>(dat_value, <span class="kw">as.Date</span>(dat_date))
+
+<span class="kw">plot</span>(dat_zoo, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.7</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)
+
+## 규칙을 갖는 시계열이나 결측값이 있는 시계열 데이터 -------
+dat &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sample</span>(<span class="dv">3</span>),<span class="ot">NA</span>,<span class="kw">sample</span>(<span class="dv">3</span>), <span class="ot">NA</span>, <span class="kw">sample</span>(<span class="dv">4</span>))
+ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(dat, <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">2016</span>, <span class="dv">1</span>), <span class="dt">frequency=</span><span class="dv">12</span>)
+
+<span class="kw">plot</span>(ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.7</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</code></pre></div>
+<p><img src="fig/time-series-eda-1.png" title="plot of chunk time-series-eda" alt="plot of chunk time-series-eda" style="display: block; margin: auto;" /></p>
+<h2 id="시계열-데이터-기본-가정-및-시계열-모형">시계열 데이터 기본 가정 및 시계열 모형</h2>
+<p>시계열 데이터에 대한 기본 가정은 다음과 같다.</p>
+<ul>
+<li>시계열 관측점은 등간격(equally spaced)이다.</li>
+<li>시간 인덱스는 이산 시간 관측점을 적용한다.</li>
+<li>이런 가정은 근사적으로 성립한다.
+<ul>
+<li>주식시장 일별 수익률은 주말과 휴일에는 적용되지 않는다.</li>
+<li>주요 경제지표(소비자 물가지수 등)는 일별이 아닌 월별로 적용된다.</li>
+</ul></li>
+</ul>
+<p>시계열 모형은 크게 4가지 모형으로 분류된다.</p>
+<ul>
+<li>백색잡음 (White Noise)</li>
+<li>랜덤워크 (Random Walk)</li>
+<li>자기회귀 (Autoregression)</li>
+<li>이동평균 (Moving Average)</li>
+</ul>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h3 id="월드-분해정리-wolds-decomposition-theorem"><span class="glyphicon glyphicon-pushpin"></span>월드 분해정리 (Wold’s decomposition theorem)</h3>
+</div>
+<div class="panel-body">
+<p>월드는 정상성을 갖는 모든 시계열 데이터는 백색잡음의 선형결합으로 표현될 수 있다는 것을 증명하여 노벨상을 수상했다.</p>
+<p><span class="math inline">\(X_t = W_t + a_1 W_{t-1} + a_2 W_{t-2} + \cdots\)</span></p>
+<p>ARMA 모형은 월드 분해정리를 따르는 잘 따라서 시계열 데이터를 모형화하기 적합하다.</p>
+</div>
+</aside>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>

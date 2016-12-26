@@ -11,14 +11,7 @@ mainfont: NanumGothic
 ---
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-library(tidyverse)
-library(xts)
-library(stringr)
-library(ggplot2)
-library(scales)
-```
+
 > ## 학습 목표 {.objectives}
 >
 > * 시계열 데이터 유형을 파악한다.
@@ -35,13 +28,31 @@ library(scales)
 
 다음에 나와 있는 시계열 데이터는 이를 특성을 잘 나타내고 있다. 
 
-``` {r time-series-eda, message=FALSE, warning=FALSE}
+
+~~~{.r}
 library(zoo)
 par(mfrow=c(3,1))
 
 # 규칙을 갖는 시계열 데이터 ---------------------------------
 reg_ts_dat <- ts(sample(20), frequency = 4 , start= 1998)
 reg_ts_dat
+~~~
+
+
+
+~~~{.output}
+     Qtr1 Qtr2 Qtr3 Qtr4
+1998   20   18   12   16
+1999    7   13   15    1
+2000    8    4   19   17
+2001    2    9   11    3
+2002    5   10   14    6
+
+~~~
+
+
+
+~~~{.r}
 plot(reg_ts_dat, type="o", lty=5, lwd=0.8, pch="O", col=2, xlab="", ylab="")
 
 # 불규칙 시계열 데이터 --------------------------------------
@@ -57,7 +68,9 @@ dat <- c(sample(3),NA,sample(3), NA, sample(4))
 ts_dat <- ts(dat, start = c(2016, 1), frequency=12)
 
 plot(ts_dat, type="o", lty=5, lwd=0.7, pch="O", col=2, xlab="", ylab="")
-```
+~~~
+
+<img src="fig/time-series-eda-1.png" title="plot of chunk time-series-eda" alt="plot of chunk time-series-eda" style="display: block; margin: auto;" />
 
 ## 시계열 데이터 기본 가정 및 시계열 모형
 
