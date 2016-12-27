@@ -65,11 +65,11 @@
 reg_ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(<span class="kw">sample</span>(<span class="dv">20</span>), <span class="dt">frequency =</span> <span class="dv">4</span> , <span class="dt">start=</span> <span class="dv">1998</span>)
 reg_ts_dat</code></pre></div>
 <pre class="output"><code>     Qtr1 Qtr2 Qtr3 Qtr4
-1998   20   18   12   16
-1999    7   13   15    1
-2000    8    4   19   17
-2001    2    9   11    3
-2002    5   10   14    6
+1998   10   17    8    3
+1999    5   12   19   14
+2000    4   16    1   20
+2001   15    7   18    6
+2002   11    2    9   13
 </code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(reg_ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.8</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)
 
@@ -112,9 +112,91 @@ ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(dat, <span class
 <div class="panel-body">
 <p>월드는 정상성을 갖는 모든 시계열 데이터는 백색잡음의 선형결합으로 표현될 수 있다는 것을 증명하여 노벨상을 수상했다.</p>
 <p><span class="math inline">\(X_t = W_t + a_1 W_{t-1} + a_2 W_{t-2} + \cdots\)</span></p>
-<p>ARMA 모형은 월드 분해정리를 따르는 잘 따라서 시계열 데이터를 모형화하기 적합하다.</p>
+<p><span class="math inline">\(W_i\)</span>는 백색잡음, ARMA 모형은 월드 분해정리에 따라 시계열 데이터를 모형화하기 적합하다.</p>
 </div>
 </aside>
+<h2 id="시계열-데이터-분석-흐름-time-series-concept-example">시계열 데이터 분석 흐름 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h2>
+<p>시계열 데이터를 분석하기 위해서 가장 먼저 문자형과 숫자형으로 준비된 데이터프레임을 시간자료구조를 포함한 적절한 데이터프레임으로 변환하는 과정이 필요하다. 시계열 데이터프레임이 준비되면 시각화를 통해 시계열 데이터 상태를 파악하고 정상 시계열 데이터로 변화하는 과정에 전념한다.</p>
+<p><img src="fig/stat-time-series-workflow.png" alt="시계열 데이터 분석 흐름" width="77%" /></p>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h3 id="정상성stationarity과-약정상성weak-stationarity"><span class="glyphicon glyphicon-pushpin"></span>정상성(Stationarity)과 약정상성(Weak Stationarity)</h3>
+</div>
+<div class="panel-body">
+<p>정상성을 갖는 시계열 데이터는 랜덤한 움직임을 갖지만 시점마다 유사하게 동작하는 특징이 있어 시간에 따라 안정된 분포를 갖는다. 약정상성은 시간에 따라 일정한 평균, 분산, 공분산을 갖는 확률과정으로 정의된다. 즉, 시계열 데이터 $Y_1 , Y_2 , $이 다음을 세가지 조건을 충족하면 된다.</p>
+<ul>
+<li>시계열 <span class="math inline">\(Y_t\)</span> 모든 시점 <span class="math inline">\(t\)</span>에 대해 평균이 <span class="math inline">\(\mu\)</span>로 같다.</li>
+<li>시계열 <span class="math inline">\(Y_t\)</span> 모든 시점 <span class="math inline">\(t\)</span>에 대해 분산이 <span class="math inline">\(\sigma^2\)</span>로 같다.</li>
+<li>시계열 <span class="math inline">\(Y_t\)</span>, <span class="math inline">\(Y_s\)</span> 모든 <span class="math inline">\(h\)</span>에 대해 공분산이 <span class="math inline">\(|t-s| = h\)</span>로 같다; 예를 들어, 6단위 만큼 차이가 나서 <span class="math inline">\(Cov(Y_1, Y_7 ) = Cov(Y_11 , Y_17 )\)</span>.</li>
+</ul>
+<p>특히, 정상성을 갖는 데이터는 절약성 원칙(Principle of Parsimony)에 따라 적은 모수만을 사용하여 모형을 만들 수 있는 장점이 있다.</p>
+</div>
+</aside>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>))
+
+<span class="co"># 백색잡음 시계열 -----------------------------------------------------------</span>
+y_t &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dt">mean=</span><span class="dv">0</span>, <span class="dt">sd=</span><span class="dv">1</span>)
+
+<span class="kw">ts.plot</span>(y_t, <span class="dt">main=</span><span class="st">&quot;백색잡음(White Noise)&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;시간(time)&quot;</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
+<span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>)
+
+<span class="co"># 추세를 갖는 시계열--------------------------------------------------</span>
+e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>, <span class="dv">10</span>)
+trend_yt &lt;-<span class="st"> </span><span class="fl">0.5</span>*<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">100</span>) +<span class="st"> </span>e
+
+<span class="kw">ts.plot</span>(trend_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;추세를 갖는 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="fl">0.5</span>)
+
+<span class="co"># 랜덤워크 시계열 -----------------------------------------------------------</span>
+
+e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>)
+rw_yt &lt;-<span class="st"> </span><span class="kw">cumsum</span>(e)
+<span class="kw">ts.plot</span>(rw_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;랜덤워크 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>)
+
+<span class="co"># 분산이 커지는 시계열 -----------------------------------------------------------</span>
+e &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:<span class="dv">100</span>, function(x) <span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">2</span>*x/<span class="dv">100</span>))
+var_yt &lt;-<span class="st"> </span><span class="fl">0.1</span>*<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">100</span>) +<span class="st"> </span>e
+
+<span class="kw">ts.plot</span>(var_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;추세와 분산이 커지는 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="fl">0.1</span>)
+
+<span class="co"># 평균이 증가하는 시계열 -----------------------------------------------------------</span>
+mean_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">50</span>), <span class="kw">rnorm</span>(<span class="dv">50</span>, <span class="dv">5</span>))
+
+<span class="kw">ts.plot</span>(mean_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;평균이 변화하는 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>) 
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">5</span>, <span class="dt">b=</span><span class="dv">0</span>)
+
+
+<span class="co"># 분산이 변화하는 시계열 -----------------------------------------------------------</span>
+var_change_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="kw">rnorm</span>(<span class="dv">200</span>,<span class="dv">0</span>,<span class="dv">10</span>), <span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>))
+
+<span class="kw">ts.plot</span>(var_change_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;분산이 변화하는 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>) </code></pre></div>
+<p><img src="fig/time-series-concept-1.png" title="plot of chunk time-series-concept" alt="plot of chunk time-series-concept" style="display: block; margin: auto;" /></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">백색잡음</th>
+<th align="left">추세를 갖는 시계열</th>
+<th align="left">랜덤워크 시계열</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">추세와 분산이 커지는 시계열</td>
+<td align="left">평균이 변화하는 시계열</td>
+<td align="left">분산이 변화하는 시계열</td>
+</tr>
+</tbody>
+</table>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="http://stackoverflow.com/questions/33522442/stationarity-tests-in-r-checking-mean-variance-and-covariance">Stationarity Tests in R, checking mean, variance and covariance</a><a href="#fnref1">↩</a></p></li>
+</ol>
+</div>
         </div>
       </div>
       </article>
