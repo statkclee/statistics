@@ -42,11 +42,11 @@ reg_ts_dat
 
 ~~~{.output}
      Qtr1 Qtr2 Qtr3 Qtr4
-1998   10   17    8    3
-1999    5   12   19   14
-2000    4   16    1   20
-2001   15    7   18    6
-2002   11    2    9   13
+1998   12   18    1   19
+1999   11    6   14    9
+2000    4    5    7   15
+2001    2   17    8   10
+2002   13    3   16   20
 
 ~~~
 
@@ -110,17 +110,7 @@ plot(ts_dat, type="o", lty=5, lwd=0.7, pch="O", col=2, xlab="", ylab="")
 <img src="fig/stat-time-series-workflow.png" alt="시계열 데이터 분석 흐름" width="77%" />
 
 
-> ### 정상성(Stationarity)과 약정상성(Weak Stationarity) {.callout}
-> 
-> 정상성을 갖는 시계열 데이터는 랜덤한 움직임을 갖지만 시점마다 유사하게 동작하는 특징이 있어 시간에 따라 안정된 분포를 갖는다.
-> 약정상성은 시간에 따라 일정한 평균, 분산, 공분산을 갖는 확률과정으로 정의된다. 즉, 시계열 데이터 $Y_1 , Y_2 , \cdots $이 다음을 세가지 
-> 조건을 충족하면 된다.
-> 
-> - 시계열 $Y_t$ 모든 시점 $t$에 대해 평균이 $\mu$로 같다.
-> - 시계열 $Y_t$ 모든 시점 $t$에 대해 분산이 $\sigma^2$로 같다.
-> - 시계열 $Y_t$, $Y_s$ 모든 $h$에 대해 공분산이 $|t-s| = h$로 같다; 예를 들어, 6단위 만큼 차이가 나서 $Cov(Y_1, Y_7 ) = Cov(Y_11 , Y_17 )$.
-> 
-> 특히, 정상성을 갖는 데이터는 절약성 원칙(Principle of Parsimony)에 따라 적은 모수만을 사용하여 모형을 만들 수 있는 장점이 있다.
+시계열 데이터는 백색잡음 시계열, 증가 혹은 감소하는 추세를 갖는 시계열, 분산이 변화하는 시계열, 평균이 변화하는 시계열, 계절성 주기를 갖는 시계열등 다양하다.
 
 
 
@@ -175,4 +165,116 @@ abline(a=0, b=0)
 |--------------|--------------------|---------------------|
 | 추세와 분산이 커지는 시계열 | 평균이 변화하는 시계열 | 분산이 변화하는 시계열 |
 
+### 정상성(Stationarity) 확보
 
+> ### 정상성(Stationarity)과 약정상성(Weak Stationarity) {.callout}
+> 
+> 정상성을 갖는 시계열 데이터는 랜덤한 움직임을 갖지만 시점마다 유사하게 동작하는 특징이 있어 시간에 따라 안정된 분포를 갖는다.
+> 약정상성은 시간에 따라 일정한 평균, 분산, 공분산을 갖는 확률과정으로 정의된다. 즉, 시계열 데이터 $Y_1 , Y_2 , \cdots $이 다음을 세가지 
+> 조건을 충족하면 된다.
+> 
+> - 시계열 $Y_t$ 모든 시점 $t$에 대해 평균이 $\mu$로 같다.
+> - 시계열 $Y_t$ 모든 시점 $t$에 대해 분산이 $\sigma^2$로 같다.
+> - 시계열 $Y_t$, $Y_s$ 모든 $h$에 대해 공분산이 $|t-s| = h$로 같다; 예를 들어, 6단위 만큼 시점차이가 나는 경우 $Cov(Y_1, Y_7 ) = Cov(Y_{11} , Y_{17} )$.
+> 
+> 특히, 정상성을 갖는 데이터는 **절약성 원칙(Principle of Parsimony)** 에 따라 적은 모수만을 사용하여 모형을 만들 수 있는 장점이 있다.
+
+
+정상성을 확보하는 것이 중요하기 때문에 정상성을 갖지 않는 시계열 데이터를 정상 시계열로 돌리는데 다음과 같은 기법이 동원된다.
+
+- 로그변환: $log(Y_t )$ 을 통해 분산이 커지는 경향을 갖는 시계열을 안정화 시킴.
+- 차분: $diff(Y_t )$ 을 통해 차분을 하계 되면 추세를 제거하는 효과를 거둠.
+- 계절차분: $diff(Y_t ,  s)$ 을 통해 계절 차분을 하계 되면 계절추세를 제거하는 효과를 거둠.
+
+### 백색잡음(White Noise)
+
+백색잡음(White Noise)은 백색잡음은 고정된 평균, 분산을 갖고 시계열 상관은 없는 시계열 데이터로 
+`arima.sim()` 함수를 통해 모수를 조절해서 백색잡음 시계열을 추출할 수 있다.
+$\mu=0, \sigma=1$인 백색잡음 시계열과 $\mu=5, \sigma=4$인 백색잡음 시계열은 다음과 같은 형태를 띈다.
+`arima` 모형을 적합시키면 $\mu=5, \sigma=4$ 값에 가깝게 추정한 것을 확인할 수 있다.
+
+
+
+~~~{.r}
+# 백색잡음 시계열 -----------------------------------------------------------
+white_noise_zero <- arima.sim(model = list(order = c(0, 0, 0)), n = 250)
+white_noise_mean_sd <- arima.sim(model = list(order = c(0, 0, 0)), n = 250, mean =5, sd =2)
+
+par(mfrow=c(1,2))
+ts.plot(white_noise_zero, ylim=c(-10,10))
+ts.plot(white_noise_mean_sd, ylim=c(-10,10))
+~~~
+
+<img src="fig/time-series-white-noise-1.png" title="plot of chunk time-series-white-noise" alt="plot of chunk time-series-white-noise" style="display: block; margin: auto;" />
+
+~~~{.r}
+arima(white_noise_mean_sd)
+~~~
+
+
+
+~~~{.output}
+
+Call:
+arima(x = white_noise_mean_sd)
+
+Coefficients:
+      intercept
+         4.9079
+s.e.     0.1321
+
+sigma^2 estimated as 4.363:  log likelihood = -538.88,  aic = 1081.77
+
+~~~
+
+### 랜덤워크(Random Walk)
+
+랜덤워크는 다음과 같은 재귀식으로 표현된다.
+
+$\text{오늘} = \text{어제} + \text{잡음}$
+
+수학적으로 표현하면 
+
+$Y_t = Y_{t-1} + \epsilon_t$
+
+단위근(Unit root)가 존재하여 초기값 $Y_0$를 지정하는 것이 모의시험을 위해 필요하고, 랜덤워크 분산 $\sigma^2$ 모수만 갖는 확률과정이다.
+
+$Y_t - Y_{t-1} = \epsilon_t$
+
+차분(`diff()`)을 하게 되면 백색잡음 과정으로 환원된다.
+
+`arima.sim()` 함수에 차분 모수를 1로 설정하면 랜덤워크 시계열을 모의추출할 수 있다.
+이를 차분하면 백색잡음과정이 되고 이를 `arima` 모형으로 추정하면 평균과 분산이 처음 모의시험에서 설정한 모수에 근접함이 확인된다.
+
+
+~~~{.r}
+# 랜덤워크 시계열 -----------------------------------------------------------
+rw_yt <- arima.sim(model = list(order = c(0, 1, 0)), n = 250)
+diff_rw_yt <- diff(rw_yt)
+
+par(mfrow=c(1,2))
+ts.plot(rw_yt, ylim=c(-10,10))
+ts.plot(diff_rw_yt, ylim=c(-10,10))
+~~~
+
+<img src="fig/time-series-random-walk-1.png" title="plot of chunk time-series-random-walk" alt="plot of chunk time-series-random-walk" style="display: block; margin: auto;" />
+
+~~~{.r}
+arima(diff_rw_yt)
+~~~
+
+
+
+~~~{.output}
+
+Call:
+arima(x = diff_rw_yt)
+
+Coefficients:
+      intercept
+        -0.0803
+s.e.     0.0651
+
+sigma^2 estimated as 1.058:  log likelihood = -361.77,  aic = 727.54
+
+~~~
