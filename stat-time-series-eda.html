@@ -65,11 +65,11 @@
 reg_ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(<span class="kw">sample</span>(<span class="dv">20</span>), <span class="dt">frequency =</span> <span class="dv">4</span> , <span class="dt">start=</span> <span class="dv">1998</span>)
 reg_ts_dat</code></pre></div>
 <pre class="output"><code>     Qtr1 Qtr2 Qtr3 Qtr4
-1998   12   18    1   19
-1999   11    6   14    9
-2000    4    5    7   15
-2001    2   17    8   10
-2002   13    3   16   20
+1998    7   18   17   14
+1999    3   11    9    4
+2000    8   19   16   20
+2001    2   13    5   15
+2002    6    1   12   10
 </code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(reg_ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.8</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)
 
@@ -160,7 +160,7 @@ mean_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw"
 var_change_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="kw">rnorm</span>(<span class="dv">200</span>,<span class="dv">0</span>,<span class="dv">10</span>), <span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>))
 
 <span class="kw">ts.plot</span>(var_change_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;분산이 변화하는 시계열&quot;</span>)
-<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>) </code></pre></div>
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>)  </code></pre></div>
 <p><img src="fig/time-series-concept-1.png" title="plot of chunk time-series-concept" alt="plot of chunk time-series-concept" style="display: block; margin: auto;" /></p>
 <table>
 <thead>
@@ -216,10 +216,10 @@ arima(x = white_noise_mean_sd)
 
 Coefficients:
       intercept
-         4.9079
-s.e.     0.1321
+         4.9003
+s.e.     0.1340
 
-sigma^2 estimated as 4.363:  log likelihood = -538.88,  aic = 1081.77
+sigma^2 estimated as 4.488:  log likelihood = -542.41,  aic = 1088.82
 </code></pre>
 <h3 id="랜덤워크random-walk">랜덤워크(Random Walk)</h3>
 <p>랜덤워크는 다음과 같은 재귀식으로 표현된다.</p>
@@ -245,10 +245,10 @@ arima(x = diff_rw_yt)
 
 Coefficients:
       intercept
-        -0.0803
+        -0.0597
 s.e.     0.0651
 
-sigma^2 estimated as 1.058:  log likelihood = -361.77,  aic = 727.54
+sigma^2 estimated as 1.06:  log likelihood = -361.98,  aic = 727.95
 </code></pre>
 <div class="footnotes">
 <hr />

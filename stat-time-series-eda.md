@@ -42,11 +42,11 @@ reg_ts_dat
 
 ~~~{.output}
      Qtr1 Qtr2 Qtr3 Qtr4
-1998   12   18    1   19
-1999   11    6   14    9
-2000    4    5    7   15
-2001    2   17    8   10
-2002   13    3   16   20
+1998    7   18   17   14
+1999    3   11    9    4
+2000    8   19   16   20
+2001    2   13    5   15
+2002    6    1   12   10
 
 ~~~
 
@@ -156,7 +156,7 @@ abline(a=5, b=0)
 var_change_yt <- c(rnorm(150,0,1), rnorm(200,0,10), rnorm(150,0,1))
 
 ts.plot(var_change_yt, lwd=2, col="blue", main="분산이 변화하는 시계열")
-abline(a=0, b=0) 
+abline(a=0, b=0)  
 ~~~
 
 <img src="fig/time-series-concept-1.png" title="plot of chunk time-series-concept" alt="plot of chunk time-series-concept" style="display: block; margin: auto;" />
@@ -220,10 +220,10 @@ arima(x = white_noise_mean_sd)
 
 Coefficients:
       intercept
-         4.9079
-s.e.     0.1321
+         4.9003
+s.e.     0.1340
 
-sigma^2 estimated as 4.363:  log likelihood = -538.88,  aic = 1081.77
+sigma^2 estimated as 4.488:  log likelihood = -542.41,  aic = 1088.82
 
 ~~~
 
@@ -272,9 +272,9 @@ arima(x = diff_rw_yt)
 
 Coefficients:
       intercept
-        -0.0803
+        -0.0597
 s.e.     0.0651
 
-sigma^2 estimated as 1.058:  log likelihood = -361.77,  aic = 727.54
+sigma^2 estimated as 1.06:  log likelihood = -361.98,  aic = 727.95
 
 ~~~

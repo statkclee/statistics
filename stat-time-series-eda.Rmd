@@ -142,7 +142,7 @@ abline(a=5, b=0)
 var_change_yt <- c(rnorm(150,0,1), rnorm(200,0,10), rnorm(150,0,1))
 
 ts.plot(var_change_yt, lwd=2, col="blue", main="분산이 변화하는 시계열")
-abline(a=0, b=0) 
+abline(a=0, b=0)  
 ```
 
 |   백색잡음   | 추세를 갖는 시계열 |   랜덤워크 시계열   |
