@@ -33,7 +33,7 @@ library(scales)
 - 불규칙 간격을 갖는 시계열 데이터
 - 등간격 규칙을 갖으나 결측값이 포함된 시계열 데이터
 
-다음에 나와 있는 시계열 데이터는 이를 특성을 잘 나타내고 있다.
+다음에 나와 있는 시계열 데이터는 이를 특성을 잘 나타내고 있다. 
 
 ``` {r time-series-eda, message=FALSE, warning=FALSE}
 library(zoo)
