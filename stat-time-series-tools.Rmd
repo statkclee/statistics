@@ -47,7 +47,7 @@ library(ggplot2)
 library(xts)
 library(dygraphs)
 library(extrafont)
-library(xtsExtra)
+# library(xtsExtra)
 ```
 
 ### 금융 데이터 가져오기
@@ -138,9 +138,6 @@ korea_stocks_diff_df <- data.frame(korea_stocks_diff)
 
 plot(korea_stocks_diff_df$Samsung, korea_stocks_diff_df$Naver)
 abline(a=0.00002607821, b=0.22059696365, col="darkgray")
-
-plot(korea_stocks_diff_df$Samsung, korea_stocks_diff_df$Naver, ylim=c(-0.1,0.1), xlim=c(-0.05, 0.05))
-abline(a=0.00002607821, b=0.22059696365, col="darkgray")
 ```
 
 ### 시계열 데이터 상관계수
@@ -149,5 +146,6 @@ abline(a=0.00002607821, b=0.22059696365, col="darkgray")
 
 ``` {r time-series-correlation, message=FALSE}
 cor(korea_stocks)
-cor(korea_stocks_diff )
+cor(korea_stocks_diff[-1,])
+
 ```
