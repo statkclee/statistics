@@ -220,3 +220,4 @@ ts.plot(diff_rw_yt, ylim=c(-10,10))
 
 arima(diff_rw_yt)
 ```
+
