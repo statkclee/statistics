@@ -1,7 +1,7 @@
 ---
 layout: page
 title: 데이터 과학 -- 기초 통계
-subtitle: 탐색적 시계열 데이터 분석
+subtitle: 시계열 모형 식별 도구
 output:
   html_document: 
     keep_md: yes
@@ -21,202 +21,133 @@ library(scales)
 ```
 > ## 학습 목표 {.objectives}
 >
-> * 시계열 데이터 유형을 파악한다.
-> * 주요 시계열 모형 및 기본 가정을 살펴본다.
+> * 시계열 데이터 사전 분석 도구를 살펴본다.
+> * 시계열 데이터 시각화 및 (자기)상관 도구를 실습한다.
 
 
-## 시계열 데이터 종류
+## 금융 시계열 데이터 [^yahoo-finance-data]
 
-시계열 데이터의 종류는 크게 보면 두가지 구체적으로 세가지 유형이 있다.
+금융 시계열 데이터, 특히 주식관련 데이터는 [야후 파이낸스](https://finance.yahoo.com/) 통해서 신뢰성 높은 데이터를 
+빠른 시간내 획득할 수 있다.
 
-- 등간격 규칙을 갖는 시계열 데이터
-- 불규칙 간격을 갖는 시계열 데이터
-- 등간격 규칙을 갖으나 결측값이 포함된 시계열 데이터
+[^yahoo-finance-data]: [Plotting Time Series in R using Yahoo Finance data](http://blog.revolutionanalytics.com/2015/08/plotting-time-series-in-r.html)
 
-다음에 나와 있는 시계열 데이터는 이를 특성을 잘 나타내고 있다. 
 
-``` {r time-series-eda, message=FALSE, warning=FALSE}
-library(zoo)
-par(mfrow=c(3,1))
+### 금융 시계열 데이터 분석환경
 
-# 규칙을 갖는 시계열 데이터 ---------------------------------
-reg_ts_dat <- ts(sample(20), frequency = 4 , start= 1998)
-reg_ts_dat
-plot(reg_ts_dat, type="o", lty=5, lwd=0.8, pch="O", col=2, xlab="", ylab="")
+금융 시계열 데이터로 작업을 할 경우 가장 먼저 시계열 데이터를 조작해야 되는데,
+이런 경우 `zoo` 를 확장한 `xts` 팩키지를 많이 사용한다. 
+정적 시계열 데이터 시각화에는 `ggplot2` 팩키지, 동적 시계열 데이터 시각화에는 `dygraphs` 팩키지를 장착하여 활용한다.
 
-# 불규칙 시계열 데이터 --------------------------------------
-## 불균등 관측점을 갖는 시계열 데이터 -----------------------
-dat_date <- c("2016-12-05", "2016-11-30", "2016-12-7" ,"2016-12-17" ,"2016-11-15", "2016-12-31", "2016-12-28")
-dat_value <- sample(7)
-dat_zoo <- zoo(dat_value, as.Date(dat_date))
-
-plot(dat_zoo, type="o", lty=5, lwd=0.7, pch="O", col=2, xlab="", ylab="")
-
-## 규칙을 갖는 시계열이나 결측값이 있는 시계열 데이터 -------
-dat <- c(sample(3),NA,sample(3), NA, sample(4))
-ts_dat <- ts(dat, start = c(2016, 1), frequency=12)
-
-plot(ts_dat, type="o", lty=5, lwd=0.7, pch="O", col=2, xlab="", ylab="")
+``` {r time-series-financial-data-setup, message=FALSE}
+# install.packages("xts", repos="http://cloud.r-project.org")
+# install.packages("xtsExtra", repos="http://R-Forge.R-project.org")
+# 환경설정 
+library(ggplot2)
+library(xts)
+library(dygraphs)
+library(extrafont)
+library(xtsExtra)
 ```
 
-## 시계열 데이터 기본 가정 및 시계열 모형
+### 금융 데이터 가져오기
 
-시계열 데이터에 대한 기본 가정은 다음과 같다.
+금융 데이터를 가져올 때 `http://real-chart.finance.yahoo.com/table.csv?s=005930.KS&a=01&b=01&c=2015&d=12&e=31&f=2015&g=d&ignore=.csv` 
+url에서 삼성전자(005930.KS), 네이버 NHN(035420.KS)을 지정하고 기간정보를 적절히 설정하여 넘겨준다.
 
-- 시계열 관측점은 등간격(equally spaced)이다.
-- 시간 인덱스는 이산 시간 관측점을 적용한다.
-- 이런 가정은 근사적으로 성립한다.
-    - 주식시장 일별 수익률은 주말과 휴일에는 적용되지 않는다.
-    - 주요 경제지표(소비자 물가지수 등)는 일별이 아닌 월별로 적용된다.
+``` {r time-series-financial-data-import, message=FALSE}
+# 야후 금융데이터 -----------------------------------------------------------
+# https://finance.yahoo.com/
 
-시계열 모형은 크게 4가지 모형으로 분류된다.
+# 삼성과 네이버 주식시세
+samsung_url <- "http://real-chart.finance.yahoo.com/table.csv?s=005930.KS&a=01&b=01&c=2015&d=12&e=31&f=2015&g=d&ignore=.csv"
+naver_url   <- "http://real-chart.finance.yahoo.com/table.csv?s=035420.KS&a=01&b=01&c=2015&d=12&e=31&f=2015&g=d&ignore=.csv"
 
-- 백색잡음 (White Noise)
-- 랜덤워크 (Random Walk)
-- 자기회귀 (Autoregression)
-- 이동평균 (Moving Average)
+yahoo.read <- function(url){
+  dat <- read.table(url,header=TRUE,sep=",")
+  df <- dat[,c(1,5)]
+  df$Date <- as.Date(as.character(df$Date))
+  return(df)
+}
 
-
-> ### 월드 분해정리 (Wold's decomposition theorem) {.callout}
-> 
-> 월드는 정상성을 갖는 모든 시계열 데이터는 백색잡음의 선형결합으로 표현될 수 있다는 것을 
-증명하여 노벨상을 수상했다.  
-> 
-> $X_t = W_t + a_1 W_{t-1} + a_2 W_{t-2} + \cdots$  
->  
-> $W_i$는 백색잡음, ARMA 모형은 월드 분해정리에 따라 시계열 데이터를 모형화하기 적합하다.
-
-## 시계열 데이터 분석 흐름 [^time-series-concept-example]
-
-[^time-series-concept-example]: [Stationarity Tests in R, checking mean, variance and covariance](http://stackoverflow.com/questions/33522442/stationarity-tests-in-r-checking-mean-variance-and-covariance)
-
-시계열 데이터를 분석하기 위해서 가장 먼저 문자형과 숫자형으로 준비된 데이터프레임을 시간자료구조를 포함한 
-적절한 데이터프레임으로 변환하는 과정이 필요하다. 
-시계열 데이터프레임이 준비되면 시각화를 통해 시계열 데이터 상태를 파악하고 정상 시계열 데이터로 변화하는 과정에 전념한다.
-
-<img src="fig/stat-time-series-workflow.png" alt="시계열 데이터 분석 흐름" width="77%" />
-
-
-시계열 데이터는 백색잡음 시계열, 증가 혹은 감소하는 추세를 갖는 시계열, 분산이 변화하는 시계열, 평균이 변화하는 시계열, 계절성 주기를 갖는 시계열등 다양하다.
-
-
-``` {r time-series-concept, message=FALSE}
-par(mfrow=c(2,3))
-
-# 백색잡음 시계열 -----------------------------------------------------------
-y_t <- rnorm(100, mean=0, sd=1)
-
-ts.plot(y_t, main="백색잡음(White Noise)",xlab="시간(time)", col="blue", lwd=2)
-abline(h=0)
-
-# 추세를 갖는 시계열--------------------------------------------------
-e <- rnorm(100, 0, 10)
-trend_yt <- 0.5*seq(1,100) + e
-
-ts.plot(trend_yt, lwd=2, col="blue", main="추세를 갖는 시계열")
-abline(a=0, b=0.5)
-
-# 랜덤워크 시계열 -----------------------------------------------------------
-
-e <- rnorm(100)
-rw_yt <- cumsum(e)
-ts.plot(rw_yt, lwd=2, col="blue", main="랜덤워크 시계열")
-abline(h=0)
-
-# 분산이 커지는 시계열 -----------------------------------------------------------
-e <- sapply(1:100, function(x) rnorm(1, sd = 2*x/100))
-var_yt <- 0.1*seq(1,100) + e
-
-ts.plot(var_yt, lwd=2, col="blue", main="추세와 분산이 커지는 시계열")
-abline(a=0, b=0.1)
-
-# 평균이 증가하는 시계열 -----------------------------------------------------------
-mean_yt <- c(rnorm(50), rnorm(50, 5))
-
-ts.plot(mean_yt, lwd=2, col="blue", main="평균이 변화하는 시계열")
-abline(a=0, b=0) 
-abline(a=5, b=0)
-
-
-# 분산이 변화하는 시계열 -----------------------------------------------------------
-var_change_yt <- c(rnorm(150,0,1), rnorm(200,0,10), rnorm(150,0,1))
-
-ts.plot(var_change_yt, lwd=2, col="blue", main="분산이 변화하는 시계열")
-abline(a=0, b=0)  
+samsung <- yahoo.read(samsung_url)
+naver  <- yahoo.read(naver_url)
 ```
 
-|   백색잡음   | 추세를 갖는 시계열 |   랜덤워크 시계열   |
-|--------------|--------------------|---------------------|
-| 추세와 분산이 커지는 시계열 | 평균이 변화하는 시계열 | 분산이 변화하는 시계열 |
+### 금융 데이터 시각화: 단변량
 
-### 정상성(Stationarity) 확보
+정적 그래프를 통해 시각화하는 경우 `ggplot`, 인터랙티브 동적 그래프를 통해 시각화하는 경우 `dygraphs` 를 활용한다.
 
-> ### 정상성(Stationarity)과 약정상성(Weak Stationarity) {.callout}
-> 
-> 정상성을 갖는 시계열 데이터는 랜덤한 움직임을 갖지만 시점마다 유사하게 동작하는 특징이 있어 시간에 따라 안정된 분포를 갖는다.
-> 약정상성은 시간에 따라 일정한 평균, 분산, 공분산을 갖는 확률과정으로 정의된다. 즉, 시계열 데이터 $Y_1 , Y_2 , \cdots $이 다음을 세가지 
-> 조건을 충족하면 된다.
-> 
-> - 시계열 $Y_t$ 모든 시점 $t$에 대해 평균이 $\mu$로 같다.
-> - 시계열 $Y_t$ 모든 시점 $t$에 대해 분산이 $\sigma^2$로 같다.
-> - 시계열 $Y_t$, $Y_s$ 모든 $h$에 대해 공분산이 $|t-s| = h$로 같다; 예를 들어, 6단위 만큼 시점차이가 나는 경우 $Cov(Y_1, Y_7 ) = Cov(Y_{11} , Y_{17} )$.
-> 
-> 특히, 정상성을 갖는 데이터는 **절약성 원칙(Principle of Parsimony)** 에 따라 적은 모수만을 사용하여 모형을 만들 수 있는 장점이 있다.
+``` {r time-series-financial-data-viz, message=FALSE}
+# 주식시세 시각화 -------------------------------------------------------------
+# 정적 시각화
 
+ggplot(samsung, aes(Date,Close)) + 
+  geom_line(aes(color="samsung")) +
+  geom_line(data=naver,aes(color="naver")) +
+  labs(color="Legend") +
+  scale_colour_manual("", breaks = c("samsung", "naver"),
+                          values = c("blue", "brown")) +
+  labs(
+    title = "삼성전자, 네이버 종가",
+    x= "날짜",
+    y="주가") + 
+  theme(plot.title = element_text(lineheight=.7, face="bold", family="NanumGothic"))
 
-정상성을 확보하는 것이 중요하기 때문에 정상성을 갖지 않는 시계열 데이터를 정상 시계열로 돌리는데 다음과 같은 기법이 동원된다.
+# 동적 시각화
+samsung_xts <- xts(samsung$Close,order.by=samsung$Date,frequency=365)
+naver_xts <- xts(naver$Close,order.by=naver$Date,frequency=365)
 
-- 로그변환: $log(Y_t )$ 을 통해 분산이 커지는 경향을 갖는 시계열을 안정화 시킴.
-- 차분: $diff(Y_t )$ 을 통해 차분을 하계 되면 추세를 제거하는 효과를 거둠.
-- 계절차분: $diff(Y_t ,  s)$ 을 통해 계절 차분을 하계 되면 계절추세를 제거하는 효과를 거둠.
+korea_stocks <- cbind(samsung_xts, naver_xts)
+names(korea_stocks) <- c("Samsung", "Naver")
 
-### 백색잡음(White Noise)
+dygraph(korea_stocks, ylab="종가", 
+        main="삼성전자, 네이버 종가") %>%
+  dySeries("Samsung",label="삼성전자") %>%
+  dySeries("Naver",label="네이버") %>%
+  dyOptions(colors = c("blue","green")) %>%
+  dyRangeSelector()
+```
 
-백색잡음(White Noise)은 백색잡음은 고정된 평균, 분산을 갖고 시계열 상관은 없는 시계열 데이터로 
-`arima.sim()` 함수를 통해 모수를 조절해서 백색잡음 시계열을 추출할 수 있다.
-$\mu=0, \sigma=1$인 백색잡음 시계열과 $\mu=5, \sigma=4$인 백색잡음 시계열은 다음과 같은 형태를 띈다.
-`arima` 모형을 적합시키면 $\mu=5, \sigma=4$ 값에 가깝게 추정한 것을 확인할 수 있다.
+### 시계열 데이터 산점도
 
+네이버와 삼성전자 두 기업 주가 및 일별 수익률을 산점도로 찍어보면 상관관계를 확인할 수 있다.
 
-``` {r time-series-white-noise, message=FALSE}
-# 백색잡음 시계열 -----------------------------------------------------------
-white_noise_zero <- arima.sim(model = list(order = c(0, 0, 0)), n = 250)
-white_noise_mean_sd <- arima.sim(model = list(order = c(0, 0, 0)), n = 250, mean =5, sd =2)
+``` {r time-series-yahoo-scatterplot, message=FALSE}
+# 상관계수 -------------------------------------------------------------------
+
+korea_stock_df <- left_join(samsung, naver, by="Date")
+names(korea_stock_df) <- c("Date", "Samsung", "Naver")
+
+plot(korea_stock_df$Date, korea_stock_df$Samsung, type="l", col="blue", ylim = c(100000, 2000000), main="삼성전자, 네이버 종가")
+lines(korea_stock_df$Date, korea_stock_df$Naver, col="darkgreen")
+
+# 산점도
+plot(korea_stock_df$Samsung, korea_stock_df$Naver)
+abline(coef=coef(lm(korea_stock_df$Naver~korea_stock_df$Samsung)), col="darkgray")
+
+# 수익률
+
+korea_stocks_diff <- diff(log(korea_stocks), diff=1)
 
 par(mfrow=c(1,2))
-ts.plot(white_noise_zero, ylim=c(-10,10))
-ts.plot(white_noise_mean_sd, ylim=c(-10,10))
 
-arima(white_noise_mean_sd)
+xts::plot.xts(korea_stocks_diff)
+
+korea_stocks_diff_df <- data.frame(korea_stocks_diff)
+
+plot(korea_stocks_diff_df$Samsung, korea_stocks_diff_df$Naver)
+abline(a=0.00002607821, b=0.22059696365, col="darkgray")
+
+plot(korea_stocks_diff_df$Samsung, korea_stocks_diff_df$Naver, ylim=c(-0.1,0.1), xlim=c(-0.05, 0.05))
+abline(a=0.00002607821, b=0.22059696365, col="darkgray")
 ```
 
-### 랜덤워크(Random Walk)
+### 시계열 데이터 상관계수
 
-랜덤워크는 다음과 같은 재귀식으로 표현된다.
+삼성전자와 네이버 두 회사 주가 및 주식수익률에 대한 상관계수도 계산할 수 있다.
 
-$\text{오늘} = \text{어제} + \text{잡음}$
-
-수학적으로 표현하면 
-
-$Y_t = Y_{t-1} + \epsilon_t$
-
-단위근(Unit root)가 존재하여 초기값 $Y_0$를 지정하는 것이 모의시험을 위해 필요하고, 랜덤워크 분산 $\sigma^2$ 모수만 갖는 확률과정이다.
-
-$Y_t - Y_{t-1} = \epsilon_t$
-
-차분(`diff()`)을 하게 되면 백색잡음 과정으로 환원된다.
-
-`arima.sim()` 함수에 차분 모수를 1로 설정하면 랜덤워크 시계열을 모의추출할 수 있다.
-이를 차분하면 백색잡음과정이 되고 이를 `arima` 모형으로 추정하면 평균과 분산이 처음 모의시험에서 설정한 모수에 근접함이 확인된다.
-
-``` {r time-series-random-walk, message=FALSE}
-# 랜덤워크 시계열 -----------------------------------------------------------
-rw_yt <- arima.sim(model = list(order = c(0, 1, 0)), n = 250)
-diff_rw_yt <- diff(rw_yt)
-
-par(mfrow=c(1,2))
-ts.plot(rw_yt, ylim=c(-10,10))
-ts.plot(diff_rw_yt, ylim=c(-10,10))
-
-arima(diff_rw_yt)
+``` {r time-series-correlation, message=FALSE}
+cor(korea_stocks)
+cor(korea_stocks_diff )
 ```
