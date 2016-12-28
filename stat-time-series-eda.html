@@ -38,132 +38,222 @@
       <div class="row">
         <div class="col-md-10 col-md-offset-1">
                     <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
-          <h2 class="subtitle">시계열 모형 식별 도구</h2>
+          <h2 class="subtitle">탐색적 시계열 데이터 분석</h2>
           <section class="objectives panel panel-warning">
 <div class="panel-heading">
 <h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
 </div>
 <div class="panel-body">
 <ul>
-<li>시계열 데이터 사전 분석 도구를 살펴본다.</li>
-<li>시계열 데이터 시각화 및 (자기)상관 도구를 실습한다.</li>
+<li>시계열 데이터 유형을 파악한다.</li>
+<li>주요 시계열 모형 및 기본 가정을 살펴본다.</li>
 </ul>
 </div>
 </section>
-<h2 id="금융-시계열-데이터-yahoo-finance-data">금융 시계열 데이터 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h2>
-<p>금융 시계열 데이터, 특히 주식관련 데이터는 <a href="https://finance.yahoo.com/">야후 파이낸스</a> 통해서 신뢰성 높은 데이터를 빠른 시간내 획득할 수 있다.</p>
-<h3 id="금융-시계열-데이터-분석환경">금융 시계열 데이터 분석환경</h3>
-<p>금융 시계열 데이터로 작업을 할 경우 가장 먼저 시계열 데이터를 조작해야 되는데, 이런 경우 <code>zoo</code> 를 확장한 <code>xts</code> 팩키지를 많이 사용한다. 정적 시계열 데이터 시각화에는 <code>ggplot2</code> 팩키지, 동적 시계열 데이터 시각화에는 <code>dygraphs</code> 팩키지를 장착하여 활용한다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># install.packages(&quot;xts&quot;, repos=&quot;http://cloud.r-project.org&quot;)</span>
-<span class="co"># install.packages(&quot;xtsExtra&quot;, repos=&quot;http://R-Forge.R-project.org&quot;)</span>
-<span class="co"># 환경설정 </span>
-<span class="kw">library</span>(ggplot2)
-<span class="kw">library</span>(xts)
-<span class="kw">library</span>(dygraphs)</code></pre></div>
-<pre class="output"><code>Error in library(dygraphs): there is no package called &#39;dygraphs&#39;
+<h2 id="시계열-데이터-종류">시계열 데이터 종류</h2>
+<p>시계열 데이터의 종류는 크게 보면 두가지 구체적으로 세가지 유형이 있다.</p>
+<ul>
+<li>등간격 규칙을 갖는 시계열 데이터</li>
+<li>불규칙 간격을 갖는 시계열 데이터</li>
+<li>등간격 규칙을 갖으나 결측값이 포함된 시계열 데이터</li>
+</ul>
+<p>다음에 나와 있는 시계열 데이터는 이를 특성을 잘 나타내고 있다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(zoo)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))
+
+<span class="co"># 규칙을 갖는 시계열 데이터 ---------------------------------</span>
+reg_ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(<span class="kw">sample</span>(<span class="dv">20</span>), <span class="dt">frequency =</span> <span class="dv">4</span> , <span class="dt">start=</span> <span class="dv">1998</span>)
+reg_ts_dat</code></pre></div>
+<pre class="output"><code>     Qtr1 Qtr2 Qtr3 Qtr4
+1998   12    3   11    2
+1999   17    1    8   18
+2000    6    9   16   15
+2001   20   19   10    4
+2002   13    7    5   14
 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(extrafont)
-<span class="kw">library</span>(xtsExtra)</code></pre></div>
-<pre class="output"><code>Error in library(xtsExtra): there is no package called &#39;xtsExtra&#39;
-</code></pre>
-<h3 id="금융-데이터-가져오기">금융 데이터 가져오기</h3>
-<p>금융 데이터를 가져올 때 <code>http://real-chart.finance.yahoo.com/table.csv?s=005930.KS&amp;a=01&amp;b=01&amp;c=2015&amp;d=12&amp;e=31&amp;f=2015&amp;g=d&amp;ignore=.csv</code> url에서 삼성전자(005930.KS), 네이버 NHN(035420.KS)을 지정하고 기간정보를 적절히 설정하여 넘겨준다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 야후 금융데이터 -----------------------------------------------------------</span>
-<span class="co"># https://finance.yahoo.com/</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(reg_ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.8</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)
 
-<span class="co"># 삼성과 네이버 주식시세</span>
-samsung_url &lt;-<span class="st"> &quot;http://real-chart.finance.yahoo.com/table.csv?s=005930.KS&amp;a=01&amp;b=01&amp;c=2015&amp;d=12&amp;e=31&amp;f=2015&amp;g=d&amp;ignore=.csv&quot;</span>
-naver_url   &lt;-<span class="st"> &quot;http://real-chart.finance.yahoo.com/table.csv?s=035420.KS&amp;a=01&amp;b=01&amp;c=2015&amp;d=12&amp;e=31&amp;f=2015&amp;g=d&amp;ignore=.csv&quot;</span>
+<span class="co"># 불규칙 시계열 데이터 --------------------------------------</span>
+## 불균등 관측점을 갖는 시계열 데이터 -----------------------
+dat_date &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;2016-12-05&quot;</span>, <span class="st">&quot;2016-11-30&quot;</span>, <span class="st">&quot;2016-12-7&quot;</span> ,<span class="st">&quot;2016-12-17&quot;</span> ,<span class="st">&quot;2016-11-15&quot;</span>, <span class="st">&quot;2016-12-31&quot;</span>, <span class="st">&quot;2016-12-28&quot;</span>)
+dat_value &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">7</span>)
+dat_zoo &lt;-<span class="st"> </span><span class="kw">zoo</span>(dat_value, <span class="kw">as.Date</span>(dat_date))
 
-yahoo.read &lt;-<span class="st"> </span>function(url){
-  dat &lt;-<span class="st"> </span><span class="kw">read.table</span>(url,<span class="dt">header=</span><span class="ot">TRUE</span>,<span class="dt">sep=</span><span class="st">&quot;,&quot;</span>)
-  df &lt;-<span class="st"> </span>dat[,<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">5</span>)]
-  df$Date &lt;-<span class="st"> </span><span class="kw">as.Date</span>(<span class="kw">as.character</span>(df$Date))
-  <span class="kw">return</span>(df)
-}
+<span class="kw">plot</span>(dat_zoo, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.7</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)
 
-samsung &lt;-<span class="st"> </span><span class="kw">yahoo.read</span>(samsung_url)
-naver  &lt;-<span class="st"> </span><span class="kw">yahoo.read</span>(naver_url)</code></pre></div>
-<h3 id="금융-데이터-시각화-단변량">금융 데이터 시각화: 단변량</h3>
-<p>정적 그래프를 통해 시각화하는 경우 <code>ggplot</code>, 인터랙티브 동적 그래프를 통해 시각화하는 경우 <code>dygraphs</code> 를 활용한다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 주식시세 시각화 -------------------------------------------------------------</span>
-<span class="co"># 정적 시각화</span>
+## 규칙을 갖는 시계열이나 결측값이 있는 시계열 데이터 -------
+dat &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sample</span>(<span class="dv">3</span>),<span class="ot">NA</span>,<span class="kw">sample</span>(<span class="dv">3</span>), <span class="ot">NA</span>, <span class="kw">sample</span>(<span class="dv">4</span>))
+ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(dat, <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">2016</span>, <span class="dv">1</span>), <span class="dt">frequency=</span><span class="dv">12</span>)
 
-<span class="kw">ggplot</span>(samsung, <span class="kw">aes</span>(Date,Close)) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">color=</span><span class="st">&quot;samsung&quot;</span>)) +
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data=</span>naver,<span class="kw">aes</span>(<span class="dt">color=</span><span class="st">&quot;naver&quot;</span>)) +
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">color=</span><span class="st">&quot;Legend&quot;</span>) +
-<span class="st">  </span><span class="kw">scale_colour_manual</span>(<span class="st">&quot;&quot;</span>, <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="st">&quot;samsung&quot;</span>, <span class="st">&quot;naver&quot;</span>),
-                          <span class="dt">values =</span> <span class="kw">c</span>(<span class="st">&quot;blue&quot;</span>, <span class="st">&quot;brown&quot;</span>)) +
-<span class="st">  </span><span class="kw">labs</span>(
-    <span class="dt">title =</span> <span class="st">&quot;삼성전자, 네이버 종가&quot;</span>,
-    <span class="dt">x=</span> <span class="st">&quot;날짜&quot;</span>,
-    <span class="dt">y=</span><span class="st">&quot;주가&quot;</span>) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">theme</span>(<span class="dt">plot.title =</span> <span class="kw">element_text</span>(<span class="dt">lineheight=</span>.<span class="dv">7</span>, <span class="dt">face=</span><span class="st">&quot;bold&quot;</span>, <span class="dt">family=</span><span class="st">&quot;NanumGothic&quot;</span>))</code></pre></div>
-<p><img src="fig/time-series-financial-data-viz-1.png" title="plot of chunk time-series-financial-data-viz" alt="plot of chunk time-series-financial-data-viz" style="display: block; margin: auto;" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 동적 시각화</span>
-samsung_xts &lt;-<span class="st"> </span><span class="kw">xts</span>(samsung$Close,<span class="dt">order.by=</span>samsung$Date,<span class="dt">frequency=</span><span class="dv">365</span>)
-naver_xts &lt;-<span class="st"> </span><span class="kw">xts</span>(naver$Close,<span class="dt">order.by=</span>naver$Date,<span class="dt">frequency=</span><span class="dv">365</span>)
+<span class="kw">plot</span>(ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.7</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</code></pre></div>
+<p><img src="fig/time-series-eda-1.png" title="plot of chunk time-series-eda" alt="plot of chunk time-series-eda" style="display: block; margin: auto;" /></p>
+<h2 id="시계열-데이터-기본-가정-및-시계열-모형">시계열 데이터 기본 가정 및 시계열 모형</h2>
+<p>시계열 데이터에 대한 기본 가정은 다음과 같다.</p>
+<ul>
+<li>시계열 관측점은 등간격(equally spaced)이다.</li>
+<li>시간 인덱스는 이산 시간 관측점을 적용한다.</li>
+<li>이런 가정은 근사적으로 성립한다.
+<ul>
+<li>주식시장 일별 수익률은 주말과 휴일에는 적용되지 않는다.</li>
+<li>주요 경제지표(소비자 물가지수 등)는 일별이 아닌 월별로 적용된다.</li>
+</ul></li>
+</ul>
+<p>시계열 모형은 크게 4가지 모형으로 분류된다.</p>
+<ul>
+<li>백색잡음 (White Noise)</li>
+<li>랜덤워크 (Random Walk)</li>
+<li>자기회귀 (Autoregression)</li>
+<li>이동평균 (Moving Average)</li>
+</ul>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h3 id="월드-분해정리-wolds-decomposition-theorem"><span class="glyphicon glyphicon-pushpin"></span>월드 분해정리 (Wold’s decomposition theorem)</h3>
+</div>
+<div class="panel-body">
+<p>월드는 정상성을 갖는 모든 시계열 데이터는 백색잡음의 선형결합으로 표현될 수 있다는 것을 증명하여 노벨상을 수상했다.</p>
+<p><span class="math inline">\(X_t = W_t + a_1 W_{t-1} + a_2 W_{t-2} + \cdots\)</span></p>
+<p><span class="math inline">\(W_i\)</span>는 백색잡음, ARMA 모형은 월드 분해정리에 따라 시계열 데이터를 모형화하기 적합하다.</p>
+</div>
+</aside>
+<h2 id="시계열-데이터-분석-흐름-time-series-concept-example">시계열 데이터 분석 흐름 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h2>
+<p>시계열 데이터를 분석하기 위해서 가장 먼저 문자형과 숫자형으로 준비된 데이터프레임을 시간자료구조를 포함한 적절한 데이터프레임으로 변환하는 과정이 필요하다. 시계열 데이터프레임이 준비되면 시각화를 통해 시계열 데이터 상태를 파악하고 정상 시계열 데이터로 변화하는 과정에 전념한다.</p>
+<p><img src="fig/stat-time-series-workflow.png" alt="시계열 데이터 분석 흐름" width="77%" /></p>
+<p>시계열 데이터는 백색잡음 시계열, 증가 혹은 감소하는 추세를 갖는 시계열, 분산이 변화하는 시계열, 평균이 변화하는 시계열, 계절성 주기를 갖는 시계열등 다양하다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>))
 
-korea_stocks &lt;-<span class="st"> </span><span class="kw">cbind</span>(samsung_xts, naver_xts)
-<span class="kw">names</span>(korea_stocks) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Samsung&quot;</span>, <span class="st">&quot;Naver&quot;</span>)
+<span class="co"># 백색잡음 시계열 -----------------------------------------------------------</span>
+y_t &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dt">mean=</span><span class="dv">0</span>, <span class="dt">sd=</span><span class="dv">1</span>)
 
-<span class="kw">dygraph</span>(korea_stocks, <span class="dt">ylab=</span><span class="st">&quot;종가&quot;</span>, 
-        <span class="dt">main=</span><span class="st">&quot;삼성전자, 네이버 종가&quot;</span>) %&gt;%
-<span class="st">  </span><span class="kw">dySeries</span>(<span class="st">&quot;Samsung&quot;</span>,<span class="dt">label=</span><span class="st">&quot;삼성전자&quot;</span>) %&gt;%
-<span class="st">  </span><span class="kw">dySeries</span>(<span class="st">&quot;Naver&quot;</span>,<span class="dt">label=</span><span class="st">&quot;네이버&quot;</span>) %&gt;%
-<span class="st">  </span><span class="kw">dyOptions</span>(<span class="dt">colors =</span> <span class="kw">c</span>(<span class="st">&quot;blue&quot;</span>,<span class="st">&quot;green&quot;</span>)) %&gt;%
-<span class="st">  </span><span class="kw">dyRangeSelector</span>()</code></pre></div>
-<pre class="output"><code>Error in eval(expr, envir, enclos): 함수 &quot;dygraph&quot;를 찾을 수 없습니다
-</code></pre>
-<h3 id="시계열-데이터-산점도">시계열 데이터 산점도</h3>
-<p>네이버와 삼성전자 두 기업 주가 및 일별 수익률을 산점도로 찍어보면 상관관계를 확인할 수 있다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 상관계수 -------------------------------------------------------------------</span>
+<span class="kw">ts.plot</span>(y_t, <span class="dt">main=</span><span class="st">&quot;백색잡음(White Noise)&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;시간(time)&quot;</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
+<span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>)
 
-korea_stock_df &lt;-<span class="st"> </span><span class="kw">left_join</span>(samsung, naver, <span class="dt">by=</span><span class="st">&quot;Date&quot;</span>)
-<span class="kw">names</span>(korea_stock_df) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Date&quot;</span>, <span class="st">&quot;Samsung&quot;</span>, <span class="st">&quot;Naver&quot;</span>)
+<span class="co"># 추세를 갖는 시계열--------------------------------------------------</span>
+e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>, <span class="dv">10</span>)
+trend_yt &lt;-<span class="st"> </span><span class="fl">0.5</span>*<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">100</span>) +<span class="st"> </span>e
 
-<span class="kw">plot</span>(korea_stock_df$Date, korea_stock_df$Samsung, <span class="dt">type=</span><span class="st">&quot;l&quot;</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">ylim =</span> <span class="kw">c</span>(<span class="dv">100000</span>, <span class="dv">2000000</span>), <span class="dt">main=</span><span class="st">&quot;삼성전자, 네이버 종가&quot;</span>)
-<span class="kw">lines</span>(korea_stock_df$Date, korea_stock_df$Naver, <span class="dt">col=</span><span class="st">&quot;darkgreen&quot;</span>)</code></pre></div>
-<p><img src="fig/time-series-yahoo-scatterplot-1.png" title="plot of chunk time-series-yahoo-scatterplot" alt="plot of chunk time-series-yahoo-scatterplot" style="display: block; margin: auto;" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 산점도</span>
-<span class="kw">plot</span>(korea_stock_df$Samsung, korea_stock_df$Naver)
-<span class="kw">abline</span>(<span class="dt">coef=</span><span class="kw">coef</span>(<span class="kw">lm</span>(korea_stock_df$Naver~korea_stock_df$Samsung)), <span class="dt">col=</span><span class="st">&quot;darkgray&quot;</span>)</code></pre></div>
-<p><img src="fig/time-series-yahoo-scatterplot-2.png" title="plot of chunk time-series-yahoo-scatterplot" alt="plot of chunk time-series-yahoo-scatterplot" style="display: block; margin: auto;" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 수익률</span>
+<span class="kw">ts.plot</span>(trend_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;추세를 갖는 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="fl">0.5</span>)
 
-korea_stocks_diff &lt;-<span class="st"> </span><span class="kw">diff</span>(<span class="kw">log</span>(korea_stocks), <span class="dt">diff=</span><span class="dv">1</span>)
+<span class="co"># 랜덤워크 시계열 -----------------------------------------------------------</span>
+
+e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>)
+rw_yt &lt;-<span class="st"> </span><span class="kw">cumsum</span>(e)
+<span class="kw">ts.plot</span>(rw_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;랜덤워크 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>)
+
+<span class="co"># 분산이 커지는 시계열 -----------------------------------------------------------</span>
+e &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:<span class="dv">100</span>, function(x) <span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">2</span>*x/<span class="dv">100</span>))
+var_yt &lt;-<span class="st"> </span><span class="fl">0.1</span>*<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">100</span>) +<span class="st"> </span>e
+
+<span class="kw">ts.plot</span>(var_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;추세와 분산이 커지는 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="fl">0.1</span>)
+
+<span class="co"># 평균이 증가하는 시계열 -----------------------------------------------------------</span>
+mean_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">50</span>), <span class="kw">rnorm</span>(<span class="dv">50</span>, <span class="dv">5</span>))
+
+<span class="kw">ts.plot</span>(mean_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;평균이 변화하는 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>) 
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">5</span>, <span class="dt">b=</span><span class="dv">0</span>)
+
+
+<span class="co"># 분산이 변화하는 시계열 -----------------------------------------------------------</span>
+var_change_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="kw">rnorm</span>(<span class="dv">200</span>,<span class="dv">0</span>,<span class="dv">10</span>), <span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>))
+
+<span class="kw">ts.plot</span>(var_change_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;분산이 변화하는 시계열&quot;</span>)
+<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>)  </code></pre></div>
+<p><img src="fig/time-series-concept-1.png" title="plot of chunk time-series-concept" alt="plot of chunk time-series-concept" style="display: block; margin: auto;" /></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">백색잡음</th>
+<th align="left">추세를 갖는 시계열</th>
+<th align="left">랜덤워크 시계열</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">추세와 분산이 커지는 시계열</td>
+<td align="left">평균이 변화하는 시계열</td>
+<td align="left">분산이 변화하는 시계열</td>
+</tr>
+</tbody>
+</table>
+<h3 id="정상성stationarity-확보">정상성(Stationarity) 확보</h3>
+<aside class="callout panel panel-info">
+<div class="panel-heading">
+<h3 id="정상성stationarity과-약정상성weak-stationarity"><span class="glyphicon glyphicon-pushpin"></span>정상성(Stationarity)과 약정상성(Weak Stationarity)</h3>
+</div>
+<div class="panel-body">
+<p>정상성을 갖는 시계열 데이터는 랜덤한 움직임을 갖지만 시점마다 유사하게 동작하는 특징이 있어 시간에 따라 안정된 분포를 갖는다. 약정상성은 시간에 따라 일정한 평균, 분산, 공분산을 갖는 확률과정으로 정의된다. 즉, 시계열 데이터 $Y_1 , Y_2 , $이 다음을 세가지 조건을 충족하면 된다.</p>
+<ul>
+<li>시계열 <span class="math inline">\(Y_t\)</span> 모든 시점 <span class="math inline">\(t\)</span>에 대해 평균이 <span class="math inline">\(\mu\)</span>로 같다.</li>
+<li>시계열 <span class="math inline">\(Y_t\)</span> 모든 시점 <span class="math inline">\(t\)</span>에 대해 분산이 <span class="math inline">\(\sigma^2\)</span>로 같다.</li>
+<li>시계열 <span class="math inline">\(Y_t\)</span>, <span class="math inline">\(Y_s\)</span> 모든 <span class="math inline">\(h\)</span>에 대해 공분산이 <span class="math inline">\(|t-s| = h\)</span>로 같다; 예를 들어, 6단위 만큼 시점차이가 나는 경우 <span class="math inline">\(Cov(Y_1, Y_7 ) = Cov(Y_{11} , Y_{17} )\)</span>.</li>
+</ul>
+<p>특히, 정상성을 갖는 데이터는 <strong>절약성 원칙(Principle of Parsimony)</strong> 에 따라 적은 모수만을 사용하여 모형을 만들 수 있는 장점이 있다.</p>
+</div>
+</aside>
+<p>정상성을 확보하는 것이 중요하기 때문에 정상성을 갖지 않는 시계열 데이터를 정상 시계열로 돌리는데 다음과 같은 기법이 동원된다.</p>
+<ul>
+<li>로그변환: <span class="math inline">\(log(Y_t )\)</span> 을 통해 분산이 커지는 경향을 갖는 시계열을 안정화 시킴.</li>
+<li>차분: <span class="math inline">\(diff(Y_t )\)</span> 을 통해 차분을 하계 되면 추세를 제거하는 효과를 거둠.</li>
+<li>계절차분: <span class="math inline">\(diff(Y_t , s)\)</span> 을 통해 계절 차분을 하계 되면 계절추세를 제거하는 효과를 거둠.</li>
+</ul>
+<h3 id="백색잡음white-noise">백색잡음(White Noise)</h3>
+<p>백색잡음(White Noise)은 백색잡음은 고정된 평균, 분산을 갖고 시계열 상관은 없는 시계열 데이터로 <code>arima.sim()</code> 함수를 통해 모수를 조절해서 백색잡음 시계열을 추출할 수 있다. <span class="math inline">\(\mu=0, \sigma=1\)</span>인 백색잡음 시계열과 <span class="math inline">\(\mu=5, \sigma=4\)</span>인 백색잡음 시계열은 다음과 같은 형태를 띈다. <code>arima</code> 모형을 적합시키면 <span class="math inline">\(\mu=5, \sigma=4\)</span> 값에 가깝게 추정한 것을 확인할 수 있다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 백색잡음 시계열 -----------------------------------------------------------</span>
+white_noise_zero &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>)
+white_noise_mean_sd &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>, <span class="dt">mean =</span><span class="dv">5</span>, <span class="dt">sd =</span><span class="dv">2</span>)
 
 <span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">ts.plot</span>(white_noise_zero, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>))
+<span class="kw">ts.plot</span>(white_noise_mean_sd, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>))</code></pre></div>
+<p><img src="fig/time-series-white-noise-1.png" title="plot of chunk time-series-white-noise" alt="plot of chunk time-series-white-noise" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">arima</span>(white_noise_mean_sd)</code></pre></div>
+<pre class="output"><code>
+Call:
+arima(x = white_noise_mean_sd)
 
-xts::<span class="kw">plot.xts</span>(korea_stocks_diff)</code></pre></div>
-<pre class="output"><code>Warning in xts::plot.xts(korea_stocks_diff): only the univariate series
-will be plotted
-</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">korea_stocks_diff_df &lt;-<span class="st"> </span><span class="kw">data.frame</span>(korea_stocks_diff)
+Coefficients:
+      intercept
+         4.9933
+s.e.     0.1286
 
-<span class="kw">plot</span>(korea_stocks_diff_df$Samsung, korea_stocks_diff_df$Naver)
-<span class="kw">abline</span>(<span class="dt">a=</span><span class="fl">0.00002607821</span>, <span class="dt">b=</span><span class="fl">0.22059696365</span>, <span class="dt">col=</span><span class="st">&quot;darkgray&quot;</span>)</code></pre></div>
-<p><img src="fig/time-series-yahoo-scatterplot-3.png" title="plot of chunk time-series-yahoo-scatterplot" alt="plot of chunk time-series-yahoo-scatterplot" style="display: block; margin: auto;" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(korea_stocks_diff_df$Samsung, korea_stocks_diff_df$Naver, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="fl">0.1</span>,<span class="fl">0.1</span>), <span class="dt">xlim=</span><span class="kw">c</span>(-<span class="fl">0.05</span>, <span class="fl">0.05</span>))
-<span class="kw">abline</span>(<span class="dt">a=</span><span class="fl">0.00002607821</span>, <span class="dt">b=</span><span class="fl">0.22059696365</span>, <span class="dt">col=</span><span class="st">&quot;darkgray&quot;</span>)</code></pre></div>
-<p><img src="fig/time-series-yahoo-scatterplot-4.png" title="plot of chunk time-series-yahoo-scatterplot" alt="plot of chunk time-series-yahoo-scatterplot" style="display: block; margin: auto;" /></p>
-<h3 id="시계열-데이터-상관계수">시계열 데이터 상관계수</h3>
-<p>삼성전자와 네이버 두 회사 주가 및 주식수익률에 대한 상관계수도 계산할 수 있다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(korea_stocks)</code></pre></div>
-<pre class="output"><code>          Samsung     Naver
-Samsung 1.0000000 0.8518946
-Naver   0.8518946 1.0000000
+sigma^2 estimated as 4.136:  log likelihood = -532.21,  aic = 1068.41
 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(korea_stocks_diff )</code></pre></div>
-<pre class="output"><code>        Samsung Naver
-Samsung       1    NA
-Naver        NA     1
+<h3 id="랜덤워크random-walk">랜덤워크(Random Walk)</h3>
+<p>랜덤워크는 다음과 같은 재귀식으로 표현된다.</p>
+<p><span class="math inline">\(\text{오늘} = \text{어제} + \text{잡음}\)</span></p>
+<p>수학적으로 표현하면</p>
+<p><span class="math inline">\(Y_t = Y_{t-1} + \epsilon_t\)</span></p>
+<p>단위근(Unit root)가 존재하여 초기값 <span class="math inline">\(Y_0\)</span>를 지정하는 것이 모의시험을 위해 필요하고, 랜덤워크 분산 <span class="math inline">\(\sigma^2\)</span> 모수만 갖는 확률과정이다.</p>
+<p><span class="math inline">\(Y_t - Y_{t-1} = \epsilon_t\)</span></p>
+<p>차분(<code>diff()</code>)을 하게 되면 백색잡음 과정으로 환원된다.</p>
+<p><code>arima.sim()</code> 함수에 차분 모수를 1로 설정하면 랜덤워크 시계열을 모의추출할 수 있다. 이를 차분하면 백색잡음과정이 되고 이를 <code>arima</code> 모형으로 추정하면 평균과 분산이 처음 모의시험에서 설정한 모수에 근접함이 확인된다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 랜덤워크 시계열 -----------------------------------------------------------</span>
+rw_yt &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>)
+diff_rw_yt &lt;-<span class="st"> </span><span class="kw">diff</span>(rw_yt)
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">ts.plot</span>(rw_yt, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>))
+<span class="kw">ts.plot</span>(diff_rw_yt, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>))</code></pre></div>
+<p><img src="fig/time-series-random-walk-1.png" title="plot of chunk time-series-random-walk" alt="plot of chunk time-series-random-walk" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">arima</span>(diff_rw_yt)</code></pre></div>
+<pre class="output"><code>
+Call:
+arima(x = diff_rw_yt)
+
+Coefficients:
+      intercept
+         0.0915
+s.e.     0.0595
+
+sigma^2 estimated as 0.8854:  log likelihood = -339.52,  aic = 683.04
 </code></pre>
 <div class="footnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="http://blog.revolutionanalytics.com/2015/08/plotting-time-series-in-r.html">Plotting Time Series in R using Yahoo Finance data</a><a href="#fnref1">↩</a></p></li>
+<li id="fn1"><p><a href="http://stackoverflow.com/questions/33522442/stationarity-tests-in-r-checking-mean-variance-and-covariance">Stationarity Tests in R, checking mean, variance and covariance</a><a href="#fnref1">↩</a></p></li>
 </ol>
 </div>
         </div>
