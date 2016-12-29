@@ -5,6 +5,8 @@ subtitle: 시계열 모형 식별 도구
 output:
   html_document: 
     keep_md: yes
+    theme: journal
+    toc: yes
   pdf_document:
     latex_engine: xelatex
 mainfont: NanumGothic
@@ -18,6 +20,7 @@ library(xts)
 library(stringr)
 library(ggplot2)
 library(scales)
+library(gridExtra)
 
 options(warn=-1)
 
