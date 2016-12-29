@@ -22,6 +22,8 @@ library(ggplot2)
 library(scales)
 library(gridExtra)
 library(astsa)
+library(astsa) # 존슨앤존슨 분기 수익율 데이터
+library(ggfortify) # ts 데이터를 ggplot에서 시각화
 
 options(warn=-1)
 ```
@@ -51,6 +53,26 @@ options(warn=-1)
 추가적으로 시계열 데이터에 대한 최적 모형을 정보이론 (AIC, BIC)에 따라 적절한 차수를 선정한 자기회귀이동평균이 채택되면 
 예측(forecast)함수를 통해 예측을 한다. 
 
+### 1.1. 정상성(Stationarity)
+
+존즌앤존슨 분기 수익률 데이터가 전형적인 추세를 갖고 분산도 커져 변동성이 증가하는 시계열 데이터의 전형이다.
+이를 위해 등분산성을 맞추도록 로그 변환을 하고 나서, 추세를 제거하기 위해 차분을 한다.
+로그변환과 차분을 통해 정상성을 확보한 후에 자기회귀 모형을 적합시킨다.
+
+
+``` {r time-series-arma-ar1, message=FALSE, warn=FALSE}
+# 존슨앤존슨 분기 수익률 ----------------------------------------------------
+# install_github('sinhrks/ggfortify')
+# library(astsa) # 존슨앤존슨 분기 수익율 데이터
+# library(ggfortify) # ts 데이터를 ggplot에서 시각화
+
+jj_ts <- autoplot(jj)
+jj_log_ts <- autoplot(log(jj))
+jj_log_diff_ts <- autoplot(diff(log(jj)))
+
+grid.arrange(jj_ts, jj_log_ts, jj_log_diff_ts, nrow=3)
+```
+
 
 ## 2. 자기회귀이동평균(ARMA) 모형
 
@@ -66,6 +88,18 @@ $Y_i = \beta X_i + \epsilon_i$
 - 자기회귀이동평균(ARMA) 모형 : $X_t = \phi X_{t-1} + W_t + \theta W_{t-1}$
 
 즉, 정상성 조건이 충족된다는 가정하에 현재 관측점은 과거 $p$차까지 자기회귀를 하고 남은 잔차의 상관관계를 필터링하여 백색잡음을 만드는 모형이다.
+
+자기회귀모형(AR)은 세가지 모수를 갖는다.
+
+- 평균: $\mu$
+- 자기회귀계수: $\phi$
+- 백색잡음 분산: $\sigma_{\epsilon}^{2}$
+
+이동평균모형(MA)도 세가지 모수를 갖는다.
+
+- 평균: $\mu$
+- 이동평균회귀계수: $\theta$
+- 백색잡음 분산: $\sigma_{\epsilon}^{2}$
 
 
 ### 2.1. 자기회귀이동평균(ARMA) 모형 식별
@@ -161,5 +195,10 @@ $\mathrm{BIC} = n \cdot \ln(\widehat{\sigma_e^2}) + (p+q) \cdot \ln(n)$
 - 잔차 자기상관함수(ACF)
 - 정규분포 적합 QQ-플롯
 - 융-박스(Ljung-Box) Q-통계량 p-값
+
+
+## 3. 예측(forecast)
+
+시계열 모형에 갖는 이유는 시간에 따른 미래 시점에 대한 예측에 관심을 두기 때문이다.
 
 
