@@ -60,9 +60,9 @@ options(warn=-1)
 로그변환과 차분을 통해 정상성을 확보한 후에 자기회귀 모형을 적합시킨다.
 
 
-``` {r time-series-arma-ar1, message=FALSE, warn=FALSE}
+``` {r time-series-arma-stationary, message=FALSE, warn=FALSE}
 # 존슨앤존슨 분기 수익률 ----------------------------------------------------
-# install_github('sinhrks/ggfortify')
+# install_github('sinhrks/ggfortify') 
 # library(astsa) # 존슨앤존슨 분기 수익율 데이터
 # library(ggfortify) # ts 데이터를 ggplot에서 시각화
 
