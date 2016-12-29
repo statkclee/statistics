@@ -33,6 +33,7 @@ title: 데이터 과학 -- 기초 통계
     - [탐색적 시계열 데이터 분석](stat-time-series-eda.html)
     - [시계열 모형 식별 도구](stat-time-series-tools.html)
     - [자기회귀이동평균(ARMA) 모형](stat-time-series-arma.html)
+    - [계절 자기회귀이동평균(SARIMA)](stat-time-series-sarima.html)
 1. [채팅 로그](stat-chatting-log.html)
 1. [베이즈 정리](stat-bayes.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
