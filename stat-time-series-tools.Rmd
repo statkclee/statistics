@@ -18,11 +18,15 @@ library(xts)
 library(stringr)
 library(ggplot2)
 library(scales)
+
+options(warn=-1)
+
 ```
 > ## 학습 목표 {.objectives}
 >
-> * 시계열 데이터 사전 분석 도구를 살펴본다.
-> * 시계열 데이터 시각화 및 (자기)상관 도구를 실습한다.
+> * 시계열 데이터 입수 및 시각화를 통한 사전 분석 도구를 살펴본다.
+> * 시계열 데이터 (자기)상관 계수를 이해한다.
+> * `acf()` 자기상관계수를 시각화하여 ARMA 모형 식별에 대한 단초를 파악한다.
 
 
 ## 금융 시계열 데이터 [^yahoo-finance-data]
@@ -60,8 +64,8 @@ url에서 삼성전자(005930.KS), 네이버 NHN(035420.KS)을 지정하고 기�
 # https://finance.yahoo.com/
 
 # 삼성과 네이버 주식시세
-samsung_url <- "http://real-chart.finance.yahoo.com/table.csv?s=005930.KS&a=01&b=01&c=2015&d=12&e=31&f=2015&g=d&ignore=.csv"
-naver_url   <- "http://real-chart.finance.yahoo.com/table.csv?s=035420.KS&a=01&b=01&c=2015&d=12&e=31&f=2015&g=d&ignore=.csv"
+samsung_url <- "http://real-chart.finance.yahoo.com/table.csv?s=005930.KS&a=00&b=01&c=2016&d=11&e=31&f=2016&g=d&ignore=.csv"
+naver_url   <- "http://real-chart.finance.yahoo.com/table.csv?s=035420.KS&a=00&b=01&c=2016&d=11&e=31&f=2016&g=d&ignore=.csv"
 
 yahoo.read <- function(url){
   dat <- read.table(url,header=TRUE,sep=",")
@@ -147,5 +151,51 @@ abline(a=0.00002607821, b=0.22059696365, col="darkgray")
 ``` {r time-series-correlation, message=FALSE}
 cor(korea_stocks)
 cor(korea_stocks_diff[-1,])
-
 ```
+
+## 자기상관계수(Autocorrelation)
+
+자기상관계수는 시계열에서 매우 중요한 역할을 차지하고 있다.
+시계열 데이터의 자기상관은 시차를 1, 2, ... 등 여러 시차를 두고 자기상관을 크게 갖을 수 있다.
+
+``` {r time-series-naver-lag-scatterplot, message=FALSE}
+
+p1 <- ggplot(naver, aes(Date,Close)) + 
+  geom_line() +
+  labs(
+    title = "네이버 종가",
+    x= "날짜",
+    y="주가") + 
+  theme(plot.title = element_text(lineheight=.7, face="bold", family="NanumGothic"))
+
+# 시차 1을 갖는 시계열 산점도 그리기
+naver_df <- as.data.frame(cbind(naver$Close[-length(naver$Close)], naver$Close[-1]))
+colnames(naver_df) <- c("naver_t", "naver_t_1")
+
+p2 <- ggplot(naver_df, aes(naver_t, naver_t_1)) + 
+  geom_line() +
+  geom_point(alpha=0.3) +
+  labs(
+    title = "네이버 1시차 종가",
+    x=expression(네이버[t-1]),
+    y=expression(네이버[t])
+  ) + theme(plot.title = element_text(lineheight=.7, face="bold", family="NanumGothic"))
+
+grid.arrange(p1, p2, ncol=2)
+```
+
+수작업으로 자기상관계수를 계산하는 방식은 다음과 같고, `acf` 함수를 활용하면 이를 쉽게 계산도 하고,
+시각적으로 확인도 가능하다.
+
+
+``` {r time-series-naver-acf, message=FALSE}
+# 네이버 주식 상관계수 ------------------------------------------------------------------------------
+cor(naver_df$naver_t, naver_df$naver_t_1)
+
+acf(naver$Close, lag.max = 2, plot = FALSE)
+
+acf(naver$Close, plot = TRUE)
+```
+
+
+
