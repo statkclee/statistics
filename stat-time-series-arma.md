@@ -13,18 +13,7 @@ mainfont: NanumGothic
 ---
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-library(tidyverse)
-library(xts)
-library(stringr)
-library(ggplot2)
-library(scales)
-library(gridExtra)
-library(astsa)
 
-options(warn=-1)
-```
 > ## 학습 목표 {.objectives}
 >
 > * 자기회귀이동평균(ARMA) 모형을 이해한다.
@@ -89,7 +78,8 @@ $Y_t = 7 + 0.7(Y_{t-1} -7) + W_t$
 상기 자기회귀모형을 적합시키면 `sarima` 함수를 통해 적합시킨 결과가 거의 유사함을 확인된다.
 또한, `acf2` 함수를 통해 자기상관함수는 지수적 감소하고, 편자기상관함수는 2차항부터 절단모양이 관찰된다.
 
-``` {r time-series-arma-ar1, message=FALSE, warn=FALSE}
+
+~~~{.r}
 # library(astsa)
 
 # AR(1) 모의시험 모형------------------------------------------------ 
@@ -97,10 +87,85 @@ ar_yt <- arima.sim(list(order = c(1, 0, 0), ar = 0.7), n = 250) + 7
 
 # ACF, PACF
 acf2(ar_yt)
+~~~
 
+<img src="fig/time-series-arma-ar1-1.png" title="plot of chunk time-series-arma-ar1" alt="plot of chunk time-series-arma-ar1" style="display: block; margin: auto;" />
+
+~~~{.output}
+        ACF  PACF
+ [1,]  0.66  0.66
+ [2,]  0.40 -0.06
+ [3,]  0.27  0.07
+ [4,]  0.22  0.04
+ [5,]  0.13 -0.06
+ [6,]  0.11  0.07
+ [7,]  0.07 -0.04
+ [8,]  0.03 -0.03
+ [9,]  0.04  0.06
+[10,]  0.01 -0.07
+[11,] -0.05 -0.08
+[12,] -0.08  0.00
+[13,] -0.08 -0.03
+[14,] -0.10 -0.04
+[15,] -0.12 -0.03
+[16,] -0.11  0.00
+[17,] -0.13 -0.07
+[18,] -0.14 -0.02
+[19,] -0.17 -0.10
+[20,] -0.14  0.05
+[21,] -0.09  0.04
+[22,] -0.06 -0.01
+[23,] -0.04  0.00
+[24,] -0.05 -0.04
+[25,] -0.06 -0.02
+[26,] -0.13 -0.14
+
+~~~
+
+
+
+~~~{.r}
 ar_yt_fit <- sarima(ar_yt, p = 1, d = 0, q = 0)
+~~~
+
+
+
+~~~{.output}
+initial  value 0.193852 
+iter   2 value -0.096331
+iter   3 value -0.096339
+iter   4 value -0.096352
+iter   5 value -0.096352
+iter   6 value -0.096353
+iter   6 value -0.096353
+final  value -0.096353 
+converged
+initial  value -0.094840 
+iter   2 value -0.094848
+iter   3 value -0.094885
+iter   4 value -0.094886
+iter   5 value -0.094887
+iter   6 value -0.094887
+iter   6 value -0.094887
+final  value -0.094887 
+converged
+
+~~~
+
+<img src="fig/time-series-arma-ar1-2.png" title="plot of chunk time-series-arma-ar1" alt="plot of chunk time-series-arma-ar1" style="display: block; margin: auto;" />
+
+~~~{.r}
 ar_yt_fit$ttable
-```
+~~~
+
+
+
+~~~{.output}
+      Estimate     SE t.value p.value
+ar1     0.6666 0.0474 14.0532       0
+xmean   7.2065 0.1710 42.1338       0
+
+~~~
 
 #### 2.1.2. 이동평균 MA(1) 모형
 
@@ -110,16 +175,99 @@ $Y_t = W_t + 0.7W_{t-1}$
 
 또한, `acf2` 함수를 통해 자기상관함수는 2차항부터 절단모향이 관찰되고, 편자기상관함수는 지수적 감소, 축퇴하는 사인형태를 보인다.
 
-``` {r time-series-arma-ma1, message=FALSE, warn=FALSE}
+
+~~~{.r}
 # MA(1) 모의시험 모형------------------------------------------------ 
 ma_yt <- arima.sim(list(order = c(0, 0, 1), ma = 0.7), n = 250)
 
 # ACF, PACF
 acf2(ma_yt)
+~~~
 
+<img src="fig/time-series-arma-ma1-1.png" title="plot of chunk time-series-arma-ma1" alt="plot of chunk time-series-arma-ma1" style="display: block; margin: auto;" />
+
+~~~{.output}
+        ACF  PACF
+ [1,]  0.46  0.46
+ [2,] -0.02 -0.31
+ [3,] -0.08  0.11
+ [4,] -0.01 -0.04
+ [5,]  0.06  0.08
+ [6,]  0.10  0.04
+ [7,]  0.05 -0.01
+ [8,] -0.02 -0.02
+ [9,]  0.03  0.10
+[10,]  0.10  0.03
+[11,]  0.07  0.00
+[12,] -0.04 -0.08
+[13,] -0.07  0.02
+[14,]  0.03  0.07
+[15,]  0.02 -0.09
+[16,] -0.11 -0.13
+[17,] -0.12  0.02
+[18,] -0.07 -0.04
+[19,] -0.07 -0.06
+[20,] -0.03  0.01
+[21,]  0.05  0.06
+[22,]  0.04  0.01
+[23,] -0.02 -0.02
+[24,] -0.12 -0.15
+[25,] -0.09  0.07
+[26,] -0.08 -0.09
+
+~~~
+
+
+
+~~~{.r}
 ma_yt_fit <- sarima(ma_yt, p = 0, d = 0, q = 1)
+~~~
+
+
+
+~~~{.output}
+initial  value 0.179759 
+iter   2 value 0.020912
+iter   3 value 0.010242
+iter   4 value 0.005622
+iter   5 value 0.004461
+iter   6 value 0.004396
+iter   7 value 0.004396
+iter   8 value 0.004395
+iter   9 value 0.004394
+iter  10 value 0.004394
+iter  11 value 0.004394
+iter  12 value 0.004394
+iter  13 value 0.004394
+iter  13 value 0.004394
+iter  13 value 0.004394
+final  value 0.004394 
+converged
+initial  value 0.004911 
+iter   2 value 0.004910
+iter   3 value 0.004910
+iter   4 value 0.004910
+iter   4 value 0.004910
+iter   4 value 0.004910
+final  value 0.004910 
+converged
+
+~~~
+
+<img src="fig/time-series-arma-ma1-2.png" title="plot of chunk time-series-arma-ma1" alt="plot of chunk time-series-arma-ma1" style="display: block; margin: auto;" />
+
+~~~{.r}
 ma_yt_fit$ttable
-```
+~~~
+
+
+
+~~~{.output}
+      Estimate     SE t.value p.value
+ma1     0.6182 0.0475 13.0077  0.0000
+xmean   0.0401 0.1026  0.3909  0.6962
+
+~~~
 
 #### 2.1.3. 자기회귀이동평균 ARMA(1,1) 모형
 
@@ -129,16 +277,106 @@ $Y_t = 0.7Y_{t-1} + W_t + 0.7W_{t-1}$
 
 또한, `acf2` 함수를 통해 자기상관함수와 편자기상관함수는 모두 지수적 감소, 축퇴하는 사인형태를 보인다.
 
-``` {r time-series-arma-arma11, message=FALSE, warn=FALSE}
+
+~~~{.r}
 # ARMA(1,1) 모의시험 모형------------------------------------------------ 
 arma_yt <- arima.sim(list(order = c(1, 0, 1), ar=0.7, ma = 0.7), n = 250)
 
 # ACF, PACF
 acf2(arma_yt)
+~~~
 
+<img src="fig/time-series-arma-arma11-1.png" title="plot of chunk time-series-arma-arma11" alt="plot of chunk time-series-arma-arma11" style="display: block; margin: auto;" />
+
+~~~{.output}
+        ACF  PACF
+ [1,]  0.85  0.85
+ [2,]  0.62 -0.39
+ [3,]  0.46  0.25
+ [4,]  0.32 -0.23
+ [5,]  0.21  0.13
+ [6,]  0.15 -0.03
+ [7,]  0.14  0.15
+ [8,]  0.15 -0.03
+ [9,]  0.17  0.06
+[10,]  0.15 -0.11
+[11,]  0.12  0.03
+[12,]  0.09 -0.02
+[13,]  0.06 -0.01
+[14,]  0.02 -0.06
+[15,] -0.03 -0.02
+[16,] -0.05  0.00
+[17,] -0.07 -0.08
+[18,] -0.11 -0.06
+[19,] -0.14 -0.01
+[20,] -0.14  0.04
+[21,] -0.12 -0.02
+[22,] -0.10  0.05
+[23,] -0.06  0.04
+[24,] -0.05 -0.15
+[25,] -0.08 -0.04
+[26,] -0.10  0.07
+
+~~~
+
+
+
+~~~{.r}
 arma_yt_fit <- sarima(arma_yt, p = 1, d = 0, q = 1)
+~~~
+
+
+
+~~~{.output}
+initial  value 0.831014 
+iter   2 value 0.042071
+iter   3 value 0.034195
+iter   4 value 0.011620
+iter   5 value 0.010314
+iter   6 value 0.009381
+iter   7 value 0.009274
+iter   8 value 0.009267
+iter   9 value 0.009266
+iter  10 value 0.009263
+iter  11 value 0.009259
+iter  12 value 0.009259
+iter  13 value 0.009259
+iter  13 value 0.009259
+iter  13 value 0.009259
+final  value 0.009259 
+converged
+initial  value 0.012943 
+iter   2 value 0.012916
+iter   3 value 0.012902
+iter   4 value 0.012901
+iter   5 value 0.012896
+iter   6 value 0.012894
+iter   7 value 0.012893
+iter   8 value 0.012893
+iter   9 value 0.012893
+iter  10 value 0.012893
+iter  10 value 0.012893
+iter  10 value 0.012893
+final  value 0.012893 
+converged
+
+~~~
+
+<img src="fig/time-series-arma-arma11-2.png" title="plot of chunk time-series-arma-arma11" alt="plot of chunk time-series-arma-arma11" style="display: block; margin: auto;" />
+
+~~~{.r}
 arma_yt_fit$ttable
-```
+~~~
+
+
+
+~~~{.output}
+      Estimate     SE t.value p.value
+ar1     0.6843 0.0482 14.1905  0.0000
+ma1     0.7990 0.0456 17.5022  0.0000
+xmean   0.1657 0.3595  0.4609  0.6453
+
+~~~
 
 ### 2.2. 정보이론 기반 자기회귀이동평균(ARMA) 모형 선정
 
