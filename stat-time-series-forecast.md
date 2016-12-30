@@ -13,19 +13,7 @@ mainfont: NanumGothic
 ---
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-library(tidyverse)
-library(xts)
-library(stringr)
-library(ggplot2)
-library(scales)
-library(gridExtra)
-library(astsa) # 존슨앤존슨 분기 수익율 데이터
-library(ggfortify) # ts 데이터를 ggplot에서 시각화
-  
-options(warn=-1)
-```
+
 > ## 학습 목표 {.objectives}
 >
 > * 시계열 데이터의 백미 예측을 살펴본다.
@@ -77,31 +65,34 @@ ETS(**E**rror,**T**rend,**S**easonal, **E**xponen**T**ial **S**moothing) 모형�
 
 ### 4.1. 환경설정
 
-``` {r time-series-airpassenger-forecast-setup, message=FALSE, warn=FALSE}
+
+~~~{.r}
 library(astsa)
 library(fpp)
 library(tidyverse)
-```
+~~~
 
 ### 4.2. 항공여객 데이터 
 
 내장된 "AirPassengers" 데이터를 불러와서 모형개발에 사용될 데이터와 
 최적모형 선택을 위한 데이터를 준비한다.
 
-``` {r time-series-airpassenger-forecast-data, message=FALSE, warn=FALSE}
+
+~~~{.r}
 # 1. 항공여객 데이터셋 ---------------------------------------------------------
 data("AirPassengers")
 
 ap_ts <- window(AirPassengers, start=1949, end=1958.99)
 ap_ts_test <- window(AirPassengers, start=1959)
-```
+~~~
 
 ### 4.3. 항공여객 데이터 탐색적 분석
 
 항공여객 예측모형을 적합시키기 전에 데이터에 대한 이해와 모형개발전략을 위한 
 탐색적 데이터분석을 수행한다.
 
-``` {r time-series-airpassenger-forecast-eda, message=FALSE, warn=FALSE}
+
+~~~{.r}
 # 1.1. 항공여객 데이터셋 시각화 ---------------------------------------------------------
 par(mfrow=c(2,1))
 par(mar=c(2, 3, 0, 2), xaxs='i', yaxs='i')
@@ -110,13 +101,21 @@ plot(ap_ts, ylab="항공여객 (천명)", type="c", pch =20, xaxt='n', xlab="")
 text(ap_ts, col=1:12, labels=1:12, cex=.7)
 
 plot(ap_ts, ylab="항공여객 (천명)", type="o", pch =20, xlab="")
+~~~
 
+<img src="fig/time-series-airpassenger-forecast-eda-1.png" title="plot of chunk time-series-airpassenger-forecast-eda" alt="plot of chunk time-series-airpassenger-forecast-eda" style="display: block; margin: auto;" />
+
+~~~{.r}
 # 2. 시계열 분해 -----------------------------------------------------------------
 
 # 기본 시계열 분해
 ap_ts_decompM <- decompose(ap_ts, type = "multiplicative")
 plot(ap_ts_decompM, xlab="")
+~~~
 
+<img src="fig/time-series-airpassenger-forecast-eda-2.png" title="plot of chunk time-series-airpassenger-forecast-eda" alt="plot of chunk time-series-airpassenger-forecast-eda" style="display: block; margin: auto;" />
+
+~~~{.r}
 # `forecast` 팩키지 계절변동 시각화
 seasonplot(ap_ts, ylab="항공여객 (천명)", xlab="", 
            main="",
@@ -124,7 +123,9 @@ seasonplot(ap_ts, ylab="항공여객 (천명)", xlab="",
 
 monthplot(ap_ts, ylab="항공여객 (천명)", xlab="", xaxt="n", main="")
 axis(1, at=1:12, labels=month.abb, cex=0.8)
-```
+~~~
+
+<img src="fig/time-series-airpassenger-forecast-eda-3.png" title="plot of chunk time-series-airpassenger-forecast-eda" alt="plot of chunk time-series-airpassenger-forecast-eda" style="display: block; margin: auto;" />
 
 ### 4.4. 항공여객 예측모형 
 
@@ -132,7 +133,8 @@ ARIMA 모형 등 가능한 모든 시계열 모형을 항공여객 모형데이�
 검증데이터에 예측모형 각각의 성능을 비교한 후에 가장 최적 모형을 선택한다.
 **MASE**가 가장 낮은 모형을 선택한다.
 
-``` {r time-series-airpassenger-forecast-model, message=FALSE, warn=FALSE}
+
+~~~{.r}
 # 3. 모형선정 ------------------------------------------------------------------------
 models <- list (
   mod_arima = auto.arima(ap_ts, ic='aicc', stepwise=FALSE),
@@ -154,7 +156,11 @@ for(f in forecasts){
   plot(f, ylim=c(0,600), main="", xaxt="n")
   lines(ap_ts_test, col='red')
 }
+~~~
 
+<img src="fig/time-series-airpassenger-forecast-model-1.png" title="plot of chunk time-series-airpassenger-forecast-model" alt="plot of chunk time-series-airpassenger-forecast-model" style="display: block; margin: auto;" />
+
+~~~{.r}
 acc <- lapply(forecasts, function(f){
   accuracy(f, ap_ts_test)[2,,drop=FALSE]
 })
@@ -163,18 +169,38 @@ acc <- Reduce(rbind, acc)
 row.names(acc) <- names(forecasts)
 acc <- acc[order(acc[,'MASE']),]
 round(acc, 2)
-```
+~~~
+
+
+
+~~~{.output}
+                    ME   RMSE    MAE   MPE  MAPE MASE ACF1 Theil's U
+mod_tbats        36.25  43.03  36.44  8.00  8.05 1.28 0.68      0.82
+mod_arima        42.53  44.45  42.53  9.93  9.93 1.49 0.32      0.92
+mod_exponential  44.79  51.80  44.79  9.96  9.96 1.57 0.70      1.00
+mod_neural       51.02  54.81  51.02 11.83 11.83 1.79 0.23      1.15
+mod_bats         52.18  59.35  52.18 11.66 11.66 1.83 0.73      1.14
+mod_stl          53.38  67.26  53.38 11.40 11.40 1.87 0.68      1.25
+naive            91.33 113.19  91.33 19.54 19.54 3.20 0.67      2.11
+mod_sts         274.99 301.30 274.99 62.94 62.94 9.62 0.77      6.03
+
+~~~
 
 ### 4.5. 항공여객 최적예측모형 적합
 
 검증데이터에 예측오차가 가장 작은 **MASE**값을 갖는 모형 `tbats`를 최종 예측모형으로 선정한다.
 
-``` {r time-series-airpassenger-forecast-fit, message=FALSE, warn=FALSE}
+
+~~~{.r}
 # 4. 모형적합 ------------------------------------------------------------------------
 
 ap_tbats_fit <- tbats(ap_ts, ic='aicc', seasonal.periods=12)
 plot(ap_tbats_fit)
+~~~
 
+<img src="fig/time-series-airpassenger-forecast-fit-1.png" title="plot of chunk time-series-airpassenger-forecast-fit" alt="plot of chunk time-series-airpassenger-forecast-fit" style="display: block; margin: auto;" />
+
+~~~{.r}
 ap_stl_fit <- stl(ap_ts, s.window = 12)
 
 par(mfrow = c(2,2))
@@ -182,13 +208,16 @@ monthplot(ap_ts, ylab = "data", cex.axis = 0.8)
 monthplot(ap_stl_fit, choice = "seasonal", cex.axis = 0.8)
 monthplot(ap_stl_fit, choice = "trend", cex.axis = 0.8)
 monthplot(ap_stl_fit, choice = "remainder", type = "h", cex.axis = 0.8)
-```
+~~~
+
+<img src="fig/time-series-airpassenger-forecast-fit-2.png" title="plot of chunk time-series-airpassenger-forecast-fit" alt="plot of chunk time-series-airpassenger-forecast-fit" style="display: block; margin: auto;" />
 
 ### 4.6. 항공여객 예측
 
 최적 예측모형에 기반해서 항공수요 예측값을 뽑아내고 최저모형과 예측값을 시각적으로 비교한다.
 
-``` {r time-series-airpassenger-forecast, message=FALSE, warn=FALSE}
+
+~~~{.r}
 # 5. 예측 ------------------------------------------------------------------------
 # 최적 모형
 op <- par(mfrow = c(2,1))
@@ -201,4 +230,6 @@ plot(ap_tbats_fit_fcast, xaxt="n")
 mod_sts_fit <- StructTS(ap_ts)
 ap_sts_fit_fcast <- forecast(mod_sts_fit)
 plot(ap_sts_fit_fcast)
-```
+~~~
+
+<img src="fig/time-series-airpassenger-forecast-1.png" title="plot of chunk time-series-airpassenger-forecast" alt="plot of chunk time-series-airpassenger-forecast" style="display: block; margin: auto;" />

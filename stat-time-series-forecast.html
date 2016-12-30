@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="pandoc">
+    <title>Software Carpentry: 데이터 과학 – 기초 통계</title>
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-theme.css" />
+    <link rel="stylesheet" type="text/css" href="css/swc.css" />
+    <link rel="alternate" type="application/rss+xml" title="Software Carpentry Blog" href="http://software-carpentry.org/feed.xml"/>
+    <meta charset="UTF-8" />
+    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+    
+      ga('create', 'UA-59802572-17', 'auto');
+      ga('send', 'pageview');
+    
+    </script>
+  </head>
+  <body class="lesson">
+    <div class="container card">
+      <div class="banner">
+        <a href="http://software-carpentry.org" title="Software Carpentry">
+          <img alt="Software Carpentry banner" src="img/software-carpentry-banner.png" />
+        </a>
+      </div>
+      <article>
+      <div class="row">
+        <div class="col-md-10 col-md-offset-1">
+                    <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
+          <h2 class="subtitle">시계열 데이터 예측(forecast)</h2>
+          <section class="objectives panel panel-warning">
+<div class="panel-heading">
+<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</div>
+<div class="panel-body">
+<ul>
+<li>시계열 데이터의 백미 예측을 살펴본다.</li>
+<li>다양한 시계열 데이터 모형의 장단점을 비교한다.</li>
+<li>자동 시계열 예측의 필요성을 이해한다.</li>
+</ul>
+</div>
+</section>
+<h2 id="시계열-데이터-예측-자동화-time-series-procedure-time-series-fpp-time-series-youtube-hyndman-time-series-advanced-graphics">1. 시계열 데이터 예측 자동화 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h2>
+<p>시계열 데이터 예측모형을 자동화하는 이유는 다음과 같다.</p>
+<ul>
+<li>시계열 데이터를 다루는 대부분의 사람들이 시계열 데이터에 다양한 시계열 모형을 적합시키는데 전문적인 훈련을 받지 못했다.</li>
+<li>시계열 데이터에 대한 전문적인 지식읅 갖는 사람들도 수작업으로 예측모형을 만들어도 시계열 예측모형 자동화 알고리즘을 이기지 못한다.
+<ul>
+<li>가낸 수공업 방식 시계열 예측모형개발방법론으로 가능한 모든 시계열 모형을 적합시켜 가장 적절한 모형을 추출해내는 자동화 방식을 이길 수 없다.</li>
+</ul></li>
+<li>다수 산업계에서 주별로 월별로 수많은 예측모형을 개발해서 예측값을 제시해야 하기 때문에 시계열 알고리즘을 통한 자동 예측 시스템이 필수적이다.</li>
+<li>다변량 시계열 예측모형도 단변량 시계열 예측모형을 기반으로 한다.</li>
+</ul>
+<h2 id="시계열-데이터-예측-정확성-측도">2. 시계열 데이터 예측 정확성 측도</h2>
+<p>시계열 모형의 우수성을 측정하는 다양한 측도가 존재한다. 하지만, MAE, MSE, RMSE는 척도에 의존성이 있어 MAPE, MASE를 추천한다.</p>
+<ul>
+<li><span class="math inline">\(\mathrm{MAE} = \frac{1}{n}\sum_{t=1}^n \left| Y_t - f_i \right| =\frac{1}{n}\sum_{t=1}^n \left| e_i \right|\)</span></li>
+<li><span class="math inline">\(\mathrm{MSE} =\frac{1}{n}\sum_{t=1}^n(\hat{Y_t} - f_t)^2\)</span></li>
+<li><span class="math inline">\(\mathrm{RMSD}=\sqrt{\frac{\sum_{t=1}^n (\hat y_t - f_t)^2}{n}}\)</span></li>
+<li><span class="math inline">\(\mathrm{MAPE} = \frac{100}{n}\sum_{t=1}^n \left|\frac{Y_t-f_t}{Y_t}\right|\)</span></li>
+<li><span class="math inline">\(\mathrm{MASE} = \frac{1}{T}\sum_{t=1}^T\left( \frac{\left| e_t \right|}{\frac{1}{T-1}\sum_{t=2}^T \left| Y_t-Y_{t-1}\right|} \right) = \frac{\sum_{t=1}^{T} \left| e_t \right|}{\frac{T}{T-1}\sum_{t=2}^T \left| Y_t-Y_{t-1}\right|}\)</span></li>
+</ul>
+<h2 id="arima-vs-지수평활ets-모형">3. ARIMA vs 지수평활(ETS) 모형</h2>
+<p>자기회귀누적이동평균(ARIMA, <strong>A</strong>uto<strong>R</strong>egressive <strong>I</strong>ntegrated <strong>M</strong>oving <strong>A</strong>verage ) 모형과 ETS(<strong>E</strong>rror,<strong>T</strong>rend,<strong>S</strong>easonal, <strong>E</strong>xponen<strong>T</strong>ial <strong>S</strong>moothing) 모형에 대해서 서로 적대적으로 생각하는 분들도 많다. 박스-젠킨스가 제안한 ARIMA 모형이 매우 수학적인 반면에 ETS는 1950년대부터 실무적으로 개발되어 서로 동일한 목적으로 하고 있지만 많은 교류가 없어 보여 잘못 알려진 것도 많다.</p>
+<ul>
+<li>ARIMA 모형이 더 일반적이고 지수평활(exponential smoothing)모형은 적용범위가 한정되어 있다는 잘못된 미신이 존재한다.</li>
+<li>선형 지수평활 모형은 ARIMA 모형의 특수한 사례다.</li>
+<li>비선형 지수평활 모형에 대응되는 ARIMA 모형은 없다.</li>
+<li>많은 ARIMA 모형은 대응되는 지수평활모형이 없다.</li>
+<li>지수평활 모형은 정상성을 갖지 않는 모든 시계열 데이터를 모형화할 수 있다.</li>
+</ul>
+<h2 id="항공여객수-자동예측">4. 항공여객수 자동예측</h2>
+<h3 id="환경설정">4.1. 환경설정</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(astsa)
+<span class="kw">library</span>(fpp)
+<span class="kw">library</span>(tidyverse)</code></pre></div>
+<h3 id="항공여객-데이터">4.2. 항공여객 데이터</h3>
+<p>내장된 “AirPassengers” 데이터를 불러와서 모형개발에 사용될 데이터와 최적모형 선택을 위한 데이터를 준비한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 1. 항공여객 데이터셋 ---------------------------------------------------------</span>
+<span class="kw">data</span>(<span class="st">&quot;AirPassengers&quot;</span>)
+
+ap_ts &lt;-<span class="st"> </span><span class="kw">window</span>(AirPassengers, <span class="dt">start=</span><span class="dv">1949</span>, <span class="dt">end=</span><span class="fl">1958.99</span>)
+ap_ts_test &lt;-<span class="st"> </span><span class="kw">window</span>(AirPassengers, <span class="dt">start=</span><span class="dv">1959</span>)</code></pre></div>
+<h3 id="항공여객-데이터-탐색적-분석">4.3. 항공여객 데이터 탐색적 분석</h3>
+<p>항공여객 예측모형을 적합시키기 전에 데이터에 대한 이해와 모형개발전략을 위한 탐색적 데이터분석을 수행한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 1.1. 항공여객 데이터셋 시각화 ---------------------------------------------------------</span>
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))
+<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">0</span>, <span class="dv">2</span>), <span class="dt">xaxs=</span><span class="st">&#39;i&#39;</span>, <span class="dt">yaxs=</span><span class="st">&#39;i&#39;</span>)
+
+<span class="kw">plot</span>(ap_ts, <span class="dt">ylab=</span><span class="st">&quot;항공여객 (천명)&quot;</span>, <span class="dt">type=</span><span class="st">&quot;c&quot;</span>, <span class="dt">pch =</span><span class="dv">20</span>, <span class="dt">xaxt=</span><span class="st">&#39;n&#39;</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>)
+<span class="kw">text</span>(ap_ts, <span class="dt">col=</span><span class="dv">1</span>:<span class="dv">12</span>, <span class="dt">labels=</span><span class="dv">1</span>:<span class="dv">12</span>, <span class="dt">cex=</span>.<span class="dv">7</span>)
+
+<span class="kw">plot</span>(ap_ts, <span class="dt">ylab=</span><span class="st">&quot;항공여객 (천명)&quot;</span>, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">pch =</span><span class="dv">20</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>)</code></pre></div>
+<p><img src="fig/time-series-airpassenger-forecast-eda-1.png" title="plot of chunk time-series-airpassenger-forecast-eda" alt="plot of chunk time-series-airpassenger-forecast-eda" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 2. 시계열 분해 -----------------------------------------------------------------</span>
+
+<span class="co"># 기본 시계열 분해</span>
+ap_ts_decompM &lt;-<span class="st"> </span><span class="kw">decompose</span>(ap_ts, <span class="dt">type =</span> <span class="st">&quot;multiplicative&quot;</span>)
+<span class="kw">plot</span>(ap_ts_decompM, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>)</code></pre></div>
+<p><img src="fig/time-series-airpassenger-forecast-eda-2.png" title="plot of chunk time-series-airpassenger-forecast-eda" alt="plot of chunk time-series-airpassenger-forecast-eda" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># `forecast` 팩키지 계절변동 시각화</span>
+<span class="kw">seasonplot</span>(ap_ts, <span class="dt">ylab=</span><span class="st">&quot;항공여객 (천명)&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, 
+           <span class="dt">main=</span><span class="st">&quot;&quot;</span>,
+           <span class="dt">year.labels=</span><span class="ot">TRUE</span>, <span class="dt">year.labels.left=</span><span class="ot">TRUE</span>, <span class="dt">col=</span><span class="dv">1</span>:<span class="dv">20</span>, <span class="dt">pch=</span><span class="dv">19</span>)
+
+<span class="kw">monthplot</span>(ap_ts, <span class="dt">ylab=</span><span class="st">&quot;항공여객 (천명)&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">xaxt=</span><span class="st">&quot;n&quot;</span>, <span class="dt">main=</span><span class="st">&quot;&quot;</span>)
+<span class="kw">axis</span>(<span class="dv">1</span>, <span class="dt">at=</span><span class="dv">1</span>:<span class="dv">12</span>, <span class="dt">labels=</span>month.abb, <span class="dt">cex=</span><span class="fl">0.8</span>)</code></pre></div>
+<p><img src="fig/time-series-airpassenger-forecast-eda-3.png" title="plot of chunk time-series-airpassenger-forecast-eda" alt="plot of chunk time-series-airpassenger-forecast-eda" style="display: block; margin: auto;" /></p>
+<h3 id="항공여객-예측모형">4.4. 항공여객 예측모형</h3>
+<p>ARIMA 모형 등 가능한 모든 시계열 모형을 항공여객 모형데이터에 적합시키고, 검증데이터에 예측모형 각각의 성능을 비교한 후에 가장 최적 모형을 선택한다. <strong>MASE</strong>가 가장 낮은 모형을 선택한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 3. 모형선정 ------------------------------------------------------------------------</span>
+models &lt;-<span class="st"> </span><span class="kw">list</span> (
+  <span class="dt">mod_arima =</span> <span class="kw">auto.arima</span>(ap_ts, <span class="dt">ic=</span><span class="st">&#39;aicc&#39;</span>, <span class="dt">stepwise=</span><span class="ot">FALSE</span>),
+  <span class="dt">mod_exponential =</span> <span class="kw">ets</span>(ap_ts, <span class="dt">ic=</span><span class="st">&#39;aicc&#39;</span>, <span class="dt">restrict=</span><span class="ot">FALSE</span>),
+  <span class="dt">mod_neural =</span> <span class="kw">nnetar</span>(ap_ts, <span class="dt">p=</span><span class="dv">12</span>, <span class="dt">size=</span><span class="dv">25</span>),
+  <span class="dt">mod_tbats =</span> <span class="kw">tbats</span>(ap_ts, <span class="dt">ic=</span><span class="st">&#39;aicc&#39;</span>, <span class="dt">seasonal.periods=</span><span class="dv">12</span>),
+  <span class="dt">mod_bats =</span> <span class="kw">bats</span>(ap_ts, <span class="dt">ic=</span><span class="st">&#39;aicc&#39;</span>, <span class="dt">seasonal.periods=</span><span class="dv">12</span>),
+  <span class="dt">mod_stl =</span> <span class="kw">stlm</span>(ap_ts, <span class="dt">s.window=</span><span class="dv">12</span>, <span class="dt">ic=</span><span class="st">&#39;aicc&#39;</span>, <span class="dt">robust=</span><span class="ot">TRUE</span>, <span class="dt">method=</span><span class="st">&#39;ets&#39;</span>),
+  <span class="dt">mod_sts =</span> <span class="kw">StructTS</span>(ap_ts)
+)
+
+forecasts &lt;-<span class="st"> </span><span class="kw">lapply</span>(models, forecast, <span class="dv">12</span>)
+forecasts$naive &lt;-<span class="st"> </span><span class="kw">naive</span>(ap_ts, <span class="dv">12</span>)
+
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">2</span>))
+<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="fl">1.5</span>, <span class="dv">2</span>), <span class="dt">xaxs=</span><span class="st">&#39;i&#39;</span>, <span class="dt">yaxs=</span><span class="st">&#39;i&#39;</span>)
+
+for(f in forecasts){
+  <span class="kw">plot</span>(f, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">600</span>), <span class="dt">main=</span><span class="st">&quot;&quot;</span>, <span class="dt">xaxt=</span><span class="st">&quot;n&quot;</span>)
+  <span class="kw">lines</span>(ap_ts_test, <span class="dt">col=</span><span class="st">&#39;red&#39;</span>)
+}</code></pre></div>
+<p><img src="fig/time-series-airpassenger-forecast-model-1.png" title="plot of chunk time-series-airpassenger-forecast-model" alt="plot of chunk time-series-airpassenger-forecast-model" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">acc &lt;-<span class="st"> </span><span class="kw">lapply</span>(forecasts, function(f){
+  <span class="kw">accuracy</span>(f, ap_ts_test)[<span class="dv">2</span>,,drop=<span class="ot">FALSE</span>]
+})
+
+acc &lt;-<span class="st"> </span><span class="kw">Reduce</span>(rbind, acc)
+<span class="kw">row.names</span>(acc) &lt;-<span class="st"> </span><span class="kw">names</span>(forecasts)
+acc &lt;-<span class="st"> </span>acc[<span class="kw">order</span>(acc[,<span class="st">&#39;MASE&#39;</span>]),]
+<span class="kw">round</span>(acc, <span class="dv">2</span>)</code></pre></div>
+<pre class="output"><code>                    ME   RMSE    MAE   MPE  MAPE MASE ACF1 Theil&#39;s U
+mod_tbats        36.25  43.03  36.44  8.00  8.05 1.28 0.68      0.82
+mod_arima        42.53  44.45  42.53  9.93  9.93 1.49 0.32      0.92
+mod_exponential  44.79  51.80  44.79  9.96  9.96 1.57 0.70      1.00
+mod_neural       51.02  54.81  51.02 11.83 11.83 1.79 0.23      1.15
+mod_bats         52.18  59.35  52.18 11.66 11.66 1.83 0.73      1.14
+mod_stl          53.38  67.26  53.38 11.40 11.40 1.87 0.68      1.25
+naive            91.33 113.19  91.33 19.54 19.54 3.20 0.67      2.11
+mod_sts         274.99 301.30 274.99 62.94 62.94 9.62 0.77      6.03
+</code></pre>
+<h3 id="항공여객-최적예측모형-적합">4.5. 항공여객 최적예측모형 적합</h3>
+<p>검증데이터에 예측오차가 가장 작은 <strong>MASE</strong>값을 갖는 모형 <code>tbats</code>를 최종 예측모형으로 선정한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 4. 모형적합 ------------------------------------------------------------------------</span>
+
+ap_tbats_fit &lt;-<span class="st"> </span><span class="kw">tbats</span>(ap_ts, <span class="dt">ic=</span><span class="st">&#39;aicc&#39;</span>, <span class="dt">seasonal.periods=</span><span class="dv">12</span>)
+<span class="kw">plot</span>(ap_tbats_fit)</code></pre></div>
+<p><img src="fig/time-series-airpassenger-forecast-fit-1.png" title="plot of chunk time-series-airpassenger-forecast-fit" alt="plot of chunk time-series-airpassenger-forecast-fit" style="display: block; margin: auto;" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ap_stl_fit &lt;-<span class="st"> </span><span class="kw">stl</span>(ap_ts, <span class="dt">s.window =</span> <span class="dv">12</span>)
+
+<span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">2</span>))
+<span class="kw">monthplot</span>(ap_ts, <span class="dt">ylab =</span> <span class="st">&quot;data&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.8</span>)
+<span class="kw">monthplot</span>(ap_stl_fit, <span class="dt">choice =</span> <span class="st">&quot;seasonal&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.8</span>)
+<span class="kw">monthplot</span>(ap_stl_fit, <span class="dt">choice =</span> <span class="st">&quot;trend&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.8</span>)
+<span class="kw">monthplot</span>(ap_stl_fit, <span class="dt">choice =</span> <span class="st">&quot;remainder&quot;</span>, <span class="dt">type =</span> <span class="st">&quot;h&quot;</span>, <span class="dt">cex.axis =</span> <span class="fl">0.8</span>)</code></pre></div>
+<p><img src="fig/time-series-airpassenger-forecast-fit-2.png" title="plot of chunk time-series-airpassenger-forecast-fit" alt="plot of chunk time-series-airpassenger-forecast-fit" style="display: block; margin: auto;" /></p>
+<h3 id="항공여객-예측">4.6. 항공여객 예측</h3>
+<p>최적 예측모형에 기반해서 항공수요 예측값을 뽑아내고 최저모형과 예측값을 시각적으로 비교한다.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 5. 예측 ------------------------------------------------------------------------</span>
+<span class="co"># 최적 모형</span>
+op &lt;-<span class="st"> </span><span class="kw">par</span>(<span class="dt">mfrow =</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">1</span>))
+<span class="kw">par</span>(<span class="dt">mar=</span><span class="kw">c</span>(<span class="dv">2</span>, <span class="dv">2</span>, <span class="fl">1.5</span>, <span class="dv">2</span>), <span class="dt">xaxs=</span><span class="st">&#39;i&#39;</span>, <span class="dt">yaxs=</span><span class="st">&#39;i&#39;</span>)
+
+ap_tbats_fit_fcast &lt;-<span class="st"> </span><span class="kw">forecast</span>(ap_tbats_fit)
+<span class="kw">plot</span>(ap_tbats_fit_fcast, <span class="dt">xaxt=</span><span class="st">&quot;n&quot;</span>)
+
+<span class="co">#최저 모형</span>
+mod_sts_fit &lt;-<span class="st"> </span><span class="kw">StructTS</span>(ap_ts)
+ap_sts_fit_fcast &lt;-<span class="st"> </span><span class="kw">forecast</span>(mod_sts_fit)
+<span class="kw">plot</span>(ap_sts_fit_fcast)</code></pre></div>
+<p><img src="fig/time-series-airpassenger-forecast-1.png" title="plot of chunk time-series-airpassenger-forecast" alt="plot of chunk time-series-airpassenger-forecast" style="display: block; margin: auto;" /></p>
+<div class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p><a href="http://stats.stackexchange.com/questions/140163/timeseries-analysis-procedure-and-methods-using-r">Timeseries analysis procedure and methods using R</a><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p><a href="https://www.otexts.org/fpp">Forecasting: principles and practice</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="https://www.youtube.com/watch?v=1Lh1HlBUf8k">Forecasting time series using R by Prof Rob J Hyndman at Melbourne R Users</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p><a href="http://rpubs.com/sinhrks/plot_ts">Plotting Time Series with ggplot2 and ggfortify</a><a href="#fnref4">↩</a></p></li>
+</ol>
+</div>
+        </div>
+      </div>
+      </article>
+      <div class="footer">
+        <a class="label swc-blue-bg" href="http://software-carpentry.org">Software Carpentry</a>
+        <a class="label swc-blue-bg" href="https://github.com/swcarpentry/lesson-template">Source</a>
+        <a class="label swc-blue-bg" href="mailto:admin@software-carpentry.org">Contact</a>
+        <a class="label swc-blue-bg" href="LICENSE.html">License</a>
+      </div>
+    </div>
+    <!-- Javascript placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script src="css/bootstrap/bootstrap-js/bootstrap.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </body>
+</html>
