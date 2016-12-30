@@ -1,7 +1,7 @@
 ---
 layout: page
 title: 데이터 과학 -- 기초 통계
-subtitle: 계절 자기회귀이동평균(SARIMA)
+subtitle: 시계열 데이터 예측(forecast)
 output:
   html_document: 
     keep_md: yes
@@ -28,85 +28,11 @@ options(warn=-1)
 ```
 > ## 학습 목표 {.objectives}
 >
-> * 계절 자기회귀이동평균(ARIMA) 모형을 이해한다.
-> * 항공승객 데이터를 예제로 모형을 식별, 적합, 예측까지 전과정을 실습한다. 
+> * 시계열 데이터의 백미 예측을 살펴본다.
+> * 다양한 시계열 데이터 모형의 장단점을 비교한다.
+> * 자동 시계열 예측의 필요성을 이해한다.
 
 
-## 1. 비행기 승객 데이터(AirPassengers)
-
-시계열 데이터 중 유명한 비행기 승객 데이터를 자기회귀이동평균(ARIMA) 모형을 
-적합시키기 전에 먼저 정상성을 확보하기 위해 비행기 승객 데이터(AirPassengers)를 
-시각화하면 원데이터는 정상성 가정을 만족하지 않는 것이 다수 확인된다.
-
-로그 변환하고 차분을 해도 계절성에 대한 것이 여전히 남아 있어 1년 단위, 즉 12차분을 
-수행한다. 그리고 나면 정상성이 확인된 것이 사각적으로 판단할 수 있다.
-
-``` {r time-series-sarima-stationary, message=FALSE, warn=FALSE}
-# 비행기 승객 데이터 ----------------------------------------------------
-# SARIMA ---------------------------------------------------------
-par(mfrow=c(4,1))
-par(mar=c(2, 5, 0, 2), xaxs='i', yaxs='i')
-
-# 원본 시계열 데이터
-AirPassengers_ts <- ts(AirPassengers, start=1949, frequency = 12)
-
-plot(AirPassengers_ts, type="c", xlab="", ylab=expression(y[t]), xaxt='n')
-text(AirPassengers_ts, labels = 1:12, col = 1:12, cex=.7)
-
-
-# 로그변환 시계열 데이터
-AirPassengers_ts_log <- log(AirPassengers_ts)
-
-plot(AirPassengers_ts_log, type="c", xlab="", ylab=expression(log(y[t])), xaxt='n')
-text(AirPassengers_ts_log, labels = 1:12, col = 1:12, cex=.7)
-
-# 1차분 시계열 데이터
-AirPassengers_ts_log_diff <- diff(AirPassengers_ts_log)
-
-plot(AirPassengers_ts_log_diff, type="c", xlab="", ylab=expression(diff(log(y[t]))), xaxt='n')
-text(AirPassengers_ts_log_diff, labels = 1:12, col = 1:12, cex=.7)
-
-# 계절차분(12) 시계열 데이터
-AirPassengers_ts_log_diff_12 <- diff(AirPassengers_ts_log_diff, 12)
-
-plot(AirPassengers_ts_log_diff_12, type="c", xlab="", ylab=expression(diff(diff(log(y[t]))),12))
-text(AirPassengers_ts_log_diff_12, labels = 1:12, col = 1:12, cex=.7)
-```
-
-## 2. 항공여객 데이터 모형식별 
-
-항공여객 데이터 모형식별을 위해 `astsa` 팩키지 `acf2()` 함수를 통해 원데이터, 로그변환 데이터,
-1차분 데이터, 12차분 계절성 반영 데이터를 시각화한다.
-
-``` {r time-series-sarima-acf, message=FALSE, warn=FALSE}
-# SARIMA ACF, PACF---------------------------------------------------------
-acf2(AirPassengers_ts, max.lag=60)
-acf2(AirPassengers_ts_log, max.lag=60)
-acf2(AirPassengers_ts_log_diff, max.lag=60)
-acf2(AirPassengers_ts_log_diff_12, max.lag=60)
-```
-
-## 3. 항공여객 데이터 SARIMA 모형 적합
-
-계절을 반영한 SARIMA 모형을 적합시킨다. 모형 적합결과 잔차는 백색잡음으로 적절한 모형이 식별된 것으로 파악된다.
-
-``` {r time-series-sarima-fit, message=FALSE, warn=FALSE}
-# SARIMA 모형---------------------------------------------------------
-airpass_sarima_fit <- sarima(AirPassengers_ts_log, p=0, d=1, q=1, 
-                                                   P=0, D=1, Q=1, S=12)
-airpass_sarima_fit$ttable
-```
-
-## 4. SARIMA 모형기반 항공여객 예측
-
-마지막으로 SARIMA 모형을 기반으로 항공수요를 3년치 예측한다. 
-이때 `sarima.for()` 함수를 활용한다.
-
-``` {r time-series-sarima-forecast, message=FALSE, warn=FALSE}
-# SARIMA 모형기반 예측---------------------------------------------------------
-sarima.for(AirPassengers_ts_log, p=0, d=1, q=1, 
-                                 P=0, D=1, Q=1, S=12,
-                                 n.ahead = 36)
-```
+## 시계열 데이터 예측 [^]
 
 
