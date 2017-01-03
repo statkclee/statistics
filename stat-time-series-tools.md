@@ -1,12 +1,24 @@
-# 데이터 과학 -- 기초 통계
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 시계열 모형 식별 도구
+output:
+  html_document: 
+    keep_md: yes
+    theme: journal
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
 
 
 
 > ## 학습 목표 {.objectives}
 >
 > * 시계열 데이터 입수 및 시각화를 통한 사전 분석 도구를 살펴본다.
-> * 시계열 데이터 (자기)상관 계수를 이해한다.
-> * `acf()` 자기상관계수를 시각화하여 ARMA 모형 식별에 대한 단초를 파악한다.
+> * 시계열 데이터 (자기)상관 계수를 이해하고, `acf()` 자기상관계수를 시각화하여 ARMA 모형 식별에 대한 단초로 활용한다.
+> * 시계열 분해방법에 대해 살펴본다.
 
 
 ## 금융 시계열 데이터 [^yahoo-finance-data]
@@ -82,7 +94,7 @@ ggplot(samsung, aes(Date,Close)) +
   theme(plot.title = element_text(lineheight=.7, face="bold", family="NanumGothic"))
 ~~~
 
-<img src="fig/time-series-financial-data-viz-1.png" style="display: block; margin: auto;" />
+<img src="fig/time-series-financial-data-viz-1.png" title="plot of chunk time-series-financial-data-viz" alt="plot of chunk time-series-financial-data-viz" style="display: block; margin: auto;" />
 
 ~~~{.r}
 # 동적 시각화
@@ -100,8 +112,12 @@ dygraph(korea_stocks, ylab="종가",
   dyRangeSelector()
 ~~~
 
-<!--html_preserve--><div id="htmlwidget-d21913108111a14fbbf6" style="width:672px;height:480px;" class="dygraphs html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d21913108111a14fbbf6">{"x":{"attrs":{"title":"삼성전자, 네이버 종가","ylabel":"종가","labels":["day","삼성전자","네이버"],"legend":"auto","retainDateWindow":false,"axes":{"x":{"pixelsPerLabel":60,"drawAxis":true},"y":{"drawAxis":true}},"series":{"삼성전자":{"axis":"y"},"네이버":{"axis":"y"}},"stackedGraph":false,"fillGraph":false,"fillAlpha":0.15,"stepPlot":false,"drawPoints":false,"pointSize":1,"drawGapEdgePoints":false,"connectSeparatedPoints":false,"strokeWidth":1,"strokeBorderColor":"white","colors":["blue","green"],"colorValue":0.5,"colorSaturation":1,"includeZero":false,"drawAxesAtZero":false,"logscale":false,"axisTickSize":3,"axisLineColor":"black","axisLineWidth":0.3,"axisLabelColor":"black","axisLabelFontSize":14,"axisLabelWidth":60,"drawGrid":true,"gridLineWidth":0.3,"rightGap":5,"digitsAfterDecimal":2,"labelsKMB":false,"labelsKMG2":false,"labelsUTC":false,"maxNumberWidth":6,"animatedZooms":false,"mobileDisableYTouch":true,"showRangeSelector":true,"rangeSelectorHeight":40,"rangeSelectorPlotFillColor":" #A7B1C4","rangeSelectorPlotStrokeColor":"#808FAB","interactionModel":"Dygraph.Interaction.defaultModel"},"scale":"daily","annotations":[],"shadings":[],"events":[],"format":"date","data":[["2016-01-01T00:00:00.000Z","2016-01-04T00:00:00.000Z","2016-01-05T00:00:00.000Z","2016-01-06T00:00:00.000Z","2016-01-07T00:00:00.000Z","2016-01-08T00:00:00.000Z","2016-01-11T00:00:00.000Z","2016-01-12T00:00:00.000Z","2016-01-13T00:00:00.000Z","2016-01-14T00:00:00.000Z","2016-01-15T00:00:00.000Z","2016-01-18T00:00:00.000Z","2016-01-19T00:00:00.000Z","2016-01-20T00:00:00.000Z","2016-01-21T00:00:00.000Z","2016-01-22T00:00:00.000Z","2016-01-25T00:00:00.000Z","2016-01-26T00:00:00.000Z","2016-01-27T00:00:00.000Z","2016-01-28T00:00:00.000Z","2016-01-29T00:00:00.000Z","2016-02-01T00:00:00.000Z","2016-02-02T00:00:00.000Z","2016-02-03T00:00:00.000Z","2016-02-04T00:00:00.000Z","2016-02-05T00:00:00.000Z","2016-02-08T00:00:00.000Z","2016-02-09T00:00:00.000Z","2016-02-10T00:00:00.000Z","2016-02-11T00:00:00.000Z","2016-02-12T00:00:00.000Z","2016-02-15T00:00:00.000Z","2016-02-16T00:00:00.000Z","2016-02-17T00:00:00.000Z","2016-02-18T00:00:00.000Z","2016-02-19T00:00:00.000Z","2016-02-22T00:00:00.000Z","2016-02-23T00:00:00.000Z","2016-02-24T00:00:00.000Z","2016-02-25T00:00:00.000Z","2016-02-26T00:00:00.000Z","2016-02-29T00:00:00.000Z","2016-03-01T00:00:00.000Z","2016-03-02T00:00:00.000Z","2016-03-03T00:00:00.000Z","2016-03-04T00:00:00.000Z","2016-03-07T00:00:00.000Z","2016-03-08T00:00:00.000Z","2016-03-09T00:00:00.000Z","2016-03-10T00:00:00.000Z","2016-03-11T00:00:00.000Z","2016-03-14T00:00:00.000Z","2016-03-15T00:00:00.000Z","2016-03-16T00:00:00.000Z","2016-03-17T00:00:00.000Z","2016-03-18T00:00:00.000Z","2016-03-21T00:00:00.000Z","2016-03-22T00:00:00.000Z","2016-03-23T00:00:00.000Z","2016-03-24T00:00:00.000Z","2016-03-25T00:00:00.000Z","2016-03-28T00:00:00.000Z","2016-03-29T00:00:00.000Z","2016-03-30T00:00:00.000Z","2016-03-31T00:00:00.000Z","2016-04-01T00:00:00.000Z","2016-04-04T00:00:00.000Z","2016-04-05T00:00:00.000Z","2016-04-06T00:00:00.000Z","2016-04-07T00:00:00.000Z","2016-04-08T00:00:00.000Z","2016-04-11T00:00:00.000Z","2016-04-12T00:00:00.000Z","2016-04-13T00:00:00.000Z","2016-04-14T00:00:00.000Z","2016-04-15T00:00:00.000Z","2016-04-18T00:00:00.000Z","2016-04-19T00:00:00.000Z","2016-04-20T00:00:00.000Z","2016-04-21T00:00:00.000Z","2016-04-22T00:00:00.000Z","2016-04-25T00:00:00.000Z","2016-04-26T00:00:00.000Z","2016-04-27T00:00:00.000Z","2016-04-28T00:00:00.000Z","2016-04-29T00:00:00.000Z","2016-05-02T00:00:00.000Z","2016-05-03T00:00:00.000Z","2016-05-04T00:00:00.000Z","2016-05-05T00:00:00.000Z","2016-05-06T00:00:00.000Z","2016-05-09T00:00:00.000Z","2016-05-10T00:00:00.000Z","2016-05-11T00:00:00.000Z","2016-05-12T00:00:00.000Z","2016-05-13T00:00:00.000Z","2016-05-16T00:00:00.000Z","2016-05-17T00:00:00.000Z","2016-05-18T00:00:00.000Z","2016-05-19T00:00:00.000Z","2016-05-20T00:00:00.000Z","2016-05-23T00:00:00.000Z","2016-05-24T00:00:00.000Z","2016-05-25T00:00:00.000Z","2016-05-26T00:00:00.000Z","2016-05-27T00:00:00.000Z","2016-05-30T00:00:00.000Z","2016-05-31T00:00:00.000Z","2016-06-01T00:00:00.000Z","2016-06-02T00:00:00.000Z","2016-06-03T00:00:00.000Z","2016-06-06T00:00:00.000Z","2016-06-07T00:00:00.000Z","2016-06-08T00:00:00.000Z","2016-06-09T00:00:00.000Z","2016-06-10T00:00:00.000Z","2016-06-13T00:00:00.000Z","2016-06-14T00:00:00.000Z","2016-06-15T00:00:00.000Z","2016-06-16T00:00:00.000Z","2016-06-17T00:00:00.000Z","2016-06-20T00:00:00.000Z","2016-06-21T00:00:00.000Z","2016-06-22T00:00:00.000Z","2016-06-23T00:00:00.000Z","2016-06-24T00:00:00.000Z","2016-06-27T00:00:00.000Z","2016-06-28T00:00:00.000Z","2016-06-29T00:00:00.000Z","2016-06-30T00:00:00.000Z","2016-07-01T00:00:00.000Z","2016-07-04T00:00:00.000Z","2016-07-05T00:00:00.000Z","2016-07-06T00:00:00.000Z","2016-07-07T00:00:00.000Z","2016-07-08T00:00:00.000Z","2016-07-11T00:00:00.000Z","2016-07-12T00:00:00.000Z","2016-07-13T00:00:00.000Z","2016-07-14T00:00:00.000Z","2016-07-15T00:00:00.000Z","2016-07-18T00:00:00.000Z","2016-07-19T00:00:00.000Z","2016-07-20T00:00:00.000Z","2016-07-21T00:00:00.000Z","2016-07-22T00:00:00.000Z","2016-07-25T00:00:00.000Z","2016-07-26T00:00:00.000Z","2016-07-27T00:00:00.000Z","2016-07-28T00:00:00.000Z","2016-07-29T00:00:00.000Z","2016-08-01T00:00:00.000Z","2016-08-02T00:00:00.000Z","2016-08-03T00:00:00.000Z","2016-08-04T00:00:00.000Z","2016-08-05T00:00:00.000Z","2016-08-08T00:00:00.000Z","2016-08-09T00:00:00.000Z","2016-08-10T00:00:00.000Z","2016-08-11T00:00:00.000Z","2016-08-12T00:00:00.000Z","2016-08-15T00:00:00.000Z","2016-08-16T00:00:00.000Z","2016-08-17T00:00:00.000Z","2016-08-18T00:00:00.000Z","2016-08-19T00:00:00.000Z","2016-08-22T00:00:00.000Z","2016-08-23T00:00:00.000Z","2016-08-24T00:00:00.000Z","2016-08-25T00:00:00.000Z","2016-08-26T00:00:00.000Z","2016-08-29T00:00:00.000Z","2016-08-30T00:00:00.000Z","2016-08-31T00:00:00.000Z","2016-09-01T00:00:00.000Z","2016-09-02T00:00:00.000Z","2016-09-05T00:00:00.000Z","2016-09-06T00:00:00.000Z","2016-09-07T00:00:00.000Z","2016-09-08T00:00:00.000Z","2016-09-09T00:00:00.000Z","2016-09-12T00:00:00.000Z","2016-09-13T00:00:00.000Z","2016-09-14T00:00:00.000Z","2016-09-15T00:00:00.000Z","2016-09-16T00:00:00.000Z","2016-09-19T00:00:00.000Z","2016-09-20T00:00:00.000Z","2016-09-21T00:00:00.000Z","2016-09-22T00:00:00.000Z","2016-09-23T00:00:00.000Z","2016-09-26T00:00:00.000Z","2016-09-27T00:00:00.000Z","2016-09-28T00:00:00.000Z","2016-09-29T00:00:00.000Z","2016-09-30T00:00:00.000Z","2016-10-03T00:00:00.000Z","2016-10-04T00:00:00.000Z","2016-10-05T00:00:00.000Z","2016-10-06T00:00:00.000Z","2016-10-07T00:00:00.000Z","2016-10-10T00:00:00.000Z","2016-10-11T00:00:00.000Z","2016-10-12T00:00:00.000Z","2016-10-13T00:00:00.000Z","2016-10-14T00:00:00.000Z","2016-10-17T00:00:00.000Z","2016-10-18T00:00:00.000Z","2016-10-19T00:00:00.000Z","2016-10-20T00:00:00.000Z","2016-10-21T00:00:00.000Z","2016-10-24T00:00:00.000Z","2016-10-25T00:00:00.000Z","2016-10-26T00:00:00.000Z","2016-10-27T00:00:00.000Z","2016-10-28T00:00:00.000Z","2016-10-31T00:00:00.000Z","2016-11-01T00:00:00.000Z","2016-11-02T00:00:00.000Z","2016-11-03T00:00:00.000Z","2016-11-04T00:00:00.000Z","2016-11-07T00:00:00.000Z","2016-11-08T00:00:00.000Z","2016-11-09T00:00:00.000Z","2016-11-10T00:00:00.000Z","2016-11-11T00:00:00.000Z","2016-11-14T00:00:00.000Z","2016-11-15T00:00:00.000Z","2016-11-16T00:00:00.000Z","2016-11-17T00:00:00.000Z","2016-11-18T00:00:00.000Z","2016-11-21T00:00:00.000Z","2016-11-22T00:00:00.000Z","2016-11-23T00:00:00.000Z","2016-11-24T00:00:00.000Z","2016-11-25T00:00:00.000Z","2016-11-28T00:00:00.000Z","2016-11-29T00:00:00.000Z","2016-11-30T00:00:00.000Z","2016-12-01T00:00:00.000Z","2016-12-02T00:00:00.000Z","2016-12-05T00:00:00.000Z","2016-12-06T00:00:00.000Z","2016-12-07T00:00:00.000Z","2016-12-08T00:00:00.000Z","2016-12-09T00:00:00.000Z","2016-12-12T00:00:00.000Z","2016-12-13T00:00:00.000Z","2016-12-14T00:00:00.000Z","2016-12-15T00:00:00.000Z","2016-12-16T00:00:00.000Z","2016-12-19T00:00:00.000Z","2016-12-20T00:00:00.000Z","2016-12-21T00:00:00.000Z","2016-12-22T00:00:00.000Z","2016-12-23T00:00:00.000Z","2016-12-26T00:00:00.000Z","2016-12-27T00:00:00.000Z","2016-12-28T00:00:00.000Z"],[1260000,1205000,1208000,1175000,1163000,1171000,1152000,1146000,1148000,1138000,1132000,1126000,1171000,1138000,1131000,1168000,1162000,1137000,1175000,1145000,1150000,1163000,1156000,1146000,1156000,1164000,1164000,1164000,1164000,1130000,1130000,1154000,1168000,1185000,1187000,1190000,1175000,1181000,1172000,1179000,1172000,1178000,1178000,1197000,1220000,1215000,1223000,1192000,1194000,1225000,1249000,1255000,1253000,1256000,1263000,1273000,1267000,1269000,1279000,1282000,1288000,1294000,1290000,1308000,1312000,1279000,1305000,1260000,1285000,1269000,1246000,1266000,1275000,1275000,1300000,1300000,1299000,1288000,1299000,1294000,1280000,1281000,1296000,1300000,1265000,1245000,1250000,1261000,1290000,1290000,1290000,1299000,1296000,1292000,1281000,1253000,1248000,1264000,1268000,1270000,1269000,1286000,1271000,1295000,1296000,1282000,1280000,1292000,1333000,1365000,1377000,1377000,1398000,1406000,1430000,1406000,1371000,1380000,1413000,1409000,1426000,1431000,1448000,1445000,1430000,1400000,1398000,1399000,1396000,1425000,1466000,1466000,1469000,1421000,1450000,1460000,1489000,1464000,1481000,1500000,1518000,1533000,1533000,1540000,1543000,1516000,1502000,1530000,1527000,1507000,1539000,1568000,1548000,1517000,1517000,1561000,1569000,1567000,1541000,1559000,1545000,1545000,1568000,1566000,1640000,1675000,1665000,1687000,1653000,1639000,1612000,1640000,1645000,1620000,1587000,1597000,1606000,1643000,1621000,1639000,1575000,1465000,1527000,1527000,1527000,1527000,1558000,1585000,1592000,1618000,1571000,1568000,1569000,1567000,1600000,1598000,1598000,1614000,1619000,1691000,1706000,1680000,1545000,1535000,1557000,1577000,1590000,1589000,1625000,1620000,1589000,1608000,1597000,1567000,1573000,1614000,1639000,1652000,1643000,1616000,1627000,1640000,1644000,1596000,1649000,1598000,1553000,1539000,1558000,1568000,1586000,1593000,1640000,1649000,1650000,1650000,1677000,1677000,1746000,1749000,1727000,1718000,1748000,1772000,1790000,1780000,1752000,1766000,1777000,1759000,1793000,1795000,1812000,1805000,1809000,1782000,1798000,1799000,1788000],[658000,632000,637000,623000,652000,652000,628000,650000,649000,651000,670000,687000,670000,664000,639000,668000,673000,680000,674000,631000,628000,613000,600000,601000,602000,599000,599000,599000,599000,563000,556000,556000,575000,575000,582000,573000,565000,584000,580000,582000,580000,572000,572000,609000,610000,613000,599000,604000,608000,635000,636000,635000,641000,640000,636000,639000,642000,649000,634000,624000,613000,617000,640000,637000,637000,628000,651000,652000,649000,675000,663000,664000,670000,670000,673000,673000,661000,669000,654000,667000,663000,662000,654000,665000,659000,677000,678000,676000,680000,680000,680000,700000,707000,693000,676000,677000,692000,694000,698000,701000,688000,690000,694000,704000,703000,700000,710000,720000,687000,697000,707000,707000,707000,722000,720000,720000,697000,697000,697000,701000,689000,692000,697000,730000,747000,739000,710000,719000,713000,710000,713000,727000,750000,745000,753000,750000,754000,755000,758000,734000,716000,712000,718000,695000,704000,705000,710000,710000,712000,710000,710000,701000,713000,705000,707000,723000,749000,755000,775000,778000,782000,782000,790000,790000,801000,805000,795000,806000,812000,804000,805000,810000,821000,845000,829000,831000,850000,843000,872000,869000,847000,840000,841000,841000,841000,841000,856000,836000,855000,873000,878000,876000,884000,887000,900000,883000,883000,858000,867000,861000,843000,872000,862000,864000,827000,844000,851000,846000,829000,844000,831000,833000,837000,848000,859000,860000,857000,847000,826000,812000,789000,820000,815000,805000,806000,760000,746000,744000,751000,745000,771000,786000,810000,795000,802000,805000,808000,801000,798000,764000,755000,764000,756000,750000,804000,800000,792000,786000,785000,786000,806000,800000,787000,779000,773000,768000,765000,772000,763000]],"fixedtz":false,"tzone":"UTC"},"evals":["attrs.interactionModel"],"jsHooks":[]}</script><!--/html_preserve-->
+
+
+~~~{.output}
+Error in loadNamespace(name): there is no package called 'webshot'
+
+~~~
 
 ### 시계열 데이터 산점도
 
@@ -118,7 +134,7 @@ plot(korea_stock_df$Date, korea_stock_df$Samsung, type="l", col="blue", ylim = c
 lines(korea_stock_df$Date, korea_stock_df$Naver, col="darkgreen")
 ~~~
 
-<img src="fig/time-series-yahoo-scatterplot-1.png" style="display: block; margin: auto;" />
+<img src="fig/time-series-yahoo-scatterplot-1.png" title="plot of chunk time-series-yahoo-scatterplot" alt="plot of chunk time-series-yahoo-scatterplot" style="display: block; margin: auto;" />
 
 ~~~{.r}
 # 산점도
@@ -126,7 +142,7 @@ plot(korea_stock_df$Samsung, korea_stock_df$Naver)
 abline(coef=coef(lm(korea_stock_df$Naver~korea_stock_df$Samsung)), col="darkgray")
 ~~~
 
-<img src="fig/time-series-yahoo-scatterplot-2.png" style="display: block; margin: auto;" />
+<img src="fig/time-series-yahoo-scatterplot-2.png" title="plot of chunk time-series-yahoo-scatterplot" alt="plot of chunk time-series-yahoo-scatterplot" style="display: block; margin: auto;" />
 
 ~~~{.r}
 # 수익률
@@ -143,7 +159,7 @@ plot(korea_stocks_diff_df$Samsung, korea_stocks_diff_df$Naver)
 abline(a=0.00002607821, b=0.22059696365, col="darkgray")
 ~~~
 
-<img src="fig/time-series-yahoo-scatterplot-3.png" style="display: block; margin: auto;" />
+<img src="fig/time-series-yahoo-scatterplot-3.png" title="plot of chunk time-series-yahoo-scatterplot" alt="plot of chunk time-series-yahoo-scatterplot" style="display: block; margin: auto;" />
 
 ### 시계열 데이터 상관계수
 
@@ -158,8 +174,8 @@ cor(korea_stocks)
 
 ~~~{.output}
           Samsung     Naver
-Samsung 1.0000000 0.8463098
-Naver   0.8463098 1.0000000
+Samsung 1.0000000 0.8422533
+Naver   0.8422533 1.0000000
 
 ~~~
 
@@ -173,8 +189,8 @@ cor(korea_stocks_diff[-1,])
 
 ~~~{.output}
           Samsung     Naver
-Samsung 1.0000000 0.1930709
-Naver   0.1930709 1.0000000
+Samsung 1.0000000 0.1939654
+Naver   0.1939654 1.0000000
 
 ~~~
 
@@ -209,7 +225,7 @@ p2 <- ggplot(naver_df, aes(naver_t, naver_t_1)) +
 grid.arrange(p1, p2, ncol=2)
 ~~~
 
-<img src="fig/time-series-naver-lag-scatterplot-1.png" style="display: block; margin: auto;" />
+<img src="fig/time-series-naver-lag-scatterplot-1.png" title="plot of chunk time-series-naver-lag-scatterplot" alt="plot of chunk time-series-naver-lag-scatterplot" style="display: block; margin: auto;" />
 
 수작업으로 자기상관계수를 계산하는 방식은 다음과 같고, `acf` 함수를 활용하면 이를 쉽게 계산도 하고,
 시각적으로 확인도 가능하다.
@@ -224,7 +240,7 @@ cor(naver_df$naver_t, naver_df$naver_t_1)
 
 
 ~~~{.output}
-[1] 0.9874355
+[1] 0.9874287
 
 ~~~
 
@@ -251,7 +267,301 @@ Autocorrelations of series 'naver$Close', by lag
 acf(naver$Close, plot = TRUE)
 ~~~
 
-<img src="fig/time-series-naver-acf-1.png" style="display: block; margin: auto;" />
+<img src="fig/time-series-naver-acf-1.png" title="plot of chunk time-series-naver-acf" alt="plot of chunk time-series-naver-acf" style="display: block; margin: auto;" />
 
 
+## 시계열 분해 [^time-series-decomposition]
 
+[^time-series-decomposition]: [Decomposition of time series](https://en.wikipedia.org/wiki/Decomposition_of_time_series)
+
+- 계절성($S_t$): 계절변동(Seasonality)은 계절적 요인으로 일정한 주기를 갖고 반복적으로 유사한 패턴으로 변화하는 것으로 항상 고정되고 이미 알려진 주기를 갖는다.
+- 추세성($T_t$): 시계열의 장기적인 진화과정을 반영하는 것으로 상승 혹은 하락 방향성이 있을 때 존재하고 반듯이 선형일 필요는 없다.
+- 순환성($C_t$): 반복되나 주기성이 없는 변동을 반영하는 것으로 통상적으로 적어도 2년의 기간이 필요하다.
+- 불규칙성($I_t$): 불규칙성(Irregularity)은 랜덤으로 비정규적인 영향을 반영하는 것으로 계절성, 추세성, 순환성이 제거된 후 남은 단차 부분을 반영한다.
+
+가법 모형(additive model)으로 상기 구성요소를 시계열 모형을 표현하면 다음과 같다.
+
+$$y_t = T_t + C_t + S_t + I_t$$
+
+승법 모형(multiplicative model)으로 상기 구성요소를 시계열 모형을 표현하면 다음과 같다.
+
+$$y_t = T_t \times C_t \times S_t \times I_t$$
+
+특히, `loess`를 활용한 STL(Seasonal and Trend decomposition using Loess)는 순환성이 추세성에 반영된 계절성($S_t$)과 추세성($T_t$)만으로 시계열을 분해하는데
+비선형성은 `loess()`가 그 역할을 담당한다.
+
+**STL**을 활용한 장점은 [Forecasting: principles and practice, STL decomposition](https://www.otexts.org/fpp/6/5)에 설명되어 있다.
+
+
+### 가법 시계열 분해: 수작업 [^time-series-decomp-tutorial]
+
+[^time-series-decomp-tutorial]: [Extract Seasonal & Trend: using decomposition in R](https://anomaly.io/seasonal-trend-decomposition-in-r/)
+
+
+~~~{.r}
+# 환경설정 ------------------------------------------------------------------------
+
+# library(extrafont)
+# library(fpp)
+
+# 1. 가법 시계열분해---------------------------------------------------------
+
+data(ausbeer)
+ausbeer_ts <- ts(tail(head(ausbeer, 17*4+2),17*4-4), frequency = 4)
+plot(ausbeer_ts)
+
+## 1.1. 추세 제거------------------------------------------------------------
+trend_beer <- ma(ausbeer_ts, order = 4, centre = T)
+plot(ausbeer_ts)
+lines(trend_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-1.png" title="plot of chunk time-series-ausbeer-decomposition" alt="plot of chunk time-series-ausbeer-decomposition" style="display: block; margin: auto;" />
+
+~~~{.r}
+detrend_beer <- ausbeer_ts - trend_beer
+plot(detrend_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-2.png" title="plot of chunk time-series-ausbeer-decomposition" alt="plot of chunk time-series-ausbeer-decomposition" style="display: block; margin: auto;" />
+
+~~~{.r}
+## 1.2. 계절성------------------------------------------------------------
+
+# m_beer <- t(matrix(data = detrend_beer[-c(1,2)], nrow = 4))
+m_beer <- t(matrix(data = detrend_beer, nrow = 4))
+seasonal_beer <- colMeans(m_beer, na.rm = T)
+seasonal_beer <- ts(rep(seasonal_beer,16), start=1956, frequency=4)
+plot(seasonal_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-3.png" title="plot of chunk time-series-ausbeer-decomposition" alt="plot of chunk time-series-ausbeer-decomposition" style="display: block; margin: auto;" />
+
+~~~{.r}
+## 1.3. 불규칙성------------------------------------------------------------
+seasonal_beer <- colMeans(m_beer, na.rm = T)
+random_beer <- ausbeer_ts - trend_beer - seasonal_beer
+plot(random_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-4.png" title="plot of chunk time-series-ausbeer-decomposition" alt="plot of chunk time-series-ausbeer-decomposition" style="display: block; margin: auto;" />
+
+~~~{.r}
+## 1.4. 복원------------------------------------------------------------
+par(mfrow=c(2,1), family="NanumGothic")
+par(mar=c(2, 2, 1.5, 2), xaxs='i', yaxs='i')
+recomposed_beer <- (trend_beer + seasonal_beer + random_beer)
+plot(ausbeer_ts, main="원본 맥주 데이터",  xaxt="n")
+plot(recomposed_beer, main="시계열 재합성 맥주 데이터")
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-5.png" title="plot of chunk time-series-ausbeer-decomposition" alt="plot of chunk time-series-ausbeer-decomposition" style="display: block; margin: auto;" />
+
+### 승법 시계열 분해: 수작업
+
+
+~~~{.r}
+# 2. 승법 시계열분해---------------------------------------------------------
+
+data(AirPassengers)
+ap_ts <- AirPassengers
+plot(ap_ts)
+
+## 1.1. 추세 제거------------------------------------------------------------
+trend_ap <- ma(ap_ts, order = 12, centre = T)
+plot(ap_ts)
+lines(trend_ap)
+~~~
+
+<img src="fig/time-series-ap-decomposition-1.png" title="plot of chunk time-series-ap-decomposition" alt="plot of chunk time-series-ap-decomposition" style="display: block; margin: auto;" />
+
+~~~{.r}
+detrend_ap <- ap_ts / trend_ap
+plot(detrend_ap)
+~~~
+
+<img src="fig/time-series-ap-decomposition-2.png" title="plot of chunk time-series-ap-decomposition" alt="plot of chunk time-series-ap-decomposition" style="display: block; margin: auto;" />
+
+~~~{.r}
+## 1.2. 계절성------------------------------------------------------------
+
+ap_mat <- t(matrix(data = detrend_ap, nrow = 12))
+seasonal_ap <- colMeans(ap_mat, na.rm = T)
+plot(as.ts(rep(seasonal_ap,12)))
+~~~
+
+<img src="fig/time-series-ap-decomposition-3.png" title="plot of chunk time-series-ap-decomposition" alt="plot of chunk time-series-ap-decomposition" style="display: block; margin: auto;" />
+
+~~~{.r}
+## 1.3. 불규칙성------------------------------------------------------------
+random_ap <- ap_ts / (trend_ap * seasonal_ap)
+plot(random_ap)
+~~~
+
+<img src="fig/time-series-ap-decomposition-4.png" title="plot of chunk time-series-ap-decomposition" alt="plot of chunk time-series-ap-decomposition" style="display: block; margin: auto;" />
+
+~~~{.r}
+## 1.4. 원시계열 복원------------------------------------------------------------
+par(mfrow=c(2,1), family="NanumGothic")
+par(mar=c(2, 3, 1.5, 2), xaxs='i', yaxs='i')
+
+recomposed_ap <- (trend_ap * seasonal_ap * random_ap)
+plot(ap_ts, main="원본 항공여객 데이터", xaxt="n")
+plot(recomposed_ap, main="시계열 재합성 항공여객 데이터")
+~~~
+
+<img src="fig/time-series-ap-decomposition-5.png" title="plot of chunk time-series-ap-decomposition" alt="plot of chunk time-series-ap-decomposition" style="display: block; margin: auto;" />
+
+### 가법 시계열 분해: 자동화
+
+
+~~~{.r}
+# 2. 수작업 자동화, decompose(), stl() ------------------------------------
+
+# 가법모형
+decompose_beer  <- decompose(ausbeer_ts, "additive")
+
+plot(ausbeer_ts)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-fn-1.png" title="plot of chunk time-series-ausbeer-decomposition-fn" alt="plot of chunk time-series-ausbeer-decomposition-fn" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(decompose_beer$seasonal)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-fn-2.png" title="plot of chunk time-series-ausbeer-decomposition-fn" alt="plot of chunk time-series-ausbeer-decomposition-fn" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(decompose_beer$trend)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-fn-3.png" title="plot of chunk time-series-ausbeer-decomposition-fn" alt="plot of chunk time-series-ausbeer-decomposition-fn" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(decompose_beer$random)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-fn-4.png" title="plot of chunk time-series-ausbeer-decomposition-fn" alt="plot of chunk time-series-ausbeer-decomposition-fn" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(decompose_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-fn-5.png" title="plot of chunk time-series-ausbeer-decomposition-fn" alt="plot of chunk time-series-ausbeer-decomposition-fn" style="display: block; margin: auto;" />
+
+### 승법 시계열 분해: 자동화
+
+
+~~~{.r}
+# 승법모형
+decompose_air <- decompose(ap_ts, "multiplicative")
+
+plot(ap_ts)
+~~~
+
+<img src="fig/time-series-ap-decomposition-fn-1.png" title="plot of chunk time-series-ap-decomposition-fn" alt="plot of chunk time-series-ap-decomposition-fn" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(decompose_air$seasonal)
+~~~
+
+<img src="fig/time-series-ap-decomposition-fn-2.png" title="plot of chunk time-series-ap-decomposition-fn" alt="plot of chunk time-series-ap-decomposition-fn" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(decompose_air$trend)
+~~~
+
+<img src="fig/time-series-ap-decomposition-fn-3.png" title="plot of chunk time-series-ap-decomposition-fn" alt="plot of chunk time-series-ap-decomposition-fn" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(decompose_air$random)
+~~~
+
+<img src="fig/time-series-ap-decomposition-fn-4.png" title="plot of chunk time-series-ap-decomposition-fn" alt="plot of chunk time-series-ap-decomposition-fn" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(decompose_air)
+~~~
+
+<img src="fig/time-series-ap-decomposition-fn-5.png" title="plot of chunk time-series-ap-decomposition-fn" alt="plot of chunk time-series-ap-decomposition-fn" style="display: block; margin: auto;" />
+
+### 맥주 데이터 시계열 분해: stl() 자동화
+
+
+~~~{.r}
+# stl() : ausbeer 데이터 ------------------------------------
+
+stl_beer <- stl(ausbeer_ts, s.window = "periodic")
+seasonal_stl_beer <- stl_beer$time.series[,1]
+trend_stl_beer <- stl_beer$time.series[,2]
+random_stl_beer <- stl_beer$time.series[,3]
+
+plot(ausbeer_ts)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-stl-1.png" title="plot of chunk time-series-ausbeer-decomposition-stl" alt="plot of chunk time-series-ausbeer-decomposition-stl" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(seasonal_stl_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-stl-2.png" title="plot of chunk time-series-ausbeer-decomposition-stl" alt="plot of chunk time-series-ausbeer-decomposition-stl" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(trend_stl_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-stl-3.png" title="plot of chunk time-series-ausbeer-decomposition-stl" alt="plot of chunk time-series-ausbeer-decomposition-stl" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(random_stl_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-stl-4.png" title="plot of chunk time-series-ausbeer-decomposition-stl" alt="plot of chunk time-series-ausbeer-decomposition-stl" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(stl_beer)
+~~~
+
+<img src="fig/time-series-ausbeer-decomposition-stl-5.png" title="plot of chunk time-series-ausbeer-decomposition-stl" alt="plot of chunk time-series-ausbeer-decomposition-stl" style="display: block; margin: auto;" />
+
+### 항공여객 데이터 시계열 분해: stl() 자동화
+
+
+~~~{.r}
+# stl() : 항공여객 데이터 ------------------------------------
+
+ap_stl <- stl(ap_ts, s.window = "periodic")
+seasonal_ap_stl <- ap_stl$time.series[,1]
+trend_ap_stl <- ap_stl$time.series[,2]
+random_ap_stl <- ap_stl$time.series[,3]
+
+plot(ap_ts)
+~~~
+
+<img src="fig/time-series-ap-decomposition-stl-1.png" title="plot of chunk time-series-ap-decomposition-stl" alt="plot of chunk time-series-ap-decomposition-stl" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(seasonal_ap_stl)
+~~~
+
+<img src="fig/time-series-ap-decomposition-stl-2.png" title="plot of chunk time-series-ap-decomposition-stl" alt="plot of chunk time-series-ap-decomposition-stl" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(trend_ap_stl)
+~~~
+
+<img src="fig/time-series-ap-decomposition-stl-3.png" title="plot of chunk time-series-ap-decomposition-stl" alt="plot of chunk time-series-ap-decomposition-stl" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(random_ap_stl)
+~~~
+
+<img src="fig/time-series-ap-decomposition-stl-4.png" title="plot of chunk time-series-ap-decomposition-stl" alt="plot of chunk time-series-ap-decomposition-stl" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(ap_stl)
+~~~
+
+<img src="fig/time-series-ap-decomposition-stl-5.png" title="plot of chunk time-series-ap-decomposition-stl" alt="plot of chunk time-series-ap-decomposition-stl" style="display: block; margin: auto;" />

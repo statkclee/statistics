@@ -255,10 +255,11 @@ plot(detrend_beer)
 # m_beer <- t(matrix(data = detrend_beer[-c(1,2)], nrow = 4))
 m_beer <- t(matrix(data = detrend_beer, nrow = 4))
 seasonal_beer <- colMeans(m_beer, na.rm = T)
-# seasonal_beer <- ts(rep(seasonal_beer,16), start=1956, frequency=4)
+seasonal_beer <- ts(rep(seasonal_beer,16), start=1956, frequency=4)
 plot(seasonal_beer)
 
 ## 1.3. 불규칙성------------------------------------------------------------
+seasonal_beer <- colMeans(m_beer, na.rm = T)
 random_beer <- ausbeer_ts - trend_beer - seasonal_beer
 plot(random_beer)
 
@@ -270,7 +271,7 @@ plot(ausbeer_ts, main="원본 맥주 데이터",  xaxt="n")
 plot(recomposed_beer, main="시계열 재합성 맥주 데이터")
 ```
 
-### 승법 시계열 분해: 수작업 [^time-series-decomp-tutorial]
+### 승법 시계열 분해: 수작업
 
 ``` {r time-series-ap-decomposition, message=FALSE}
 # 2. 승법 시계열분해---------------------------------------------------------
@@ -306,7 +307,7 @@ plot(ap_ts, main="원본 항공여객 데이터", xaxt="n")
 plot(recomposed_ap, main="시계열 재합성 항공여객 데이터")
 ```
 
-### 가법 시계열 분해: 자동화 [^time-series-decomp-tutorial]
+### 가법 시계열 분해: 자동화
 
 ``` {r time-series-ausbeer-decomposition-fn, message=FALSE}
 # 2. 수작업 자동화, decompose(), stl() ------------------------------------
@@ -321,7 +322,7 @@ plot(decompose_beer$random)
 plot(decompose_beer)
 ```
 
-### 승법 시계열 분해: 자동화 [^time-series-decomp-tutorial]
+### 승법 시계열 분해: 자동화
 
 ``` {r time-series-ap-decomposition-fn, message=FALSE}
 # 승법모형
