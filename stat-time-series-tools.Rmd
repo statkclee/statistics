@@ -21,6 +21,8 @@ library(stringr)
 library(ggplot2)
 library(scales)
 library(gridExtra)
+library(extrafont)
+library(fpp)
 
 options(warn=-1)
 
@@ -28,8 +30,8 @@ options(warn=-1)
 > ## 학습 목표 {.objectives}
 >
 > * 시계열 데이터 입수 및 시각화를 통한 사전 분석 도구를 살펴본다.
-> * 시계열 데이터 (자기)상관 계수를 이해한다.
-> * `acf()` 자기상관계수를 시각화하여 ARMA 모형 식별에 대한 단초를 파악한다.
+> * 시계열 데이터 (자기)상관 계수를 이해하고, `acf()` 자기상관계수를 시각화하여 ARMA 모형 식별에 대한 단초로 활용한다.
+> * 시계열 분해방법에 대해 살펴본다.
 
 
 ## 금융 시계열 데이터 [^yahoo-finance-data]
@@ -201,4 +203,167 @@ acf(naver$Close, plot = TRUE)
 ```
 
 
+## 시계열 분해 [^time-series-decomposition]
 
+[^time-series-decomposition]: [Decomposition of time series](https://en.wikipedia.org/wiki/Decomposition_of_time_series)
+
+- 계절성($S_t$): 계절변동(Seasonality)은 계절적 요인으로 일정한 주기를 갖고 반복적으로 유사한 패턴으로 변화하는 것으로 항상 고정되고 이미 알려진 주기를 갖는다.
+- 추세성($T_t$): 시계열의 장기적인 진화과정을 반영하는 것으로 상승 혹은 하락 방향성이 있을 때 존재하고 반듯이 선형일 필요는 없다.
+- 순환성($C_t$): 반복되나 주기성이 없는 변동을 반영하는 것으로 통상적으로 적어도 2년의 기간이 필요하다.
+- 불규칙성($I_t$): 불규칙성(Irregularity)은 랜덤으로 비정규적인 영향을 반영하는 것으로 계절성, 추세성, 순환성이 제거된 후 남은 단차 부분을 반영한다.
+
+가법 모형(additive model)으로 상기 구성요소를 시계열 모형을 표현하면 다음과 같다.
+
+$$y_t = T_t + C_t + S_t + I_t$$
+
+승법 모형(multiplicative model)으로 상기 구성요소를 시계열 모형을 표현하면 다음과 같다.
+
+$$y_t = T_t \times C_t \times S_t \times I_t$$
+
+특히, `loess`를 활용한 STL(Seasonal and Trend decomposition using Loess)는 순환성이 추세성에 반영된 계절성($S_t$)과 추세성($T_t$)만으로 시계열을 분해하는데
+비선형성은 `loess()`가 그 역할을 담당한다.
+
+**STL**을 활용한 장점은 [Forecasting: principles and practice, STL decomposition](https://www.otexts.org/fpp/6/5)에 설명되어 있다.
+
+
+### 가법 시계열 분해: 수작업 [^time-series-decomp-tutorial]
+
+[^time-series-decomp-tutorial]: [Extract Seasonal & Trend: using decomposition in R](https://anomaly.io/seasonal-trend-decomposition-in-r/)
+
+``` {r time-series-ausbeer-decomposition, message=FALSE}
+# 환경설정 ------------------------------------------------------------------------
+
+# library(extrafont)
+# library(fpp)
+
+# 1. 가법 시계열분해---------------------------------------------------------
+
+data(ausbeer)
+ausbeer_ts <- ts(tail(head(ausbeer, 17*4+2),17*4-4), frequency = 4)
+plot(ausbeer_ts)
+
+## 1.1. 추세 제거------------------------------------------------------------
+trend_beer <- ma(ausbeer_ts, order = 4, centre = T)
+plot(ausbeer_ts)
+lines(trend_beer)
+
+detrend_beer <- ausbeer_ts - trend_beer
+plot(detrend_beer)
+
+## 1.2. 계절성------------------------------------------------------------
+
+# m_beer <- t(matrix(data = detrend_beer[-c(1,2)], nrow = 4))
+m_beer <- t(matrix(data = detrend_beer, nrow = 4))
+seasonal_beer <- colMeans(m_beer, na.rm = T)
+# seasonal_beer <- ts(rep(seasonal_beer,16), start=1956, frequency=4)
+plot(seasonal_beer)
+
+## 1.3. 불규칙성------------------------------------------------------------
+random_beer <- ausbeer_ts - trend_beer - seasonal_beer
+plot(random_beer)
+
+## 1.4. 복원------------------------------------------------------------
+par(mfrow=c(2,1), family="NanumGothic")
+par(mar=c(2, 2, 1.5, 2), xaxs='i', yaxs='i')
+recomposed_beer <- (trend_beer + seasonal_beer + random_beer)
+plot(ausbeer_ts, main="원본 맥주 데이터",  xaxt="n")
+plot(recomposed_beer, main="시계열 재합성 맥주 데이터")
+```
+
+### 승법 시계열 분해: 수작업 [^time-series-decomp-tutorial]
+
+``` {r time-series-ap-decomposition, message=FALSE}
+# 2. 승법 시계열분해---------------------------------------------------------
+
+data(AirPassengers)
+ap_ts <- AirPassengers
+plot(ap_ts)
+
+## 1.1. 추세 제거------------------------------------------------------------
+trend_ap <- ma(ap_ts, order = 12, centre = T)
+plot(ap_ts)
+lines(trend_ap)
+
+detrend_ap <- ap_ts / trend_ap
+plot(detrend_ap)
+
+## 1.2. 계절성------------------------------------------------------------
+
+ap_mat <- t(matrix(data = detrend_ap, nrow = 12))
+seasonal_ap <- colMeans(ap_mat, na.rm = T)
+plot(as.ts(rep(seasonal_ap,12)))
+
+## 1.3. 불규칙성------------------------------------------------------------
+random_ap <- ap_ts / (trend_ap * seasonal_ap)
+plot(random_ap)
+
+## 1.4. 원시계열 복원------------------------------------------------------------
+par(mfrow=c(2,1), family="NanumGothic")
+par(mar=c(2, 3, 1.5, 2), xaxs='i', yaxs='i')
+
+recomposed_ap <- (trend_ap * seasonal_ap * random_ap)
+plot(ap_ts, main="원본 항공여객 데이터", xaxt="n")
+plot(recomposed_ap, main="시계열 재합성 항공여객 데이터")
+```
+
+### 가법 시계열 분해: 자동화 [^time-series-decomp-tutorial]
+
+``` {r time-series-ausbeer-decomposition-fn, message=FALSE}
+# 2. 수작업 자동화, decompose(), stl() ------------------------------------
+
+# 가법모형
+decompose_beer  <- decompose(ausbeer_ts, "additive")
+
+plot(ausbeer_ts)
+plot(decompose_beer$seasonal)
+plot(decompose_beer$trend)
+plot(decompose_beer$random)
+plot(decompose_beer)
+```
+
+### 승법 시계열 분해: 자동화 [^time-series-decomp-tutorial]
+
+``` {r time-series-ap-decomposition-fn, message=FALSE}
+# 승법모형
+decompose_air <- decompose(ap_ts, "multiplicative")
+
+plot(ap_ts)
+plot(decompose_air$seasonal)
+plot(decompose_air$trend)
+plot(decompose_air$random)
+plot(decompose_air)
+```
+
+### 맥주 데이터 시계열 분해: stl() 자동화
+
+``` {r time-series-ausbeer-decomposition-stl, message=FALSE}
+# stl() : ausbeer 데이터 ------------------------------------
+
+stl_beer <- stl(ausbeer_ts, s.window = "periodic")
+seasonal_stl_beer <- stl_beer$time.series[,1]
+trend_stl_beer <- stl_beer$time.series[,2]
+random_stl_beer <- stl_beer$time.series[,3]
+
+plot(ausbeer_ts)
+plot(seasonal_stl_beer)
+plot(trend_stl_beer)
+plot(random_stl_beer)
+plot(stl_beer)
+```
+
+### 항공여객 데이터 시계열 분해: stl() 자동화
+
+``` {r time-series-ap-decomposition-stl, message=FALSE}
+# stl() : 항공여객 데이터 ------------------------------------
+
+ap_stl <- stl(ap_ts, s.window = "periodic")
+seasonal_ap_stl <- ap_stl$time.series[,1]
+trend_ap_stl <- ap_stl$time.series[,2]
+random_ap_stl <- ap_stl$time.series[,3]
+
+plot(ap_ts)
+plot(seasonal_ap_stl)
+plot(trend_ap_stl)
+plot(random_ap_stl)
+plot(ap_stl)
+```
