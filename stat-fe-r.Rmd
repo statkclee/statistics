@@ -159,3 +159,111 @@ split_cash_lst$`2015`$cash_flow <- 0
 ## 결합하기(Combine)
 unsplit(split_cash_lst, split_var)
 ```
+
+## Apply 적용
+
+벡터연산을 수행하게 되면 R 코드가 간결해지는 장점과 함께 반복문 `repeat, while, for` 을 사용하는 것과 비교하여 속도도 빠르다.
+문제는 apply 계열 함수가 너무 많아서 처음 접하게 되면 언제 무엇을 어떻게 사용하는지 난감한 경우가 많다.
+가장 많이 사용되는 apply 가족 함수는 다음과 같다.
+
+|  함수명 |            함수명 설명               |
+|---------|--------------------------------------|
+| `apply` | 행과 열에 방향으로 데이터프레임을 받아 함수를 적용할 때 주로 사용 |
+| `lapply` | 리스트 자료에 대해 함수를 적용할 때 사용 |
+| `sapply` | `lapply`를 적용한 반환결과를 단순화시킴, 될때가 있고 안될때도 많음. |
+| `vapply` | `lapply`를 적용한 반환결과를 엄격하게 변환시킨, 단 출력 자료형을 명시해야 함. |
+
+### 기본개념
+
+리스트 자료형을 R로 불러오게 되면 가장 먼저 리스트에 들어가 있는 자료형을 파악하는 것이다.
+이를 `for` 문을 사용하게 되면 3줄이 필요한데, `lapply`를 사용하면 한줄이면 가능하다.
+
+``` {r fe-apply-family, warning=FALSE, message=FALSE}
+# 기본개념 ----------------------------------------
+## for 루프
+samsung_lst <- list(stock_name = "삼성전자", stock_code = "005930",
+                    price = 2291000, buy_or_sell = TRUE,
+                    df = data.frame(x=c(1), y=c(2)))
+
+for(i in samsung_lst) {
+  print(class(i))
+}
+## apply 가족 
+lapply(samsung_lst, class)
+```
+
+### Apply 가족 (샤프지수)
+
+`apply` 가족을 소개하기 전에 데이터를 불러와야 하기 때문에 `quantmod` 팩키지에서 
+야후와 구글 데이터를 가져온다. 
+ticker와 동일한 데이터프레임이 자동생성되기 때문에 이를 list로 묶어 두 주식을 하나로 묶어 
+`portfolio`라고 이름짖고 나서 `lapply` 함수를 통해 `summary` 함수를 적용시킨다.
+
+``` {r fe-lapply, warning=FALSE, message=FALSE}
+library(quantmod)
+
+getSymbols("AAPL", src = 'yahoo', from = '2017-05-01', auto.assign = T)
+getSymbols("GOOG", src = 'yahoo', from = '2017-05-01', auto.assign = T)
+
+portfolio <- list(apple=AAPL, google=GOOG)
+
+lapply(portfolio, FUN = summary)
+```
+
+[샤프지수(Sharpe Ratio)](https://ko.wikipedia.org/wiki/샤프_비율)은 (또는 샤프 지수 등)은 
+금융에서 투자성과를 평가함에 있어 해당 투자의 위험을 조정해 반영한 한가지 측도로 볼 수 있다.
+
+즉, 분산으로 측정된 위험을 가정하고 해당 위험대비 수익이 높은 것을 좋은 것으로 판단한다.
+
+$S_a = \frac{E[R_a-R_b]}{\sigma_a} = \frac{E[R_a-R_b]}{\sqrt{\mathrm{var}[R_a-R_b]}}$
+
+- $R_a$: 자산수익률
+- $R_b$: 무위험 수익률이나 코스피 같은 지수의 수익률 등, 기준지표(benckmark) 자산의 수익률이다. 
+- $E[R_a-R_b]$: 기준지표 수익률 대비 자산의 초과수익률
+- $\sigma_a$: 자산수익률의 표준편차
+
+샤프지수는 년을 기준으로 계산한다. 물론 주가가 주식분할과 배당을 반영하여 주식 수익률을 계산하는 것이 일반적이다.
+삼성전자, 네이버, 현대자동차를 이영애 누님이 한창 달리던 카드대란을 뒤로하고 새롭게 출범한 노무현 정권이후 샤프지수를 
+구해본다. `sharpe_ratio`을 두고 무위험 수익을 0.3%로 가정하여 산출한다.
+
+사실 동일한 함수가 `PerformanceAnalytics`에 구현되어 있어 이를 비교하기 위해 함께 동일한 값을 산출해 보자.
+
+``` {r fe-sharpe, warning=FALSE, message=FALSE}
+getSymbols('005930.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
+`005930.KS`$`005930.KS.Close` <- `005930.KS`$`005930.KS.Adjusted`
+samsung_retun <- periodReturn(`005930.KS`, period='yearly',subset='2003::')
+
+getSymbols('035420.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
+`035420.KS`$`035420.KS.Close` <- `035420.KS`$`035420.KS.Adjusted`
+naver_retun <- periodReturn(`035420.KS`, period='yearly',subset='2003::')
+
+getSymbols('005380.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
+`005380.KS`$`005380.KS.Close` <- `005380.KS`$`005380.KS.Adjusted`
+hmc_retun <- periodReturn(`005380.KS`, period='yearly',subset='2003::')
+
+sharpe_ratio <- function(returns) {
+  (mean(returns) - .0003) / sd(returns)
+}
+
+portfolio_return_lst <- list(samsung_retun, naver_retun, hmc_retun)
+lapply(portfolio_return_lst, sharpe_ratio)
+
+library(PerformanceAnalytics)
+lapply(portfolio_return_lst, SharpeRatio.annualized, Rf=.0003, geometric=FALSE) 
+```
+
+### `lapply`, `sapply`, `vapply` 
+
+해당 주식의 연도별 최대 수익률을 구해보면 각 함수가 왜 사용되는지 이해가 쉽다.
+`lapply` 함수가 기본이 되고, 경우에 따라 `sapply` 함수로 간략하고 빠르게 결과값을 확인하기도 하고,
+`vapply` 함수를 사용해서 훨씬 더 유연하게 활용도 가능하지만, 문제는 자유도가 많은 만큼
+그에 대응하여 코드가 길어지고 출력형에 대해서도 일일이 명시적으로 코드를 작성할 필요가 생긴다.
+
+``` {r fe-lapply-vapply, warning=FALSE, message=FALSE}
+## lapply, sapply, vapply --------------------------------------------------
+## 해당 주식에 대한 최대 수익율을 계산
+lapply(portfolio_return_lst, max)
+sapply(portfolio_return_lst, max)
+vapply(portfolio_return_lst, FUN = function(x) {max(x)}, 
+       FUN.VALUE = numeric(1))
+```
