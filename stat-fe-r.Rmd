@@ -1,0 +1,161 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: R 언어
+output:
+  html_document: 
+    keep_md: yes
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
+
+
+```{r, include=FALSE}
+source("tools/chunk-options.R") 
+
+```
+
+## 금융공학을 위한 R 기초 
+
+### 현재가치(Present Value) 
+
+[현재가치](https://ko.wikipedia.org/wiki/현재가치)는 현재가치와 장래가치로 구분되며, 미래에 얻게 될 확실한 부(富)의 가치를 현재의 가치로 환산한 값을 말한다.
+즉, 미래에 얻게 될 가치에 대해 시간에 대한 기회비용을 고려하여 비교하는 척도가 된다. 
+
+$$\mbox{PV} = \frac{\mbox{FV}}{(1+r)^n}$$
+
+- $\mbox{PV} = 현재가치(Present Value)$
+- $\mbox{FV} = 미래가치(Future Value)$
+- $r = 무위험이자율$
+- $n = 기간$
+
+특정기간 한 시점이 아니라 여러 시점이 $n$인 경우까지 확장하면 다음과 같다.
+
+$$\mbox{PV} = \frac{\mbox{CF}}{(1+r)^1} + \frac{\mbox{CF}}{(1+r)^2} + \frac{\mbox{CF}}{(1+r)^3} + ... + \frac{\mbox{CF}}{(1+r)^n}$$
+
+- $\mbox{PV} = 현재가치(Present Value)$
+- $\mbox{CF} = 현금흐름(Cash Flow)$
+- $r = 무위험이자율$
+- $n = 기간$
+
+갑돌 가구에 현금흐름이 1년후 1,000원, 2년후 2,000원, 3년후 3,000원의 현금이 들어올 것으로 예상되는데, 
+현재 이자율 3%를 가정하면 현재가치는 얼마나 될까? $1,000+2,000+3,000$ 보다 적은 가치를 확인할 수 있다.
+
+``` {r fe-pv, warning=FALSE, message=FALSE}
+# 현재가치 예제 ----------------------------------------
+## 갑돌 현금흐름 작성
+cash_df <- data.frame(household =c("갑돌", "갑돌", "갑돌"),
+                      cash_flow =c(1000,2000, 3000),
+                      year = c(1,2,3)) 
+cash_df
+
+## 1년 후 현금흐름 계산(3%)
+(pv_cash <- 1000 * (1+0.03) ^ -1)
+
+## 년도별 현금흐름 계산(3%)
+cash_df$pv <- cash_df$cash_flow * (1+0.03) ^ -cash_df$year
+
+sum(cash_df$pv)
+```
+
+### 자료구조
+
+금융공학에서 R을 활용할 경우 데이터를 R에서 처리할 수 있는 자료구조로 표현하는 것이다.
+자주 사용되는 자료구조는 데이터프레임과 리스트다. 그리고 요인(factor)에 대한 이해도 필수적이다.
+
+- 데이터프레임(dataframe)
+- 리스트(list)
+- 요인(factor)
+
+#### 데이터프레임
+
+데이터프레임은 동일한 길이를 갖는 벡터를 쭉 연결하여 생성된 자료구조로 다른 프로그래밍 언어에는 존재하지 않는 자료구조다.
+왜냐하면 벡터의 자료형이 숫자형, 문자형, 논리형을 다 받을 수 있기 때문이다. 이런 점이 행렬자료형과 비교하여 특별히 비교되는 큰 특징이다.
+데이터프레임을 생성할 때 동일한 길이를 갖는 벡터를 생성하고 나서, `data.frame`에 넣게 되면 데이터프레임이 생성된다.
+
+``` {r fe-dataframe, warning=FALSE, message=FALSE}
+# 자료구조 ---------------------------------------------
+## 데이터프레임 ----------------------------------------
+company <- c("갑사", "갑사", "갑사", "을사", "을사", "을사")
+cash_flow <- c(1000,2000, 3000, 3000, 4000, 5000)
+year <- c(1,2,3,1,2,3) 
+
+cash_df <- data.frame(company, cash_flow, year)
+```
+
+#### 요인(Factor)
+
+요인은 범주를 표현하는 자료구조로 숫자형와 문자형 자료구조의 특정을 동시에 갖는데 숫자가 고정된 범주로 표현된다.
+예를 들어, 성별을 남자 여자 두 수준으로 표현하는 경우 이를 R 내부적으로 1, 2 정수로 저장하여 저장공간을 부동소수점과 비교하여 획기적으로 
+줄일 수 있지만 사람이 읽고 이해할 수 있도록 "M", "F"로 표현하는 것이 좋은 사례가 된다. 
+채권에 대한 신용도를 평가할 때 S&P, 무디스, 피치 같은 글로벌 신용평가기관과 한국의 한국기업평가같은 회사가 
+회사가 발행되는 채권에 대해 신용도를 AAA, AA, A, ..., CCC와 같은 방식으로 표현하게 되는데 이런 경우 요인형 자료구조가 적절한 자료형이 된다.
+
+연속형 변수가 있을 경우 이를 범주형 변수로 변환할 필요가 있다. 이런 경우 `cut` 함수를 사용하여 숫자형 자료를 범주형 요인자료형으로 변환시킨다.
+당연히 연속형 구간을 나누는 구분점이 필요한데 `breaks`를 인자로 넣어 정해 둔다.
+마치 중간고사 기말고사 시험을 보게되면 0점에서 100점 사이 점수가 나오게 되고 수우미양가로 나누는 것과 동일한 로직을 프로그램으로 구현한 것으로 볼 수 있다.
+
+``` {r fe-factor-cut, warning=FALSE, message=FALSE}
+## 요인(Factor) ----------------------------------------
+eval_v <- sample(1:100, 100)
+eval_f <- cut(x = eval_v, breaks = c(0, 25, 50, 75, 100))
+levels(eval_f) <- c("매우 낮음", "낮음", "높음", "매우 높음")
+plot(eval_f)
+```
+
+[기업신용등급](https://ko.wikipedia.org/wiki/신용등급)을 보게되면 우수, 높은 등급부터 시작해서 채무불이행까지 쭉 나열되어 있다.
+이런 경우 요인에 대해 순서가 있게 되고 이를 표현하게 되는 방식 `factor`에 `ordered=TRUE`를 반영하면 순서를 자료형에 담백하게 담아낼 수 있다.
+
+``` {r fe-factor-order, warning=FALSE, message=FALSE}
+## 순서가 있는 요인(Factor) ----------------------------------------
+bond_rating_v <- c("B", "AA", "CCC", "CC", "BB", "AAA", "AA", "AA", "AAA", "B", "BB")
+unique(bond_rating_v)
+
+bond_rating_f <- factor(bond_rating_v, ordered=TRUE, levels=c("AAA", "AA", "BB", "B", "CCC", "CC"))
+plot(bond_rating_f)
+```
+
+#### 리스트
+
+데이터프레임과 마찬가지로 벡터를 조합하여 생성할 수도 있지만, 단순한 문자형 벡터부터, 데이터프레임, 내부에 행렬 등 
+다양한 데이터를 한곳에 담아낼 수 있다. 이런 경우, 상황에 따라 필요한 데이터를 꺼내서 사용할 수 있고
+메모리에 산재된 다수 데이터를 한 자료구조를 통해 통일되고 일관되게 활용할 수 있다는 장점도 생긴다.
+
+``` {r fe-list, warning=FALSE, message=FALSE}
+## 리스트(list) ----------------------------------------
+name <- "실업율과 경제성장률"
+year   <- c(2012,2013,2014,2015)
+growth <- c(2.3, 2.9, 3.3, 2.6, 2.7)
+unemp <-  c(3.4, 3.2, 3.1, 3.5, 3.6)
+cor_m <- cor(cbind(growth, unemp))
+
+(economy_lst <- list(name=name, year=year, growth=growth, unemp=unemp, cor_m=cor_m))
+```
+
+### Split-Apply-Combine 전략
+
+리스트 자료형을 갖게 되면 Split-Apply-Combine 전략을 활용하면 유용하다.
+데이터프레임 내부 일단 쪼개는 변수를 하나 생성하고 나서, `split` 함수로 그룹을 나눠게 되면
+리스트로 자료형이 변환된다. 각 그룹으로 나눠지 리스트 내부 원소에 대해 적절한 연산작업을 적용하고 나서 
+`unsplit` 함수로 결합하게 되면 다시 데이터프레임으로 복원된다.
+
+``` {r fe-list-strategy, warning=FALSE, message=FALSE}
+## 데이터
+company <- c("갑사", "갑사", "갑사", "을사", "을사", "을사")
+cash_flow <- c(1000,2000, 3000, 3000, 4000, 5000)
+year <- c(2015,2016,2017,2015,2016,2017) 
+
+cash_df <- data.frame(company, cash_flow, year)
+
+## 쪼개기(Split)
+split_var <- cash_df$year
+split_cash_lst <- split(cash_df, split_var)
+
+## 적용하기(Apply)
+split_cash_lst$`2015`$cash_flow <- 0
+
+## 결합하기(Combine)
+unsplit(split_cash_lst, split_var)
+```
