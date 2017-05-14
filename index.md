@@ -37,6 +37,7 @@ title: 데이터 과학 -- 기초 통계
     - [시계열 데이터 예측(forecast)](stat-time-series-forecast.html)
 1. **금융공학(Financial Engineering)**
     - [R 언어](stat-fe-r.html)
+    - [금융데이터 가져오기](stat-fe-import.html)
 1. [채팅 로그](stat-chatting-log.html)
 1. [베이즈 정리](stat-bayes.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
