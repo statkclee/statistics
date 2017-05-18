@@ -1,31 +1,27 @@
----
-layout: page
-title: 데이터 과학 -- 기초 통계
-subtitle: 시계열 모형 - 기초
-output:
-  html_document: 
-    keep_md: yes
-  pdf_document:
-    latex_engine: xelatex
-mainfont: NanumGothic
----
+# 데이터 과학 -- 기초 통계
 
 
 
 > ## 학습 목표 {.objectives}
 >
-> * 시계열 데이터를 이해한다.
-> * 시계열 데이터 분석 기본 모형을 살펴본다.
+> * 금융공학을 위한 시계열 데이터 기초를 이해한다.
+> * 금융데이터를 가져와서 데이터를 정제하는 방식을 살펴본다.
 
-
-## 1. 시계열 데이터
 
 시계열 데이터(time series)는 시간 순서로 배열된 데이터의 한 종류로 시간에 걸쳐
 순차적으로 기록된다. 시계열 데이터는 널려있다고 해도 과언은 아니다.
 주식수익률 데이터를 포함한 재무데이터, 인플레이션, 소비자 물가를
 포함한 각종 경제 관련 데이터 및 시간순으로 정당 지지율도 대표적인 시계열 데이터가 된다.
 
-### 1.1. 시계열 데이터 자료구조 [^eric-zivot-time-series]
+날짜와 시간을 어떻게 R 자료구조로 표현하는 방법과 실무에서 자주 등장하는 불규칙한 시계열 데이터를 일정 간격을 갖는 시계열 데이터로 변환하는 방법에 대해서는 
+다음 웹사이트를 참고한다.
+
+- [시간 데이터 기초](http://statkclee.github.io/data-science/ds-date-basics.html)
+- [불규칙 시계열 데이터](http://statkclee.github.io/data-science/ds-irregular-time-series.html)
+
+## 1. 시계열 데이터 맛보기
+
+### 1.1. 시계열 데이터 팩키지와 자료구조 [^eric-zivot-time-series]
 
 [^eric-zivot-time-series]: [Eric Zivot(2014), "Working with Financial Time Series Data in R"](https://faculty.washington.edu/ezivot/econ424/Working%20with%20Time%20Series%20Data%20in%20R.pdf)
 
@@ -124,14 +120,14 @@ window(dat_quarter_ts, start=c(1987,3), end=c(1988,4))
 
 ~~~
 
-**시계열 자료구조를 활용하는 이유**  
-
-시계열 자료구조를 활용하는 이유는 다음 맥주생산량 데이터를 통해 이해하면 쉽다.
-시계열 자료구조가 아닌 경우 `plot` 함수에 던지게 되면 산점도를 찍게 되지만,
-시계열 자료구조를 갖는 경우 각 관측점을 연결한 시각화 산출물을 생성시킨다.
-
-`xts` 팩키지를 활용하면 불규칙, 규칙 시계열 데이터를 자체 색인을 통해 빠르게 접근하고 
-다양한 시계열 데이터를 자유로이 다룰 수 있는 도구상자를 지원한다.
+> **시계열 자료구조를 활용하는 이유**  
+> 
+> 시계열 자료구조를 활용하는 이유는 다음 맥주생산량 데이터를 통해 이해하면 쉽다.
+> 시계열 자료구조가 아닌 경우 `plot` 함수에 던지게 되면 산점도를 찍게 되지만,
+> 시계열 자료구조를 갖는 경우 각 관측점을 연결한 시각화 산출물을 생성시킨다.
+> 
+> `xts` 팩키지를 활용하면 불규칙, 규칙 시계열 데이터를 자체 색인을 통해 빠르게 접근하고 
+> 다양한 시계열 데이터를 자유로이 다룰 수 있는 도구상자를 지원한다.
 
 
 ~~~{.r}
@@ -192,7 +188,7 @@ plot(beer_df, main="시계열 정보 활용 못함", xlab="", ylab="맥주생산
 plot(beer_ts, main="시계열 정보 활용 직선으로 연결함", xlab="", ylab="맥주생산량")
 ~~~
 
-<img src="fig/time-series-data-import-1.png" title="plot of chunk time-series-data-import" alt="plot of chunk time-series-data-import" style="display: block; margin: auto;" />
+<img src="fig/time-series-data-import-1.png" style="display: block; margin: auto;" />
 
 ~~~{.r}
 # xts 변환
@@ -202,7 +198,7 @@ par(mfrow=c(1,1))
 plot(beer_xts)
 ~~~
 
-<img src="fig/time-series-data-import-2.png" title="plot of chunk time-series-data-import" alt="plot of chunk time-series-data-import" style="display: block; margin: auto;" />
+<img src="fig/time-series-data-import-2.png" style="display: block; margin: auto;" />
 
 ### 1.2. 시계열 데이터 시각화 [^time-series-sunsplot]
 
@@ -235,4 +231,196 @@ title(xlab="시간", outer=TRUE, cex.lab=1.2)
 mtext(side=2, "태양의 흑점개수", line=2, las=0, adj=.75)
 ~~~
 
-<img src="fig/time-series-warning-1.png" title="plot of chunk time-series-warning" alt="plot of chunk time-series-warning" style="display: block; margin: auto;" />
+<img src="fig/time-series-warning-1.png" style="display: block; margin: auto;" />
+
+# 2. 시계열 데이터 다루기
+
+## 2.1. 주식 데이터 1종
+
+시계열 데이터의 대표적인 데이터가 주식 데이터로 [특정 기업(웹젠)](http://www.webzen.co.kr/)을 살펴보자.
+
+> ### 오류 
+>
+> Error in download.file(paste(yahoo.URL, "s=", Symbols.name, "&a=", from.m,  : 
+>   cannot open URL 'https://ichart.finance.yahoo.com/table.csv?s=069080.KQ&a=0&b=01&c=2017&d=4&e=18&f=2017&g=d&q=q&y=0&z=069080.KQ&x=.csv'
+> In addition: Warning message:
+> In download.file(paste(yahoo.URL, "s=", Symbols.name, "&a=", from.m,  :
+>   cannot open URL 'https://ichart.finance.yahoo.com/table.csv?s=069080.KQ&a=0&b=01&c=2017&d=4&e=18&f=2017&g=d&q=q&y=0&z=069080.KQ&x=.csv': HTTP status was '502 Connection refused'
+
+따라서, 아마존을 대상으로 살펴보자.
+`getSymbols` 함수로 야후나 구글에서 주식데이터를 긁어오면 시가, 종가 등 다양한 정보를 아래 함수를 혹은 조합해서 활용이 가능하다.
+
+- Op() : 개장가격(opening price)
+- Hi() : 최고가(high price)
+- Lo() : 최저가(low price)
+- Cl() : 마감 종가(close price)
+- Vo() : 거래량(traded volume)
+- Ad() : 조정된 마감 종가(adjusted close price)
+
+
+
+~~~{.r}
+# 1. 데이터 긁어오기 ----------------------------------
+# webzen_env <- new.env()
+# webzen_xts <- getSymbols('069080.KQ', src='yahoo', env=webzen_env, from = "2017-01-01", auto.assign = F)
+
+getSymbols("AMZN", src="google", auto.assign = TRUE, from = "2017-05-01")
+~~~
+
+
+
+~~~{.output}
+[1] "AMZN"
+
+~~~
+
+
+
+~~~{.r}
+# 2. 특정 칼럼 뽑아내기 ----------------------------------
+## 2.1. 한 칼럼만 뽑아내기
+head(Op(AMZN), 3)
+~~~
+
+
+
+~~~{.output}
+           AMZN.Open
+2017-05-01    927.80
+2017-05-02    946.64
+2017-05-03    946.00
+
+~~~
+
+
+
+~~~{.r}
+head(Hi(AMZN), 3)
+~~~
+
+
+
+~~~{.output}
+           AMZN.High
+2017-05-01     954.4
+2017-05-02     950.1
+2017-05-03     946.0
+
+~~~
+
+
+
+~~~{.r}
+head(Lo(AMZN), 3)
+~~~
+
+
+
+~~~{.output}
+           AMZN.Low
+2017-05-01   927.80
+2017-05-02   941.41
+2017-05-03   935.90
+
+~~~
+
+
+
+~~~{.r}
+head(Cl(AMZN), 3)
+~~~
+
+
+
+~~~{.output}
+           AMZN.Close
+2017-05-01     948.23
+2017-05-02     946.94
+2017-05-03     941.03
+
+~~~
+
+
+
+~~~{.r}
+head(Vo(AMZN), 3)
+~~~
+
+
+
+~~~{.output}
+           AMZN.Volume
+2017-05-01     5466544
+2017-05-02     3848835
+2017-05-03     3582686
+
+~~~
+
+
+
+~~~{.r}
+# head(Ad(AMZN), 3)
+
+## 2.2. 칼럼 다수 뽑아내기
+
+head(OHLC(AMZN), 3)
+~~~
+
+
+
+~~~{.output}
+           AMZN.Open AMZN.High AMZN.Low AMZN.Close
+2017-05-01    927.80     954.4   927.80     948.23
+2017-05-02    946.64     950.1   941.41     946.94
+2017-05-03    946.00     946.0   935.90     941.03
+
+~~~
+
+## 2.2. 주식 데이터 다수
+
+주식 데이터 다수를 가져열 경우 일단 `new.env()` 함수로 다수 주식데이터를 담아놓는 공간을 마련한다.
+그후 split-apply-combine 전략을 적용한다.
+
+
+~~~{.r}
+# 3. 다수 데이터 긁어오기 ----------------------------------
+
+data_env <- new.env()
+getSymbols(c("AMZN", "AAPL"), env = data_env, src="google", auto.assign = TRUE, from = "2017-05-01")
+~~~
+
+
+
+~~~{.output}
+[1] "AMZN" "AAPL"
+
+~~~
+
+
+
+~~~{.r}
+## 3.1. 다수 데이터 종가 가져오기
+
+data_lst <- lapply(data_env, Cl)
+(closed <- do.call(merge, data_lst))
+~~~
+
+
+
+~~~{.output}
+           AAPL.Close AMZN.Close
+2017-05-01     146.58     948.23
+2017-05-02     147.51     946.94
+2017-05-03     147.06     941.03
+2017-05-04     146.53     937.53
+2017-05-05     148.96     934.15
+2017-05-08     153.01     949.04
+2017-05-09     153.99     952.82
+2017-05-10     153.26     948.95
+2017-05-11     153.95     947.62
+2017-05-12     156.10     961.35
+2017-05-15     155.70     957.97
+2017-05-16     155.47     966.07
+2017-05-17     150.25     944.76
+
+~~~

@@ -1,7 +1,7 @@
 ---
 layout: page
 title: 데이터 과학 -- 기초 통계
-subtitle: R 언어
+subtitle: 금융공학을 위한 R 언어 기초
 output:
   html_document: 
     keep_md: yes
