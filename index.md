@@ -34,6 +34,7 @@ title: 데이터 과학 -- 기초 통계
     - [자기회귀이동평균(ARMA) 모형](stat-time-series-arma.html)
     - [계절 자기회귀이동평균(SARIMA)](stat-time-series-sarima.html)
     - [시계열 데이터 예측(forecast)](stat-time-series-forecast.html)
+    - [시계열 예측 자동화](stat-forecast-automation.html)
 1. **금융공학(Financial Engineering)**
     - [금융공학을 위한 R 언어 기초](stat-fe-r.html)
     - [금융데이터 가져오기](stat-fe-import.html)
