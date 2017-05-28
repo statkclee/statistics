@@ -1,4 +1,15 @@
-# 데이터 과학 -- 기초 통계
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 금융공학을 위한 R 언어 기초
+output:
+  html_document: 
+    keep_md: yes
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
 
 
 
@@ -126,7 +137,7 @@ levels(eval_f) <- c("매우 낮음", "낮음", "높음", "매우 높음")
 plot(eval_f)
 ~~~
 
-<img src="fig/fe-factor-cut-1.png" style="display: block; margin: auto;" />
+<img src="fig/fe-factor-cut-1.png" title="plot of chunk fe-factor-cut" alt="plot of chunk fe-factor-cut" style="display: block; margin: auto;" />
 
 [기업신용등급](https://ko.wikipedia.org/wiki/신용등급)을 보게되면 우수, 높은 등급부터 시작해서 채무불이행까지 쭉 나열되어 있다.
 이런 경우 요인에 대해 순서가 있게 되고 이를 표현하게 되는 방식 `factor`에 `ordered=TRUE`를 반영하면 순서를 자료형에 담백하게 담아낼 수 있다.
@@ -152,7 +163,7 @@ bond_rating_f <- factor(bond_rating_v, ordered=TRUE, levels=c("AAA", "AA", "BB",
 plot(bond_rating_f)
 ~~~
 
-<img src="fig/fe-factor-order-1.png" style="display: block; margin: auto;" />
+<img src="fig/fe-factor-order-1.png" title="plot of chunk fe-factor-order" alt="plot of chunk fe-factor-order" style="display: block; margin: auto;" />
 
 #### 리스트
 
@@ -320,7 +331,7 @@ getSymbols("AAPL", src = 'yahoo', from = '2017-05-01', auto.assign = T)
 
 
 ~~~{.output}
-[1] "AAPL"
+Error in download.file(paste(yahoo.URL, "s=", Symbols.name, "&a=", from.m, : URL 'https://ichart.finance.yahoo.com/table.csv?s=AAPL&a=4&b=01&c=2017&d=4&e=28&f=2017&g=d&q=q&y=0&z=AAPL&x=.csv'를 열 수 없습니다
 
 ~~~
 
@@ -333,7 +344,7 @@ getSymbols("GOOG", src = 'yahoo', from = '2017-05-01', auto.assign = T)
 
 
 ~~~{.output}
-[1] "GOOG"
+Error in download.file(paste(yahoo.URL, "s=", Symbols.name, "&a=", from.m, : URL 'https://ichart.finance.yahoo.com/table.csv?s=GOOG&a=4&b=01&c=2017&d=4&e=28&f=2017&g=d&q=q&y=0&z=GOOG&x=.csv'를 열 수 없습니다
 
 ~~~
 
@@ -341,44 +352,25 @@ getSymbols("GOOG", src = 'yahoo', from = '2017-05-01', auto.assign = T)
 
 ~~~{.r}
 portfolio <- list(apple=AAPL, google=GOOG)
+~~~
 
+
+
+~~~{.output}
+Error in eval(expr, envir, enclos): 객체 'AAPL'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
 lapply(portfolio, FUN = summary)
 ~~~
 
 
 
 ~~~{.output}
-$apple
-     Index              AAPL.Open       AAPL.High        AAPL.Low    
- Min.   :2017-05-01   Min.   :145.1   Min.   :147.1   Min.   :144.3  
- 1st Qu.:2017-05-03   1st Qu.:146.6   1st Qu.:147.6   1st Qu.:146.0  
- Median :2017-05-06   Median :148.3   Median :151.3   Median :147.9  
- Mean   :2017-05-06   Mean   :149.5   Mean   :151.2   Mean   :149.0  
- 3rd Qu.:2017-05-09   3rd Qu.:153.3   3rd Qu.:154.0   3rd Qu.:152.3  
- Max.   :2017-05-12   Max.   :154.7   Max.   :156.4   Max.   :154.7  
-   AAPL.Close     AAPL.Volume       AAPL.Adjusted  
- Min.   :146.5   Min.   :23371900   Min.   :145.9  
- 1st Qu.:147.2   1st Qu.:27273250   1st Qu.:146.6  
- Median :151.0   Median :32912350   Median :150.4  
- Mean   :150.7   Mean   :34851710   Mean   :150.2  
- 3rd Qu.:153.8   3rd Qu.:43796750   3rd Qu.:153.2  
- Max.   :156.1   Max.   :48752400   Max.   :156.1  
-
-$google
-     Index              GOOG.Open       GOOG.High        GOOG.Low    
- Min.   :2017-05-01   Min.   :901.9   Min.   :915.7   Min.   :901.5  
- 1st Qu.:2017-05-03   1st Qu.:917.5   1st Qu.:929.1   1st Qu.:915.2  
- Median :2017-05-06   Median :926.1   Median :933.0   Median :924.9  
- Mean   :2017-05-06   Mean   :923.8   Mean   :930.8   Mean   :920.4  
- 3rd Qu.:2017-05-09   3rd Qu.:931.9   3rd Qu.:935.7   3rd Qu.:925.2  
- Max.   :2017-05-12   Max.   :937.0   Max.   :937.5   Max.   :929.5  
-   GOOG.Close     GOOG.Volume      GOOG.Adjusted  
- Min.   :912.6   Min.   : 835000   Min.   :912.6  
- 1st Qu.:927.1   1st Qu.:1210800   1st Qu.:927.1  
- Median :929.7   Median :1450700   Median :929.7  
- Mean   :927.3   Mean   :1441200   Mean   :927.3  
- 3rd Qu.:932.0   3rd Qu.:1570775   3rd Qu.:932.0  
- Max.   :934.3   Max.   :2114600   Max.   :934.3  
+Error in lapply(portfolio, FUN = summary): 객체 'portfolio'를 찾을 수 없습니다
 
 ~~~
 
@@ -408,7 +400,7 @@ getSymbols('005930.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
 
 
 ~~~{.output}
-[1] "005930.KS"
+Error in download.file(paste(yahoo.URL, "s=", Symbols.name, "&a=", from.m, : URL 'https://ichart.finance.yahoo.com/table.csv?s=005930.KS&a=0&b=01&c=2003&d=4&e=28&f=2017&g=d&q=q&y=0&z=005930.KS&x=.csv'를 열 수 없습니다
 
 ~~~
 
@@ -416,15 +408,38 @@ getSymbols('005930.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
 
 ~~~{.r}
 `005930.KS`$`005930.KS.Close` <- `005930.KS`$`005930.KS.Adjusted`
-samsung_retun <- periodReturn(`005930.KS`, period='yearly',subset='2003::')
+~~~
 
+
+
+~~~{.output}
+Error in eval(expr, envir, enclos): 객체 '005930.KS'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
+samsung_retun <- periodReturn(`005930.KS`, period='yearly',subset='2003::')
+~~~
+
+
+
+~~~{.output}
+Error in inherits(x, "xts"): 객체 '005930.KS'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
 getSymbols('035420.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
 ~~~
 
 
 
 ~~~{.output}
-[1] "035420.KS"
+Error in download.file(paste(yahoo.URL, "s=", Symbols.name, "&a=", from.m, : URL 'https://ichart.finance.yahoo.com/table.csv?s=035420.KS&a=0&b=01&c=2003&d=4&e=28&f=2017&g=d&q=q&y=0&z=035420.KS&x=.csv'를 열 수 없습니다
 
 ~~~
 
@@ -432,15 +447,38 @@ getSymbols('035420.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
 
 ~~~{.r}
 `035420.KS`$`035420.KS.Close` <- `035420.KS`$`035420.KS.Adjusted`
-naver_retun <- periodReturn(`035420.KS`, period='yearly',subset='2003::')
+~~~
 
+
+
+~~~{.output}
+Error in eval(expr, envir, enclos): 객체 '035420.KS'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
+naver_retun <- periodReturn(`035420.KS`, period='yearly',subset='2003::')
+~~~
+
+
+
+~~~{.output}
+Error in inherits(x, "xts"): 객체 '035420.KS'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
 getSymbols('005380.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
 ~~~
 
 
 
 ~~~{.output}
-[1] "005380.KS"
+Error in download.file(paste(yahoo.URL, "s=", Symbols.name, "&a=", from.m, : URL 'https://ichart.finance.yahoo.com/table.csv?s=005380.KS&a=0&b=01&c=2003&d=4&e=28&f=2017&g=d&q=q&y=0&z=005380.KS&x=.csv'를 열 수 없습니다
 
 ~~~
 
@@ -448,27 +486,55 @@ getSymbols('005380.KS',src='yahoo', from = "2003-01-01", auto.assign = TRUE)
 
 ~~~{.r}
 `005380.KS`$`005380.KS.Close` <- `005380.KS`$`005380.KS.Adjusted`
-hmc_retun <- periodReturn(`005380.KS`, period='yearly',subset='2003::')
+~~~
 
+
+
+~~~{.output}
+Error in eval(expr, envir, enclos): 객체 '005380.KS'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
+hmc_retun <- periodReturn(`005380.KS`, period='yearly',subset='2003::')
+~~~
+
+
+
+~~~{.output}
+Error in inherits(x, "xts"): 객체 '005380.KS'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
 sharpe_ratio <- function(returns) {
   (mean(returns) - .0003) / sd(returns)
 }
 
 portfolio_return_lst <- list(samsung_retun, naver_retun, hmc_retun)
+~~~
+
+
+
+~~~{.output}
+Error in eval(expr, envir, enclos): 객체 'samsung_retun'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
 lapply(portfolio_return_lst, sharpe_ratio)
 ~~~
 
 
 
 ~~~{.output}
-[[1]]
-[1] 0.6155469
-
-[[2]]
-[1] 0.5046724
-
-[[3]]
-[1] 0.3675301
+Error in lapply(portfolio_return_lst, sharpe_ratio): 객체 'portfolio_return_lst'를 찾을 수 없습니다
 
 ~~~
 
@@ -476,23 +542,25 @@ lapply(portfolio_return_lst, sharpe_ratio)
 
 ~~~{.r}
 library(PerformanceAnalytics)
+~~~
+
+
+
+~~~{.output}
+Error in library(PerformanceAnalytics): there is no package called 'PerformanceAnalytics'
+
+~~~
+
+
+
+~~~{.r}
 lapply(portfolio_return_lst, SharpeRatio.annualized, Rf=.0003, geometric=FALSE) 
 ~~~
 
 
 
 ~~~{.output}
-[[1]]
-                                yearly.returns
-Annualized Sharpe Ratio (Rf=0%)      0.6155469
-
-[[2]]
-                                yearly.returns
-Annualized Sharpe Ratio (Rf=0%)      0.5046724
-
-[[3]]
-                                yearly.returns
-Annualized Sharpe Ratio (Rf=0%)      0.3675301
+Error in match.fun(FUN): 객체 'SharpeRatio.annualized'를 찾을 수 없습니다
 
 ~~~
 
@@ -513,14 +581,7 @@ lapply(portfolio_return_lst, max)
 
 
 ~~~{.output}
-[[1]]
-[1] 0.7901662
-
-[[2]]
-[1] 2.233537
-
-[[3]]
-[1] 2.092932
+Error in lapply(portfolio_return_lst, max): 객체 'portfolio_return_lst'를 찾을 수 없습니다
 
 ~~~
 
@@ -533,7 +594,7 @@ sapply(portfolio_return_lst, max)
 
 
 ~~~{.output}
-[1] 0.7901662 2.2335365 2.0929321
+Error in lapply(X = X, FUN = FUN, ...): 객체 'portfolio_return_lst'를 찾을 수 없습니다
 
 ~~~
 
@@ -547,6 +608,6 @@ vapply(portfolio_return_lst, FUN = function(x) {max(x)},
 
 
 ~~~{.output}
-[1] 0.7901662 2.2335365 2.0929321
+Error in vapply(portfolio_return_lst, FUN = function(x) {: 객체 'portfolio_return_lst'를 찾을 수 없습니다
 
 ~~~

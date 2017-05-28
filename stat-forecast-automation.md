@@ -1,28 +1,7 @@
----
-layout: page
-title: 데이터 과학 -- 기초 통계
-subtitle: 시계열 예측 자동화
-output:
-  html_document: 
-    keep_md: yes
-    toc: yes
-  pdf_document:
-    latex_engine: xelatex
-mainfont: NanumGothic
----
+# 데이터 과학 -- 기초 통계
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-library(tidyverse)
-library(extrafont)
-library(gridExtra)
-library(fpp)
-library(ggthemes)
-library(xts)
-library(tidyquant)
-library(DT)
-```
+
 
 ## 1. 대한민국 자살율
 
@@ -41,7 +20,8 @@ OECD 통계를 바탕으로 애니메이션으로 자살율을 시각화했다.
 
 시각화를 위한 데이터 정제과정을 함께 수행하여 가져온 데이터와 데이터 정제과정이 올바르게 수행되었는지 확인한다.
 
-``` {r suicide-forecast-setup, warning=FALSE, message=FALSE}
+
+~~~{.r}
 # 0. 환경설정 ------------------------------------------------------------------------
 #library(tidyverse)
 #library(extrafont)
@@ -81,7 +61,9 @@ ggplot(data=kor_df, aes(x=date, y=suicide))+
   labs(x="",y="",title="자살자수 국제 비교",
        caption="\n 자료출처: 십만명당 자살자수 OECD 데이터, https://data.oecd.org/healthstat/suicide-rates.htm",
        subtitle="십만명당 자살자수(남녀 총합)")
-```
+~~~
+
+<img src="fig/suicide-forecast-setup-1.png" style="display: block; margin: auto;" />
 
 
 ### 2.2. 자살율 예측
@@ -96,8 +78,8 @@ ggplot(data=kor_df, aes(x=date, y=suicide))+
 ggAcf() 함수를 통해 자기상관이 존재하는지 시각적으로 확인하고,
 `Ljung-Box` 검정을 통해 자기상관이 존재하는지 통계량으로 검정한다.
 
-``` {r suicide-forecast-initial, warning=FALSE, message=FALSE}
 
+~~~{.r}
 # 4. 자살율 예측 ------------------------------------------------------------------------
 ## 4.1. 시계열 데이터 변환 --------------------------------------------------------------
 # library(tidyquant)
@@ -107,13 +89,32 @@ kor_ts <- as.ts(kor_xts, start=c(1985), end=c(2015))
 
 ## 4.2. 시계열 데이터 시각화 및 시계열 예측 적합성 --------------------------------------
 autoplot(kor_xts)
+~~~
 
+<img src="fig/suicide-forecast-initial-1.png" style="display: block; margin: auto;" />
+
+~~~{.r}
 ggAcf(kor_xts) +
   theme_tufte(base_family = "NanumGothic") +
   ggtitle("대한민국 십명당 자살자수 자기상관함수(ACF)")
+~~~
 
+<img src="fig/suicide-forecast-initial-2.png" style="display: block; margin: auto;" />
+
+~~~{.r}
 Box.test(kor_xts, lag = 24, fitdf = 0, type = "Lj")
-```
+~~~
+
+
+
+~~~{.output}
+
+	Box-Ljung test
+
+data:  kor_xts
+X-squared = 293.12, df = 24, p-value < 2.2e-16
+
+~~~
 
 #### 2.2.2. 시계열 모형 적합
 
@@ -145,26 +146,113 @@ Box.test(kor_xts, lag = 24, fitdf = 0, type = "Lj")
 - 추세를 잡아내는데 추세항 사용
 - 계절성을 잡아내는데 계절항 사용
 
-``` {r suicide-forecast-models, warning=FALSE, message=FALSE}
+
+~~~{.r}
 ## 4.3. 벤치마크 시계열 예측모형 --------------------------------------
 
 kor_ts %>% naive() %>% checkresiduals()
-kor_ts %>% naive() %>% forecast() %>% autoplot()
+~~~
 
+<img src="fig/suicide-forecast-models-1.png" style="display: block; margin: auto;" />
+
+~~~{.output}
+
+	Ljung-Box test
+
+data:  residuals
+Q* = 17.484, df = 10, p-value = 0.06432
+
+Model df: 0.   Total lags used: 10
+
+~~~
+
+
+
+~~~{.r}
+kor_ts %>% naive() %>% forecast() %>% autoplot()
+~~~
+
+<img src="fig/suicide-forecast-models-2.png" style="display: block; margin: auto;" />
+
+~~~{.r}
 ## 4.4. 시계열 예측모형 3종 세트 --------------------------------------
 
 ### 4.4.1. ETS 모형
 kor_ts %>% ets(lambda=BoxCox.lambda(kor_xts)) %>% checkresiduals()
-kor_ts %>% ets(lambda=BoxCox.lambda(kor_xts)) %>% forecast() %>% autoplot()
+~~~
 
+<img src="fig/suicide-forecast-models-3.png" style="display: block; margin: auto;" />
+
+~~~{.output}
+
+	Ljung-Box test
+
+data:  residuals
+Q* = 7.7468, df = 8, p-value = 0.4586
+
+Model df: 2.   Total lags used: 10
+
+~~~
+
+
+
+~~~{.r}
+kor_ts %>% ets(lambda=BoxCox.lambda(kor_xts)) %>% forecast() %>% autoplot()
+~~~
+
+<img src="fig/suicide-forecast-models-4.png" style="display: block; margin: auto;" />
+
+~~~{.r}
 ### 4.4.2. ARIMA 모형
 kor_ts %>% auto.arima() %>% checkresiduals()
-kor_ts %>% auto.arima() %>% forecast() %>% autoplot()
+~~~
 
+<img src="fig/suicide-forecast-models-5.png" style="display: block; margin: auto;" />
+
+~~~{.output}
+
+	Ljung-Box test
+
+data:  residuals
+Q* = 17.857, df = 10, p-value = 0.05742
+
+Model df: 0.   Total lags used: 10
+
+~~~
+
+
+
+~~~{.r}
+kor_ts %>% auto.arima() %>% forecast() %>% autoplot()
+~~~
+
+<img src="fig/suicide-forecast-models-6.png" style="display: block; margin: auto;" />
+
+~~~{.r}
 ### 4.4.3. TBATS 모형
 kor_ts %>% tbats() %>% checkresiduals()
+~~~
+
+<img src="fig/suicide-forecast-models-7.png" style="display: block; margin: auto;" />
+
+~~~{.output}
+
+	Ljung-Box test
+
+data:  residuals
+Q* = 9.8574, df = 7, p-value = 0.1968
+
+Model df: 3.   Total lags used: 10
+
+~~~
+
+
+
+~~~{.r}
 kor_ts %>% tbats() %>% forecast() %>% autoplot()
-```
+~~~
+
+<img src="fig/suicide-forecast-models-8.png" style="display: block; margin: auto;" />
 
 #### 2.2.3. 자살율 예측모형 선정과 예측
 
@@ -174,7 +262,8 @@ kor_ts %>% tbats() %>% forecast() %>% autoplot()
 즉, 1985 - 2012년까지 자살률을 훈련데이터로 놓고 2013 - 2015 자살률을 예측하는 것으로 시계열 데이터를 나눈다.
 총 6개 시계열 예측모형을 적합시키고 최적의 모형을 선택하여 향후 5년 대한민국 인구 10만명당 자살자수를 예측한다.
 
-``` {r suicide-forecast-production, warning=FALSE, message=FALSE}
+
+~~~{.r}
 # 5. 예측 모형선정 ------------------------------------------------------------------------
 ## 5.1. 모형선정 ------------------------------------------------------------------------
 
@@ -205,13 +294,37 @@ acc <- acc[order(acc[,'MASE']),] %>% round(2)
 ## 5.2. 모형적합 및 예측 ------------------------------------------------------------------------
 
 kor_ts %>% tbats() %>% checkresiduals()
+~~~
+
+<img src="fig/suicide-forecast-production-1.png" style="display: block; margin: auto;" />
+
+~~~{.output}
+
+	Ljung-Box test
+
+data:  residuals
+Q* = 9.8574, df = 7, p-value = 0.1968
+
+Model df: 3.   Total lags used: 10
+
+~~~
+
+
+
+~~~{.r}
 kor_ts %>% tbats() %>% forecast(h=5) %>% autoplot() +
   labs(x="", y="십만명당 자살자수", title="대한민국 자살자수 5년 예측") +
   theme_tufte(base_family = "NanumGothic")
+~~~
 
+<img src="fig/suicide-forecast-production-2.png" style="display: block; margin: auto;" />
 
+~~~{.r}
 kor_ts %>% tbats() %>% forecast(h=5) %>% 
   as_tibble() %>% 
   DT::datatable() %>% 
   DT::formatRound(c(1:5), digits=1)
-```
+~~~
+
+<!--html_preserve--><div id="htmlwidget-7b968850e90cd407e368" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-7b968850e90cd407e368">{"x":{"filter":"none","data":[["2016","2017","2018","2019","2020"],[26.411524426823,26.411524426823,26.411524426823,26.411524426823,26.411524426823],[22.6225323456824,20.8537737882549,19.6427843668648,18.6917046209389,17.8986299373712],[30.8336666811615,33.446791143855,35.5065758908105,37.3108942222956,38.961664621757],[20.8416311409516,18.4012557750078,16.7919435019507,15.5641602544249,14.5652511621891],[33.4662595598015,37.8989889283861,41.5250655944143,44.7942019027127,47.8592319240509]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Point Forecast<\/th>\n      <th>Lo 80<\/th>\n      <th>Hi 80<\/th>\n      <th>Lo 95<\/th>\n      <th>Hi 95<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatRound(this, row, data, 1, 1);\nDTWidget.formatRound(this, row, data, 2, 1);\nDTWidget.formatRound(this, row, data, 3, 1);\nDTWidget.formatRound(this, row, data, 4, 1);\nDTWidget.formatRound(this, row, data, 5, 1);\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script><!--/html_preserve-->
