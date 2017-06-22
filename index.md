@@ -38,6 +38,7 @@ title: 데이터 과학 -- 기초 통계
     - [금융공학을 위한 R 언어 기초](stat-fe-r.html)
     - [금융데이터 가져오기](stat-fe-import.html)
     - [시계열 데이터 다루기](stat-time-series-basics.html)    
+    - [깔끔한 금융 시장 분석가(tidyquant)](stat-time-series-tidyquant.html)    
 1. [채팅 로그](stat-chatting-log.html)
 1. [베이즈 정리](stat-bayes.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
