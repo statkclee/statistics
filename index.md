@@ -27,7 +27,7 @@ title: 데이터 과학 -- 기초 통계
     - [측정 척도(Scales of Measurement)](stat-measurement.html)
     - [A/B 검정(A/B Testing)](stat-ab-testing.html)
     - [실무에서 자주 활용되는 검정($t$-검정)](stat-testing.html)
-    - [단일 표본 비율검정 -- 웹사이트 선호도 분석](stat-coursera-prop-test.html)
+    - [A/B 검정 -- A안 혹은 B안 선정](stat-ab-testing-in-practice.html)
 1. [통계 모형(Statistical models)](stat-modeling.html)
     - [탐색적 시계열 데이터 분석](stat-time-series-eda.html)
     - [시계열 모형 식별 도구](stat-time-series-tools.html)
