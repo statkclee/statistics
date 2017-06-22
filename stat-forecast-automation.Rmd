@@ -1,0 +1,217 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 시계열 예측 자동화
+output:
+  html_document: 
+    keep_md: yes
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
+
+
+```{r, include=FALSE}
+source("tools/chunk-options.R") 
+library(tidyverse)
+library(extrafont)
+library(gridExtra)
+library(fpp)
+library(ggthemes)
+library(xts)
+library(tidyquant)
+library(DT)
+```
+
+## 1. 대한민국 자살율
+
+대한민국 자살율은 세계적으로 높지만 이에 대한 관심은 다른 이슈에 빠를게 잊혀져가고 있다.
+[자살자수 국제비교(10만명당 자살자수)](http://statkclee.github.io/politics/oecd-suicide.html)에서 
+OECD 통계를 바탕으로 애니메이션으로 자살율을 시각화했다. 
+
+이번에는 다양한 시계열 예측모형을 바탕으로 향후 대한민국 10만명당 자살율을 예측해보자.
+
+## 2. 대한민국 10만명당 자살율 예측 
+
+### 2.1. 환경설정과 데이터 가져오기
+
+[OECD 통계](https://stats.oecd.org/) 웹사이트에서 실시간으로 바로 OECD 국가별 데이터를 받아온다.
+또한, [국가주요지표](http://www.index.go.kr/)에서 최근 '14년, '15년 정보를 가져온다.
+
+시각화를 위한 데이터 정제과정을 함께 수행하여 가져온 데이터와 데이터 정제과정이 올바르게 수행되었는지 확인한다.
+
+``` {r suicide-forecast-setup, warning=FALSE, message=FALSE}
+# 0. 환경설정 ------------------------------------------------------------------------
+#library(tidyverse)
+#library(extrafont)
+#library(gridExtra)
+#library(astsa)
+#library(fpp)
+#library(ggthemes)
+#library(xts)
+#library(tidyquant)
+
+# 1. 데이터 가져오기 ------------------------------------------------------------------------
+# https://data.oecd.org/healthstat/suicide-rates.htm
+
+df <- read_csv("https://stats.oecd.org/sdmx-json/data/DP_LIVE/.SUICIDE.../OECD?contentType=csv&detail=code&separator=comma&csv-lang=en")
+
+# 2. 데이터 정제 ------------------------------------------------------------------------
+# 2014년 남녀 자살자수 추가
+# http://www.index.go.kr/potal/stts/idxMain/selectPoSttsIdxMainPrint.do?idx_cd=2992&board_cd=INDX_001
+
+kor_df <- df %>%
+  dplyr::filter(LOCATION =="KOR" & SUBJECT =="TOT") %>% 
+  dplyr::select(country=LOCATION, TIME, suicide=Value) %>% 
+  mutate(date = lubridate::ymd(paste0(TIME,"-01-01"))) %>% dplyr::select(-TIME) %>% 
+  add_row(country="KOR", suicide=27.3, date="2014-01-01") %>%
+  add_row(country="KOR", suicide=26.5, date="2015-01-01")
+
+# 3. 시각화 ------------------------------------------------------------------------
+dlist <- unique(kor_df$date)
+
+ggplot(data=kor_df, aes(x=date, y=suicide))+
+  geom_line(size=1.1) +
+  scale_x_date(breaks=seq(dlist[1], tail(dlist,1) + lubridate::years(1), "5 year"),
+               date_labels="%y",limits=c(dlist[1], tail(dlist,1)+lubridate::years(5)))+
+  theme_tufte(base_family = "NanumGothic") +
+  theme(legend.position="none", plot.caption=element_text(hjust=0,size=8),plot.subtitle=element_text(face="italic"),
+        axis.text=element_text(size=7.5))+
+  labs(x="",y="",title="자살자수 국제 비교",
+       caption="\n 자료출처: 십만명당 자살자수 OECD 데이터, https://data.oecd.org/healthstat/suicide-rates.htm",
+       subtitle="십만명당 자살자수(남녀 총합)")
+```
+
+
+### 2.2. 자살율 예측
+
+#### 2.2.1. 자살율 예측 사전준비
+
+자살율 예측을 위해서 연도별 자살율을 예측하는 과정이라, `ts` 자료형으로 데이터를 변환한다.
+
+`autoplot()` 시각화를 통해 **추세(Trend)**, **계절성(Seasonality)**, **순환(Cyclic)**이 존재하는지 
+확인한다.
+
+ggAcf() 함수를 통해 자기상관이 존재하는지 시각적으로 확인하고,
+`Ljung-Box` 검정을 통해 자기상관이 존재하는지 통계량으로 검정한다.
+
+``` {r suicide-forecast-initial, warning=FALSE, message=FALSE}
+
+# 4. 자살율 예측 ------------------------------------------------------------------------
+## 4.1. 시계열 데이터 변환 --------------------------------------------------------------
+# library(tidyquant)
+kor_xts <- as_xts(kor_df %>% dplyr::select(-country), date_col = date)
+kor_ts <- as.ts(kor_xts, start=c(1985), end=c(2015))
+# kor_ts <- ts(kor_df$suicide, start=c(1985), end=c(2015), frequency=1)
+
+## 4.2. 시계열 데이터 시각화 및 시계열 예측 적합성 --------------------------------------
+autoplot(kor_xts)
+
+ggAcf(kor_xts) +
+  theme_tufte(base_family = "NanumGothic") +
+  ggtitle("대한민국 십명당 자살자수 자기상관함수(ACF)")
+
+Box.test(kor_xts, lag = 24, fitdf = 0, type = "Lj")
+```
+
+#### 2.2.2. 시계열 모형 적합
+
+자살률 시계열을 잘 설명하는 시계열 모형을 만들고 이를 바탕으로 예측모형을 생성한다.
+벤치마크 모형으로 가장 최근 시계열 관측점을 다음 시점 예측값으로 사용하는 `naive` 모형부터
+`ETS`, `ARIMA`, `TBATS` 모형까지 다양한다.
+
+`ets` 함수는 1950년부터 개발된 모형으로 **innovations state space model**을 통해 
+오차(Error), 추세(Trend), 계절성(Seasonality)을 담아낸다.
+추세와 계절성을 조합하면 지수평활(exponential smoothing)에 9가지 경우의 수가 나오고,
+오차도 두가지 상태공간(state space)을 표현하여 총 18가지 모형을 적합시키게 된다.
+
+`ets()` 함수는 기본적으로 모수를 우도로 추정하고 AIC가 가장 낮은 모형을 최적 모형으로 선정한다.
+
+`auto.arima()` 모형은 Hyndman-Khandakar 알고리즘을 구현한 것으로 다음 4단계를 거쳐 최적모형을 선정한다.
+
+- 단위근 검정(Unit Test)을 통해 차분 계수를 선정
+- AICc를 통해 ARIMA 모형 $p$, $q$ 모형 선정
+- 최대우도추정 방법으로 모수를 추정
+- 모형이 많기 때문에 단계적 검색법을 사용하여 모형탐색시간을 최소화
+
+`tbats()` 모형은 지금까지 나온 모형에 대한 완결판으로 볼 수 있다.
+한 모형으로 다양한 모형을 자동으로 담아내는 장점이 있는 반면에 강력한 컴퓨팅 파워가 뒷받침되어야 하고 
+예측구간이 다소 넓은 단점도 있다.
+
+- 계절성을 잡아내기 위해 삼각함수 항을 사용
+- 이질성(heterogeneity)을 잡아내는데 박스-콕스 변환을 사용
+- 단기 동적 움직임(short-term dynamics)을 잡아내는데 ARMA 모형 사용
+- 추세를 잡아내는데 추세항 사용
+- 계절성을 잡아내는데 계절항 사용
+
+``` {r suicide-forecast-models, warning=FALSE, message=FALSE}
+## 4.3. 벤치마크 시계열 예측모형 --------------------------------------
+
+kor_ts %>% naive() %>% checkresiduals()
+kor_ts %>% naive() %>% forecast() %>% autoplot()
+
+## 4.4. 시계열 예측모형 3종 세트 --------------------------------------
+
+### 4.4.1. ETS 모형
+kor_ts %>% ets(lambda=BoxCox.lambda(kor_xts)) %>% checkresiduals()
+kor_ts %>% ets(lambda=BoxCox.lambda(kor_xts)) %>% forecast() %>% autoplot()
+
+### 4.4.2. ARIMA 모형
+kor_ts %>% auto.arima() %>% checkresiduals()
+kor_ts %>% auto.arima() %>% forecast() %>% autoplot()
+
+### 4.4.3. TBATS 모형
+kor_ts %>% tbats() %>% checkresiduals()
+kor_ts %>% tbats() %>% forecast() %>% autoplot()
+```
+
+#### 2.2.3. 자살율 예측모형 선정과 예측
+
+실무에서 자살률 예측모형을 활용한다면 훈련 및 검증 데이터로 시계열을 나누고 이를 다양한 모형에 적합시켜 
+가장 예측오차가 적게 나오는 모형을 선정하고 이를 바탕으로 예측을 하는 것이 일반적이다.
+
+즉, 1985 - 2012년까지 자살률을 훈련데이터로 놓고 2013 - 2015 자살률을 예측하는 것으로 시계열 데이터를 나눈다.
+총 6개 시계열 예측모형을 적합시키고 최적의 모형을 선택하여 향후 5년 대한민국 인구 10만명당 자살자수를 예측한다.
+
+``` {r suicide-forecast-production, warning=FALSE, message=FALSE}
+# 5. 예측 모형선정 ------------------------------------------------------------------------
+## 5.1. 모형선정 ------------------------------------------------------------------------
+
+kor_ts_train <- window(kor_ts, start=1985, end=2012)
+kor_ts_test <- window(kor_ts, start=2013)
+
+mod_lst <- list (
+  mod_arima  = auto.arima(kor_ts_train, ic='aicc', stepwise=FALSE),
+  mod_ets    = ets(kor_ts_train, ic='aicc', restrict=FALSE),
+  mod_neural = nnetar(kor_ts_train, p=12, size=25),
+  mod_tbats  = tbats(kor_ts_train, ic='aicc'),
+  mod_bats   = bats(kor_ts_train, ic='aicc'),
+  # mod_stl    = stlm(kor_ts_train, s.window=12, ic='aicc', robust=TRUE, method='ets'),
+  mod_sts    = StructTS(kor_ts_train)
+)
+
+forecasts <- lapply(mod_lst, forecast, 3)
+forecasts$naive <- naive(kor_ts_train, 3)
+
+acc <- lapply(forecasts, function(f){
+  accuracy(f, kor_ts_test)[2,,drop=FALSE]
+})
+
+acc <- do.call(rbind, acc)
+row.names(acc) <- names(forecasts)
+acc <- acc[order(acc[,'MASE']),] %>% round(2)
+
+## 5.2. 모형적합 및 예측 ------------------------------------------------------------------------
+
+kor_ts %>% tbats() %>% checkresiduals()
+kor_ts %>% tbats() %>% forecast(h=5) %>% autoplot() +
+  labs(x="", y="십만명당 자살자수", title="대한민국 자살자수 5년 예측") +
+  theme_tufte(base_family = "NanumGothic")
+
+
+kor_ts %>% tbats() %>% forecast(h=5) %>% 
+  as_tibble() %>% 
+  DT::datatable() %>% 
+  DT::formatRound(c(1:5), digits=1)
+```
