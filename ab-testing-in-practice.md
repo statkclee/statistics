@@ -10,7 +10,8 @@
 > * 단일 표본 수준이 3개 이상인 경우 비율 검정을 수행한다.
 
 
-## 1. A/B 검정 통계량 {#theory}
+## 1. A/B 검정 통계량   {#theory}
+
 
 A/B 검정에 많이 사용되는 검정 통계량은 다양하다. 이유는 실무에서 풀고자하는 문제가 달라 
 활용되는 사례가 다르기 때문이다. [^wiki-ab-testing]
@@ -24,6 +25,35 @@ A/B 검정에 많이 사용되는 검정 통계량은 다양하다. 이유는 �
 | 포아송분포   | 과금유저당 평균 거래횟수   | E-검정          | C-검정            |
 | 다항분포     | 각 제품별 구매횟수         | $\chi^2$ 검정    | ---               |
 | 분포가정 없음|  --                        | 맨휘트니 U 검정 | 깁스 표집         |
+
+### 1.1. 검정력(Power) [^quick-r-power]
+
+[^quick-r-power]: [http://www.statmethods.net/, Power Analysis](http://www.statmethods.net/stats/power.html)
+
+검정력(Power)은 실험계획법에서 특히 중요하다. 실험에 대한 효과를 측정하기 위해서는 표본크기를 설정해야 하는데 
+무한정 크게하면 비용에 대한 제약이 있고, 수월하게 진행하기 위해서 표본크기를 너무 작게하면 주어진 신뢰수준에서 
+효과크기를 잡아내기 어렵다. 달리 말하면, 표본크기가 주어지게 되면 미리 설정한 신뢰수준에서 효과크기를 측정할 수 
+있게 해 준다. 검정력을 포함하여 총 5가지 변수가 서로 밀접한 관계를 갖는다.
+
+1. 표본크기
+1. 효과크기(Effect Size)
+1. 유의수준(1종 오류 확률): 존재하지 않는 효과를 찾아낼 확률
+1. 검정력(1 - 2종 오류 확률): 존재하는 효과를 찾아낼 확률
+1. 대립가설: 양측검정 등
+
+`pwr` 팩키지는 코헨(Cohen, 1988)이 기술한 검정력분석을 R 코드로 구현한 것이다.
+
+|    함수명       |  검정력 계산 적용분야                    |
+|-----------------|------------------------------------------|
+| pwr.2p.test     |  이표본 비율 (동일 크기 표본)            |
+| pwr.2p2n.test   |  이표본 비율 (표본크기 다름)             |
+| pwr.anova.test  |  일원 균형 분산분석                      |
+| pwr.chisq.test  |  $\chi ^2$ 검정                          |
+| pwr.f2.test     |  일반화 선형 모형                        |
+| pwr.p.test      |  비율 (일표본)                           |
+| pwr.r.test      |  상관                                    |
+| pwr.t.test      |  $t-$검정 (일표본, 이표본, 쌍체)         |
+| pwr.t2n.test    |  $t-$검정 (표본 크기가 다른 이표본       |
 
 
 ## 2. 웹사이트 A,B 선호도 분석 [^ab-testing-website] [^ab-testing-from-scratch] [^power-and-sample-size]
@@ -279,100 +309,163 @@ ggplot(data = ab_df) +
 
 <img src="fig/ab-testing-campaing-effect-1.png" style="display: block; margin: auto;" />
 
+> ### A/B 검정과 $t-$검정 차이 {.callout}
+>
+> A/B 검정은 독립된 두 표본을 비교하는 실험을 설계, 수행, 분석하는 전체적인 틀(프레임워크인)인 반면,
+> $t-$검정은 동일한 개념에 대한 통계적인 절차로 볼 수 있는데, 1908년 윌리엄 고셋이 기네스 맥주회사에서 
+> 맥주 품질검정을 위해 고안한 통계적 방법으로 $t-$검정으로 알려져 있다. [^ab-testing-t-test-quora]
 
-## 3. 웹사이트 선호도 고객만족도 조사 
+[^ab-testing-t-test-quora]: What is the difference between A/B testing and a t-test?](https://www.quora.com/What-is-the-difference-between-A-B-testing-and-a-t-test)
+
+
+## 3. 캠페인 효과가 분수가 아닌 경우
+
+평균 주문금액, 평균 웹페이지 채류시간처럼 정규분포를 따르는 분수가 아닌 값을 비교한느데 사용되는 되는 것이 독립 이표본 $t-$검정으로,
+웰치 $t-$검정을 사용하는데 이유는 두 집단 모두에 대해 표본크기가 다르고, 등분산을 갖지 않더라고 적용이 가능하다.
+데이터의 정규성 검정을 사전에 하고 필요한 경우 박스-콕스 변환을 수행한 후에 검정을 수행한다.
+
+
+~~~{.r}
+# 1. 정규분포 ----------------------------------
+pwr.t2n.test(n1=10000, d=0.5, sig.level=0.05, power=0.90)
+~~~
+
+
+
+~~~{.output}
+
+     t test power calculation 
+
+             n1 = 10000
+             n2 = 42.21518
+              d = 0.5
+      sig.level = 0.05
+          power = 0.9
+    alternative = two.sided
+
+~~~
+
+
+
+~~~{.r}
+## 1.1. 캠페인 효과 검정 -----------------------
+
+group1 <- c(64.2,28.4,85.3,83.1,13.4,56.8,44.2,90)
+group2 <- c(45, 29.5,32.3, 49.3,18.3, 34.2,43.9, 13.8,27.4, 43.4)
+
+t.test(group1, group2)
+~~~
+
+
+
+~~~{.output}
+
+	Welch Two Sample t-test
+
+data:  group1 and group2
+t = 2.3103, df = 9.0005, p-value = 0.04621
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+  0.5097856 48.4202144
+sample estimates:
+mean of x mean of y 
+   58.175    33.710 
+
+~~~
+
+
+## 4. 웹사이트 선호도 고객만족도 조사 
 
 데이터는 [Practical Statistics for HCI](http://depts.washington.edu/aimgroup/proj/ps4hci/) 사이트에 공개된 SPSS 파일을 R로 불러와서 실험 검증에 사용한다.
+웹선호도에 대한 코딩이 `1`, `2`로 되어 있다. 이를 `웹사이트 A`, `웹사이트 B` 로 요인 수준을 사람이 이해하기 쉽게 바꾼다.
 
-~~~ {r}
-##==============================================================================
-## 01. 데이터 가져오기
-##==============================================================================
-library(haven)
-spss.dat <- file.choose()
-pref.df <- read_spss(spss.dat)
+### 4.1. 두가지 웹사이트 선호도
 
-head(pref.df)
+
+~~~{.r}
+# 2. 선호도 검정 ----------------------------------
+## 2.1. 웹사이트 A, B
+tc <- textConnection("subject, preference
+                      1    ,      1
+                      2    ,      2
+                      3    ,      2
+                      4    ,      1
+                      5    ,      1
+                      6    ,      1
+                      7    ,      2
+                      8    ,      2
+                      9    ,      1
+                      10   ,       1
+                      11   ,       1
+                      12   ,       1
+                      13   ,       1
+                      14   ,       2
+                      15   ,       2
+                      16   ,       1
+                      17   ,       1
+                      18   ,       2
+                      19   ,       1
+                      20   ,       1
+                      21   ,       2
+                      22   ,       2
+                      23   ,       1
+                      24   ,       1
+                      25   ,       1
+                      26   ,       1
+                      27   ,       1
+                      28   ,       1
+                      29   ,       1
+                      30   ,       1")
+
+pref_df <- read.csv(tc, header = TRUE)
+pref_df <- pref_df %>% mutate(preference = factor(preference, 
+                                        levels=c(1,2), 
+                                        labels=c("웹사이트 A", "웹사이트 B")))
+
+(website_prefs <- xtabs( ~ preference, data=pref_df))
 ~~~
 
-~~~ {.output}
-Source: local data frame [6 x 2]
 
-  Subject Preference
-    (dbl)     (lbll)
-1       1          1
-2       2          2
-3       3          2
-4       4          1
-5       5          1
-6       6          1
+
+~~~{.output}
+preference
+웹사이트 A 웹사이트 B 
+        21          9 
+
 ~~~
 
-웹선호도에 대한 코딩이 `1`, `2`로 되어 있다. 이를 `A`, `B` 로 코딩을 바꾼다.
 
-~~~ {r}
-##==============================================================================
-## 02. 데이터 전처리 및 정제
-##==============================================================================
-library(dplyr)
-library(plyr)
 
-pref.df$Subject <- sapply(pref.df$Subject, as.factor)
-pref.df$Preference <- sapply(pref.df$Preference, as.factor)
-
-pref.df <- pref.df %>% mutate(Preference = revalue(Preference, c('1'='A', '2'='B')))
+~~~{.r}
+chisq.test(website_prefs)
 ~~~
 
-~~~ {r}
-##==============================================================================
-## 03. 실험설계 통계분석
-##==============================================================================
-# 3.1. 기초 통계 및 시각화
-summary(pref.df)
-plot(pref.df$Preference)
-~~~
 
-~~~ {.output}
-    Subject   Preference
- 1      : 1   A:21      
- 2      : 1   B: 9      
- 3      : 1             
- 4      : 1             
- 5      : 1             
- 6      : 1             
- (Other):24      
-~~~
 
-~~~ {r}
-#-------------------------------------------------------------------------------
-# 3.2 실험설계 단일표본 비율검정: One-Sample Proportion Test
-#-------------------------------------------------------------------------------
-# 근사 카이스퀘어 검정
-prefs <- xtabs( ~ Preference, data=pref.df)
-prefs
-chisq.test(prefs)
+~~~{.output}
+
+	Chi-squared test for given probabilities
+
+data:  website_prefs
+X-squared = 4.8, df = 1, p-value = 0.02846
+
 ~~~
 
 $p-$값 0.05를 기준으로 본다면, 웹사이트 A와 B 선호도에 유의성이 있다는 결론에 도달하게 된다.
 
-~~~ {.output}
-    Chi-squared test for given probabilities
 
-data:  prefs
-X-squared = 4.8, df = 1, p-value = 0.02846
+
+~~~{.r}
+binom.test(website_prefs)
 ~~~
 
-~~~ {r}
-# 정확 이항 검정 (Exact Binomial Test)
-binom.test(prefs)
-~~~
 
-$\chi^2$ 검정은 표본수가 많아지게 되면 정확도가 높아지는 근사검정이지만 정확 이항 검정(Exact Binomial Test)은 컴퓨팅 계산에 부담이 되지만, 근사 검정이 아니고 정확 검정이다. 귀무가설 웹사이트 A와 B의 선호도가 같다는 95% 신뢰구간에 0.5가 포함되지 않고 있다. 
 
-~~~ {.output}
-    Exact binomial test
+~~~{.output}
 
-data:  prefs
+	Exact binomial test
+
+data:  website_prefs
 number of successes = 21, number of trials = 30, p-value = 0.04277
 alternative hypothesis: true probability of success is not equal to 0.5
 95 percent confidence interval:
@@ -380,116 +473,127 @@ alternative hypothesis: true probability of success is not equal to 0.5
 sample estimates:
 probability of success 
                    0.7 
+
 ~~~
 
+$\chi^2$ 검정은 표본수가 많아지게 되면 정확도가 높아지는 근사검정이지만, 
+정확 이항 검정(Exact Binomial Test)은 컴퓨팅 계산에 부담이 되지만, 근사 검정이 아니고 정확 검정이다. 
+귀무가설 웹사이트 A와 B의 선호도가 같다는 95% 신뢰구간에 0.5가 포함되지 않고 있다. 
 
-#### 1.2. 단일 표본 비율검정 -- 웹사이트 A,B,C 선호도 분석
+
+### 4.2. 세가지 웹사이트 선호도
 
 웹사이트가 A,B 두가지 아니고 3개 이상인 경우 A,B,C 웹사이트 간에 선호도 차이가 있는지 검정한다.
 
-~~~ {r}
-##==============================================================================
-## 01. 데이터 가져오기
-##==============================================================================
-library(haven)
-spss.dat <- file.choose() # prefs3.sav
-pref.df <- read_spss(spss.dat)
+웹선호도에 대한 코딩이 `1`, `2`, `3`으로 되어 있다. 이를 `웹사이트 A`, `웹사이트 B`, `웹사이트 C`로 코딩을 바꾼다.
 
-head(pref.df)
+
+~~~{.r}
+tcon <- textConnection("subject, preference
+1   ,       3
+2   ,       3
+3   ,       3
+4   ,       1
+5   ,       1
+6   ,       3
+7   ,       3
+8   ,       2
+9   ,       1
+10  ,        3
+11  ,        1
+12  ,        1
+13  ,        3
+14  ,        3
+15  ,        2
+16  ,        3
+17  ,        1
+18  ,        3
+19  ,        1
+20  ,        1
+21  ,        2
+22  ,        2
+23  ,        3
+24  ,        1
+25  ,        1
+26  ,        1
+27  ,        3
+28  ,        1
+29  ,        1
+30  ,        3")
+
+pref_three_df <- read.csv(tcon, header = TRUE)
+pref_three_df <- pref_three_df %>% mutate(preference = factor(preference, 
+                                                  levels=c(1,2,3), 
+                                                  labels=c("웹사이트 A", "웹사이트 B", "웹사이트 C")))
+
+(websites_prefs <- xtabs( ~ preference, data=pref_three_df))
 ~~~
 
-~~~ {.output}
-Source: local data frame [6 x 2]
 
-  Subject Preference
-    (dbl)     (lbll)
-1       1          3
-2       2          3
-3       3          3
-4       4          1
-5       5          1
-6       6          3
+
+~~~{.output}
+preference
+웹사이트 A 웹사이트 B 웹사이트 C 
+        13          4         13 
+
 ~~~
 
-웹선호도에 대한 코딩이 `1`, `2`, `3`으로 되어 있다. 이를 `A`, `B`, `C`로 코딩을 바꾼다.
 
-~~~ {r}
-##==============================================================================
-## 02. 데이터 전처리 및 정제
-##==============================================================================
-library(dplyr)
-library(plyr)
 
-pref.df$Subject <- sapply(pref.df$Subject, as.factor)
-pref.df$Preference <- sapply(pref.df$Preference, as.factor)
-
-pref.df <- pref.df %>% mutate(Preference = revalue(Preference, c('1'='A', '2'='B', '3'='C')))
+~~~{.r}
+chisq.test(websites_prefs)
 ~~~
 
-~~~ {r}
-##==============================================================================
-## 03. 실험설계 통계분석
-##==============================================================================
-# 3.1. 기초 통계 및 시각화
-summary(pref.df)
-plot(pref.df$Preference)
-~~~
 
-~~~ {.output}
-    Subject   Preference
- 1      : 1   C:13      
- 2      : 1   A:13      
- 3      : 1   B: 4      
- 4      : 1             
- 5      : 1             
- 6      : 1             
- (Other):24   
-~~~
 
-~~~ {r}
-#-------------------------------------------------------------------------------
-# 3.2 실험설계 단일표본 비율검정: One-Sample Proportion Test
-#-------------------------------------------------------------------------------
-# 근사 카이스퀘어 검정
-prefs <- xtabs( ~ Preference, data=pref.df)
-prefs
-chisq.test(prefs)
+~~~{.output}
+
+	Chi-squared test for given probabilities
+
+data:  websites_prefs
+X-squared = 5.4, df = 2, p-value = 0.06721
+
 ~~~
 
 $p-$값 0.05를 기준으로 본다면, 웹사이트 A, B, C 선호도에 유의성이 없다는 결론에 도달할 수 있지만, 0.05에 
 가깝기 때문에 유보한다.
 
-~~~ {.output}
-    Chi-squared test for given probabilities
 
-data:  prefs
-X-squared = 5.4, df = 2, p-value = 0.06721
+
+~~~{.r}
+library(XNomial)
+xmulti(websites_prefs, c(1/3, 1/3, 1/3), statName = "Prob")
+~~~
+
+
+
+~~~{.output}
+
+P value (Prob) = 0.05117
+
+~~~
+
+
+
+~~~{.r}
+# 다중 비교
+aa <- binom.test(sum(pref_three_df$preference=='웹사이트 A'), nrow(pref_three_df), p=1/3)
+bb <- binom.test(sum(pref_three_df$preference=='웹사이트 B'), nrow(pref_three_df), p=1/3)
+cc <- binom.test(sum(pref_three_df$preference=='웹사이트 C'), nrow(pref_three_df), p=1/3)
+p.adjust(c(aa$p.value, bb$p.value, cc$p.value), method="holm")
+~~~
+
+
+
+~~~{.output}
+[1] 0.4996989 0.0583577 0.4996989
+
 ~~~
 
 다항분포 검정을 통한 정확 다항검정에서는 0.05에 더욱 가까운 $p-$ 값이 검출되었다.
 
-~~~ {r}
-# 다항분포 검정
-library(XNomial)
-xmulti(prefs, c(1/3, 1/3, 1/3), statName = "Prob")
-~~~
-
-~~~ {.output}
-P value (Prob) = 0.05117
-~~~
-
 다중비교는 세가지 웹사이트 간에 차이가 있다는 것은 이해가 되나 어느 것에서 차이가 나는지 검출할 때 사용한다.
-
-~~~ {r}
-# 다중 비교
-aa <- binom.test(sum(pref.df$Preference=='A'), nrow(pref.df), p=1/3)
-bb <- binom.test(sum(pref.df$Preference=='B'), nrow(pref.df), p=1/3)
-cc <- binom.test(sum(pref.df$Preference=='C'), nrow(pref.df), p=1/3)
-p.adjust(c(aa$p.value, bb$p.value, cc$p.value), method="holm")
-~~~
 
 웹사이트 A, C 선호도에는 차이가 없지만, B에는 유의성이 있는 것으로 보인다. 
 
-~~~ {.output}
-[1] 0.4996989 0.0583577 0.4996989
-~~~
+

@@ -122,13 +122,19 @@ $(document).ready(function () {
 
 <div id="TOC">
 <ul>
-<li><a href="#theory">1. A/B 검정 통계량</a></li>
+<li><a href="#theory">1. A/B 검정 통계량</a><ul>
+<li><a href="#power-quick-r-power">1.1. 검정력(Power) </a></li>
+</ul></li>
 <li><a href="#-ab---ab-testing-website-ab-testing-from-scratch-power-and-sample-size">2. 웹사이트 A,B 선호도 분석   </a><ul>
 <li><a href="#-----">2.1. 웹사이트 개선 전후 효과를 탐지하는 표본크기</a></li>
 <li><a href="#--1-----">2.2. 웹사이트 반응률 1% 높이는 효과를 파악하는데 필요한 표본크기</a></li>
 <li><a href="#-">2.3. 캠페인 효과</a></li>
 </ul></li>
-<li><a href="#---">3. 웹사이트 선호도 고객만족도 조사</a></li>
+<li><a href="#----">3. 캠페인 효과가 분수가 아닌 경우</a></li>
+<li><a href="#---">4. 웹사이트 선호도 고객만족도 조사</a><ul>
+<li><a href="#--">4.1. 두가지 웹사이트 선호도</a></li>
+<li><a href="#--">4.2. 세가지 웹사이트 선호도</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -185,9 +191,67 @@ $(document).ready(function () {
 </tr>
 </tbody>
 </table>
+<div id="power-quick-r-power" class="section level3">
+<h3>1.1. 검정력(Power) <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></h3>
+<p>검정력(Power)은 실험계획법에서 특히 중요하다. 실험에 대한 효과를 측정하기 위해서는 표본크기를 설정해야 하는데 무한정 크게하면 비용에 대한 제약이 있고, 수월하게 진행하기 위해서 표본크기를 너무 작게하면 주어진 신뢰수준에서 효과크기를 잡아내기 어렵다. 달리 말하면, 표본크기가 주어지게 되면 미리 설정한 신뢰수준에서 효과크기를 측정할 수 있게 해 준다. 검정력을 포함하여 총 5가지 변수가 서로 밀접한 관계를 갖는다.</p>
+<ol style="list-style-type: decimal">
+<li>표본크기</li>
+<li>효과크기(Effect Size)</li>
+<li>유의수준(1종 오류 확률): 존재하지 않는 효과를 찾아낼 확률</li>
+<li>검정력(1 - 2종 오류 확률): 존재하는 효과를 찾아낼 확률</li>
+<li>대립가설: 양측검정 등</li>
+</ol>
+<p><code>pwr</code> 팩키지는 코헨(Cohen, 1988)이 기술한 검정력분석을 R 코드로 구현한 것이다.</p>
+<table>
+<thead>
+<tr class="header">
+<th>함수명</th>
+<th>검정력 계산 적용분야</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pwr.2p.test</td>
+<td>이표본 비율 (동일 크기 표본)</td>
+</tr>
+<tr class="even">
+<td>pwr.2p2n.test</td>
+<td>이표본 비율 (표본크기 다름)</td>
+</tr>
+<tr class="odd">
+<td>pwr.anova.test</td>
+<td>일원 균형 분산분석</td>
+</tr>
+<tr class="even">
+<td>pwr.chisq.test</td>
+<td><span class="math inline">\(\chi ^2\)</span> 검정</td>
+</tr>
+<tr class="odd">
+<td>pwr.f2.test</td>
+<td>일반화 선형 모형</td>
+</tr>
+<tr class="even">
+<td>pwr.p.test</td>
+<td>비율 (일표본)</td>
+</tr>
+<tr class="odd">
+<td>pwr.r.test</td>
+<td>상관</td>
+</tr>
+<tr class="even">
+<td>pwr.t.test</td>
+<td><span class="math inline">\(t-\)</span>검정 (일표본, 이표본, 쌍체)</td>
+</tr>
+<tr class="odd">
+<td>pwr.t2n.test</td>
+<td><span class="math inline">\(t-\)</span>검정 (표본 크기가 다른 이표본</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <div id="-ab---ab-testing-website-ab-testing-from-scratch-power-and-sample-size" class="section level2">
-<h2>2. 웹사이트 A,B 선호도 분석 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h2>
+<h2>2. 웹사이트 A,B 선호도 분석 <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a> <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a></h2>
 <p>웹사이트 두개를 개발해 두고, 사용자에게 A 웹사이트와 B 웹사이트에 대한 선호도를 조사한다. 통상 A 웹사이트는 기존 웹사이트가 되고, B 웹사이트는 예를 들어 새로운 UI, 기능이 추가된 웹사이트다.</p>
 <p>첫번째 문제는 현재 웹사이트 A를 방문할 때 전환율이 천명이 들어와서 15명으로 1.5% (0.015)다. 만약 1% (0.001) 더 높이고자 하는데 필요한 표본크기는 얼마나 될까?</p>
 <p>이런 문제에 답을 하기 위해서 필요한 정보는 다음과 같다.</p>
@@ -323,159 +387,198 @@ ggplot(data = ab_df) +
   geom_vline(aes(xintercept=0.054), colour = &quot;blue&quot;, size=1.1) +
   theme(legend.position = &quot;top&quot;)</code></pre>
 <p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<blockquote>
+<h3 id="ab--t--" class="callout">A/B 검정과 <span class="math inline">\(t-\)</span>검정 차이</h3>
+<p>A/B 검정은 독립된 두 표본을 비교하는 실험을 설계, 수행, 분석하는 전체적인 틀(프레임워크인)인 반면, <span class="math inline">\(t-\)</span>검정은 동일한 개념에 대한 통계적인 절차로 볼 수 있는데, 1908년 윌리엄 고셋이 기네스 맥주회사에서 맥주 품질검정을 위해 고안한 통계적 방법으로 <span class="math inline">\(t-\)</span>검정으로 알려져 있다. <a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a></p>
+</blockquote>
 </div>
+</div>
+<div id="----" class="section level2">
+<h2>3. 캠페인 효과가 분수가 아닌 경우</h2>
+<p>평균 주문금액, 평균 웹페이지 채류시간처럼 정규분포를 따르는 분수가 아닌 값을 비교한느데 사용되는 되는 것이 독립 이표본 <span class="math inline">\(t-\)</span>검정으로, 웰치 <span class="math inline">\(t-\)</span>검정을 사용하는데 이유는 두 집단 모두에 대해 표본크기가 다르고, 등분산을 갖지 않더라고 적용이 가능하다. 데이터의 정규성 검정을 사전에 하고 필요한 경우 박스-콕스 변환을 수행한 후에 검정을 수행한다.</p>
+<pre class="r"><code># 1. 정규분포 ----------------------------------
+pwr.t2n.test(n1=10000, d=0.5, sig.level=0.05, power=0.90)</code></pre>
+<pre class="output"><code>
+     t test power calculation 
+
+             n1 = 10000
+             n2 = 42.21518
+              d = 0.5
+      sig.level = 0.05
+          power = 0.9
+    alternative = two.sided
+</code></pre>
+<pre class="r"><code>## 1.1. 캠페인 효과 검정 -----------------------
+
+group1 &lt;- c(64.2,28.4,85.3,83.1,13.4,56.8,44.2,90)
+group2 &lt;- c(45, 29.5,32.3, 49.3,18.3, 34.2,43.9, 13.8,27.4, 43.4)
+
+t.test(group1, group2)</code></pre>
+<pre class="output"><code>
+    Welch Two Sample t-test
+
+data:  group1 and group2
+t = 2.3103, df = 9.0005, p-value = 0.04621
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+  0.5097856 48.4202144
+sample estimates:
+mean of x mean of y 
+   58.175    33.710 
+</code></pre>
 </div>
 <div id="---" class="section level2">
-<h2>3. 웹사이트 선호도 고객만족도 조사</h2>
-<p>데이터는 <a href="http://depts.washington.edu/aimgroup/proj/ps4hci/">Practical Statistics for HCI</a> 사이트에 공개된 SPSS 파일을 R로 불러와서 실험 검증에 사용한다.</p>
-<pre class="{r}"><code>##==============================================================================
-## 01. 데이터 가져오기
-##==============================================================================
-library(haven)
-spss.dat &lt;- file.choose()
-pref.df &lt;- read_spss(spss.dat)
+<h2>4. 웹사이트 선호도 고객만족도 조사</h2>
+<p>데이터는 <a href="http://depts.washington.edu/aimgroup/proj/ps4hci/">Practical Statistics for HCI</a> 사이트에 공개된 SPSS 파일을 R로 불러와서 실험 검증에 사용한다. 웹선호도에 대한 코딩이 <code>1</code>, <code>2</code>로 되어 있다. 이를 <code>웹사이트 A</code>, <code>웹사이트 B</code> 로 요인 수준을 사람이 이해하기 쉽게 바꾼다.</p>
+<div id="--" class="section level3">
+<h3>4.1. 두가지 웹사이트 선호도</h3>
+<pre class="r"><code># 2. 선호도 검정 ----------------------------------
+## 2.1. 웹사이트 A, B
+tc &lt;- textConnection(&quot;subject, preference
+                      1    ,      1
+                      2    ,      2
+                      3    ,      2
+                      4    ,      1
+                      5    ,      1
+                      6    ,      1
+                      7    ,      2
+                      8    ,      2
+                      9    ,      1
+                      10   ,       1
+                      11   ,       1
+                      12   ,       1
+                      13   ,       1
+                      14   ,       2
+                      15   ,       2
+                      16   ,       1
+                      17   ,       1
+                      18   ,       2
+                      19   ,       1
+                      20   ,       1
+                      21   ,       2
+                      22   ,       2
+                      23   ,       1
+                      24   ,       1
+                      25   ,       1
+                      26   ,       1
+                      27   ,       1
+                      28   ,       1
+                      29   ,       1
+                      30   ,       1&quot;)
 
-head(pref.df)</code></pre>
-<pre class="output"><code>Source: local data frame [6 x 2]
+pref_df &lt;- read.csv(tc, header = TRUE)
+pref_df &lt;- pref_df %&gt;% mutate(preference = factor(preference, 
+                                        levels=c(1,2), 
+                                        labels=c(&quot;웹사이트 A&quot;, &quot;웹사이트 B&quot;)))
 
-  Subject Preference
-    (dbl)     (lbll)
-1       1          1
-2       2          2
-3       3          2
-4       4          1
-5       5          1
-6       6          1</code></pre>
-<p>웹선호도에 대한 코딩이 <code>1</code>, <code>2</code>로 되어 있다. 이를 <code>A</code>, <code>B</code> 로 코딩을 바꾼다.</p>
-<pre class="{r}"><code>##==============================================================================
-## 02. 데이터 전처리 및 정제
-##==============================================================================
-library(dplyr)
-library(plyr)
+(website_prefs &lt;- xtabs( ~ preference, data=pref_df))</code></pre>
+<pre class="output"><code>preference
+웹사이트 A 웹사이트 B 
+        21          9 
+</code></pre>
+<pre class="r"><code>chisq.test(website_prefs)</code></pre>
+<pre class="output"><code>
+    Chi-squared test for given probabilities
 
-pref.df$Subject &lt;- sapply(pref.df$Subject, as.factor)
-pref.df$Preference &lt;- sapply(pref.df$Preference, as.factor)
-
-pref.df &lt;- pref.df %&gt;% mutate(Preference = revalue(Preference, c('1'='A', '2'='B')))</code></pre>
-<pre class="{r}"><code>##==============================================================================
-## 03. 실험설계 통계분석
-##==============================================================================
-# 3.1. 기초 통계 및 시각화
-summary(pref.df)
-plot(pref.df$Preference)</code></pre>
-<pre class="output"><code>    Subject   Preference
- 1      : 1   A:21      
- 2      : 1   B: 9      
- 3      : 1             
- 4      : 1             
- 5      : 1             
- 6      : 1             
- (Other):24      </code></pre>
-<pre class="{r}"><code>#-------------------------------------------------------------------------------
-# 3.2 실험설계 단일표본 비율검정: One-Sample Proportion Test
-#-------------------------------------------------------------------------------
-# 근사 카이스퀘어 검정
-prefs &lt;- xtabs( ~ Preference, data=pref.df)
-prefs
-chisq.test(prefs)</code></pre>
+data:  website_prefs
+X-squared = 4.8, df = 1, p-value = 0.02846
+</code></pre>
 <p><span class="math inline">\(p-\)</span>값 0.05를 기준으로 본다면, 웹사이트 A와 B 선호도에 유의성이 있다는 결론에 도달하게 된다.</p>
-<pre class="output"><code>    Chi-squared test for given probabilities
+<pre class="r"><code>binom.test(website_prefs)</code></pre>
+<pre class="output"><code>
+    Exact binomial test
 
-data:  prefs
-X-squared = 4.8, df = 1, p-value = 0.02846</code></pre>
-<pre class="{r}"><code># 정확 이항 검정 (Exact Binomial Test)
-binom.test(prefs)</code></pre>
-<p><span class="math inline">\(\chi^2\)</span> 검정은 표본수가 많아지게 되면 정확도가 높아지는 근사검정이지만 정확 이항 검정(Exact Binomial Test)은 컴퓨팅 계산에 부담이 되지만, 근사 검정이 아니고 정확 검정이다. 귀무가설 웹사이트 A와 B의 선호도가 같다는 95% 신뢰구간에 0.5가 포함되지 않고 있다.</p>
-<pre class="output"><code>    Exact binomial test
-
-data:  prefs
+data:  website_prefs
 number of successes = 21, number of trials = 30, p-value = 0.04277
 alternative hypothesis: true probability of success is not equal to 0.5
 95 percent confidence interval:
  0.5060410 0.8526548
 sample estimates:
 probability of success 
-                   0.7 </code></pre>
-<div id="----abc--" class="section level4">
-<h4>1.2. 단일 표본 비율검정 – 웹사이트 A,B,C 선호도 분석</h4>
+                   0.7 
+</code></pre>
+<p><span class="math inline">\(\chi^2\)</span> 검정은 표본수가 많아지게 되면 정확도가 높아지는 근사검정이지만, 정확 이항 검정(Exact Binomial Test)은 컴퓨팅 계산에 부담이 되지만, 근사 검정이 아니고 정확 검정이다. 귀무가설 웹사이트 A와 B의 선호도가 같다는 95% 신뢰구간에 0.5가 포함되지 않고 있다.</p>
+</div>
+<div id="--" class="section level3">
+<h3>4.2. 세가지 웹사이트 선호도</h3>
 <p>웹사이트가 A,B 두가지 아니고 3개 이상인 경우 A,B,C 웹사이트 간에 선호도 차이가 있는지 검정한다.</p>
-<pre class="{r}"><code>##==============================================================================
-## 01. 데이터 가져오기
-##==============================================================================
-library(haven)
-spss.dat &lt;- file.choose() # prefs3.sav
-pref.df &lt;- read_spss(spss.dat)
+<p>웹선호도에 대한 코딩이 <code>1</code>, <code>2</code>, <code>3</code>으로 되어 있다. 이를 <code>웹사이트 A</code>, <code>웹사이트 B</code>, <code>웹사이트 C</code>로 코딩을 바꾼다.</p>
+<pre class="r"><code>tcon &lt;- textConnection(&quot;subject, preference
+1   ,       3
+2   ,       3
+3   ,       3
+4   ,       1
+5   ,       1
+6   ,       3
+7   ,       3
+8   ,       2
+9   ,       1
+10  ,        3
+11  ,        1
+12  ,        1
+13  ,        3
+14  ,        3
+15  ,        2
+16  ,        3
+17  ,        1
+18  ,        3
+19  ,        1
+20  ,        1
+21  ,        2
+22  ,        2
+23  ,        3
+24  ,        1
+25  ,        1
+26  ,        1
+27  ,        3
+28  ,        1
+29  ,        1
+30  ,        3&quot;)
 
-head(pref.df)</code></pre>
-<pre class="output"><code>Source: local data frame [6 x 2]
+pref_three_df &lt;- read.csv(tcon, header = TRUE)
+pref_three_df &lt;- pref_three_df %&gt;% mutate(preference = factor(preference, 
+                                                  levels=c(1,2,3), 
+                                                  labels=c(&quot;웹사이트 A&quot;, &quot;웹사이트 B&quot;, &quot;웹사이트 C&quot;)))
 
-  Subject Preference
-    (dbl)     (lbll)
-1       1          3
-2       2          3
-3       3          3
-4       4          1
-5       5          1
-6       6          3</code></pre>
-<p>웹선호도에 대한 코딩이 <code>1</code>, <code>2</code>, <code>3</code>으로 되어 있다. 이를 <code>A</code>, <code>B</code>, <code>C</code>로 코딩을 바꾼다.</p>
-<pre class="{r}"><code>##==============================================================================
-## 02. 데이터 전처리 및 정제
-##==============================================================================
-library(dplyr)
-library(plyr)
+(websites_prefs &lt;- xtabs( ~ preference, data=pref_three_df))</code></pre>
+<pre class="output"><code>preference
+웹사이트 A 웹사이트 B 웹사이트 C 
+        13          4         13 
+</code></pre>
+<pre class="r"><code>chisq.test(websites_prefs)</code></pre>
+<pre class="output"><code>
+    Chi-squared test for given probabilities
 
-pref.df$Subject &lt;- sapply(pref.df$Subject, as.factor)
-pref.df$Preference &lt;- sapply(pref.df$Preference, as.factor)
-
-pref.df &lt;- pref.df %&gt;% mutate(Preference = revalue(Preference, c('1'='A', '2'='B', '3'='C')))</code></pre>
-<pre class="{r}"><code>##==============================================================================
-## 03. 실험설계 통계분석
-##==============================================================================
-# 3.1. 기초 통계 및 시각화
-summary(pref.df)
-plot(pref.df$Preference)</code></pre>
-<pre class="output"><code>    Subject   Preference
- 1      : 1   C:13      
- 2      : 1   A:13      
- 3      : 1   B: 4      
- 4      : 1             
- 5      : 1             
- 6      : 1             
- (Other):24   </code></pre>
-<pre class="{r}"><code>#-------------------------------------------------------------------------------
-# 3.2 실험설계 단일표본 비율검정: One-Sample Proportion Test
-#-------------------------------------------------------------------------------
-# 근사 카이스퀘어 검정
-prefs &lt;- xtabs( ~ Preference, data=pref.df)
-prefs
-chisq.test(prefs)</code></pre>
+data:  websites_prefs
+X-squared = 5.4, df = 2, p-value = 0.06721
+</code></pre>
 <p><span class="math inline">\(p-\)</span>값 0.05를 기준으로 본다면, 웹사이트 A, B, C 선호도에 유의성이 없다는 결론에 도달할 수 있지만, 0.05에 가깝기 때문에 유보한다.</p>
-<pre class="output"><code>    Chi-squared test for given probabilities
-
-data:  prefs
-X-squared = 5.4, df = 2, p-value = 0.06721</code></pre>
-<p>다항분포 검정을 통한 정확 다항검정에서는 0.05에 더욱 가까운 <span class="math inline">\(p-\)</span> 값이 검출되었다.</p>
-<pre class="{r}"><code># 다항분포 검정
-library(XNomial)
-xmulti(prefs, c(1/3, 1/3, 1/3), statName = &quot;Prob&quot;)</code></pre>
-<pre class="output"><code>P value (Prob) = 0.05117</code></pre>
-<p>다중비교는 세가지 웹사이트 간에 차이가 있다는 것은 이해가 되나 어느 것에서 차이가 나는지 검출할 때 사용한다.</p>
-<pre class="{r}"><code># 다중 비교
-aa &lt;- binom.test(sum(pref.df$Preference=='A'), nrow(pref.df), p=1/3)
-bb &lt;- binom.test(sum(pref.df$Preference=='B'), nrow(pref.df), p=1/3)
-cc &lt;- binom.test(sum(pref.df$Preference=='C'), nrow(pref.df), p=1/3)
+<pre class="r"><code>library(XNomial)
+xmulti(websites_prefs, c(1/3, 1/3, 1/3), statName = &quot;Prob&quot;)</code></pre>
+<pre class="output"><code>
+P value (Prob) = 0.05117
+</code></pre>
+<pre class="r"><code># 다중 비교
+aa &lt;- binom.test(sum(pref_three_df$preference=='웹사이트 A'), nrow(pref_three_df), p=1/3)
+bb &lt;- binom.test(sum(pref_three_df$preference=='웹사이트 B'), nrow(pref_three_df), p=1/3)
+cc &lt;- binom.test(sum(pref_three_df$preference=='웹사이트 C'), nrow(pref_three_df), p=1/3)
 p.adjust(c(aa$p.value, bb$p.value, cc$p.value), method=&quot;holm&quot;)</code></pre>
+<pre class="output"><code>[1] 0.4996989 0.0583577 0.4996989
+</code></pre>
+<p>다항분포 검정을 통한 정확 다항검정에서는 0.05에 더욱 가까운 <span class="math inline">\(p-\)</span> 값이 검출되었다.</p>
+<p>다중비교는 세가지 웹사이트 간에 차이가 있다는 것은 이해가 되나 어느 것에서 차이가 나는지 검출할 때 사용한다.</p>
 <p>웹사이트 A, C 선호도에는 차이가 없지만, B에는 유의성이 있는 것으로 보인다.</p>
-<pre class="output"><code>[1] 0.4996989 0.0583577 0.4996989</code></pre>
 </div>
 </div>
 <div class="footnotes">
 <hr />
 <ol>
 <li id="fn1"><p><a href="https://en.wikipedia.org/wiki/A/B_testing">A/B testing</a><a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p><a href="http://www.marketingdistillery.com/2014/08/03/ab-tests-in-marketing-sample-size-and-significance-using-r/">A/B Tests in Marketing – Sample Size and Significance using R</a><a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p><a href="http://www.alfredo.motta.name/ab-testing-from-scratch/">A/B Testing, from scratch</a><a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p><a href="http://www.3rs-reduction.co.uk/html/6__power_and_sample_size.html">3Rs- Reduction.co.uk, Power and Sample Size</a><a href="#fnref4">↩</a></p></li>
+<li id="fn2"><p><a href="http://www.statmethods.net/stats/power.html">http://www.statmethods.net/, Power Analysis</a><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p><a href="http://www.marketingdistillery.com/2014/08/03/ab-tests-in-marketing-sample-size-and-significance-using-r/">A/B Tests in Marketing – Sample Size and Significance using R</a><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p><a href="http://www.alfredo.motta.name/ab-testing-from-scratch/">A/B Testing, from scratch</a><a href="#fnref4">↩</a></p></li>
+<li id="fn5"><p><a href="http://www.3rs-reduction.co.uk/html/6__power_and_sample_size.html">3Rs- Reduction.co.uk, Power and Sample Size</a><a href="#fnref5">↩</a></p></li>
+<li id="fn6"><p>What is the difference between A/B testing and a t-test?](<a href="https://www.quora.com/What-is-the-difference-between-A-B-testing-and-a-t-test" class="uri">https://www.quora.com/What-is-the-difference-between-A-B-testing-and-a-t-test</a>)<a href="#fnref6">↩</a></p></li>
 </ol>
 </div>
 
