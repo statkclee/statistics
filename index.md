@@ -28,6 +28,7 @@ title: 데이터 과학 -- 기초 통계
     - [A/B 검정(A/B Testing)](stat-ab-testing.html)
     - [실무에서 자주 활용되는 검정($t$-검정)](stat-testing.html)
     - [A/B 검정 -- A안 혹은 B안 선정](ab-testing-in-practice.html)
+    - [베이지안 A/B 검정](bayesian-ab-testing-in-practice.html)
 1. [통계 모형(Statistical models)](stat-modeling.html)
     - [탐색적 시계열 데이터 분석](stat-time-series-eda.html)
     - [시계열 모형 식별 도구](stat-time-series-tools.html)
@@ -41,7 +42,6 @@ title: 데이터 과학 -- 기초 통계
     - [시계열 데이터 다루기](stat-time-series-basics.html)    
     - [깔끔한 금융 시장 분석가(tidyquant)](stat-time-series-tidyquant.html)    
 1. [채팅 로그](stat-chatting-log.html)
-1. [베이즈 정리](stat-bayes.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
     * [작업장 탐지](stat-gold-farming-detection.html)
 
