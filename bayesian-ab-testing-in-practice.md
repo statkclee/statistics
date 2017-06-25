@@ -19,9 +19,7 @@
 - 투입되는 비용과 매출을 고려한 순이익관점에 봤을 때 앞선 의사결정이 뒤바뀌게 되는가?
 
 
-### 1.1. 베이지안 추론 [^rasmus-baeysian]
-
-[^rasmus-baeysian]: [Video Introduction to Bayesian Data Analysis, Part 1: What is Bayes?](http://www.sumsar.net/blog/2017/02/introduction-to-bayesian-data-analysis-part-one/)
+### 1.1. 베이지안 추론 
 
 먼저, **베이즈 추론(Bayesian inference)**은 통계적 추론의 한 방법으로, 
 추론해야 하는 대상의 사전 확률과 추가적인 관측을 통해 획득한 데이터를 기반으로 해당 대상의 사후 확률을 추론하는 방법이다. 
@@ -134,7 +132,7 @@ length(posterior) # 충분한 표본이 추출되었는지 검증
 
 
 ~~~{.output}
-[1] 588
+[1] 648
 
 ~~~
 
@@ -148,7 +146,7 @@ hist(posterior, xlim = c(0, 1), main="사후분포", xlab="구매율")
 abline(v = median(posterior), col = "red", lwd =2)
 ~~~
 
-<img src="fig/simple-bayesian-1.png" style="display: block; margin: auto;" />
+<img src="fig/simple-bayesian-uniform-1.png" style="display: block; margin: auto;" />
 
 ~~~{.r}
 median(posterior)
@@ -157,7 +155,7 @@ median(posterior)
 
 
 ~~~{.output}
-[1] 0.3882359
+[1] 0.3830216
 
 ~~~
 
@@ -171,12 +169,452 @@ quantile(posterior, c(0.025, 0.975))
 
 ~~~{.output}
      2.5%     97.5% 
-0.1753221 0.6021478 
+0.1745246 0.6276855 
 
 ~~~
 
 16회 실험하여 6회 성공이 나온 경우 즉, 16명에게 마케팅 홍보하여 6회 구매가 일어난 데이터를 기반으로 
-평균 구매율(38.8 %)과 95% 신뢰구간을 
-[17.5 %, 60.2 %]으로 
+평균 구매율(38.3 %)과 95% 신뢰구간을 
+[17.5 %, 62.8 %]으로 
 추정할 수 있다.
+
+<img src="fig/ab-testing-expert-prior.png" alt="전문가 의견을 반영한 구매율 추정" width="37%" />
+
+## 3. 전문가의 의견을 반영한 경우 홍보안은 구매율의 신뢰구간을 어떻게 될까?
+
+가장 먼저 홍보를 전혀 하지 않는 것과 비교하여 건어물을 홍보하는 책자를 제작하여 발송하는 경우, 
+서울소재한 16가구에 배송하여 6명이 제품구매를 결정한 데이터를 바탕으로,
+실제 평균 구매율과 95%신뢰구간을 구했으나, 사전 분포의 내용에 전문가의 의견이 전혀 반영되지 않았다.
+즉, 구매율이 0% -- 100% 사이가 되는 것은 가능한 모든 구매율이나, 전문가의 경험을 바탕으로 
+과거 경험과 옆집 사례를 바탕으로 파악해 보면, 실제 구매율은 5% -- 15% 사이에 위치하게 된다는 점을 강조했다.
+이런 전문가의 의견을 반영할 경우 평균 구매율과 95% 신뢰구간은 다음과 같이 계산된다.
+
+
+~~~{.r}
+## 1.1. 사전분포 정의
+n_draws <- 100000
+
+prior <- rbeta(n_draws, shape1 = 3.5, shape2 =30)
+
+## 1.2. 재생모형(generative model) 
+generative_model <- function(parameters) {
+  subscribers <- rbinom(1, 16, parameters)
+  return(subscribers)
+}
+
+## 1.3. 모수 사후분포
+# 사전분포와 재생모형을 통해 모의 데이터 생성
+sim_data <- rep(NA, n_draws)
+for(i in 1:n_draws) {
+  sim_data[i] <- generative_model(prior[i])
+}
+
+# 모수 사후분포 
+posterior <- prior[sim_data == 6] 
+length(posterior)
+~~~
+
+
+
+~~~{.output}
+[1] 1215
+
+~~~
+
+
+
+~~~{.r}
+## 1.4. 중위수와 신뢰구간(Credible Interval)
+par(mfrow=c(2,1))
+hist(prior, xlim = c(0, 0.4), main="사전분포: 베타(5~15%) 구매율 반영", xlab="구매율", n=30)
+hist(posterior, xlim = c(0, 0.4), main="사후분포", xlab="구매율", n=30)
+abline(v = median(posterior), col = "red", lwd =2)
+~~~
+
+<img src="fig/simple-bayesian-beta-expert-1.png" style="display: block; margin: auto;" />
+
+~~~{.r}
+median(posterior)
+~~~
+
+
+
+~~~{.output}
+[1] 0.1851867
+
+~~~
+
+
+
+~~~{.r}
+quantile(posterior, c(0.025, 0.975))
+~~~
+
+
+
+~~~{.output}
+      2.5%      97.5% 
+0.09372376 0.30938909 
+
+~~~
+
+16회 실험하여 6회 성공이 나온 경우 즉, 16명에게 마케팅 홍보하여 6회 구매가 일어난 데이터를 기반으로 하고,
+전문가의 경험 즉, 5 -- 15% 구매율을 반영한 평균 구매율(18.5 %)과 95% 신뢰구간을 
+[9.4 %, 30.9 %]으로 
+추정된다. 앞선 전문가 의견을 전혀 반영하지 않는 것과 비교하여 추정된 95% 신뢰구간이 훨씬 현실적으로 반영된 것이 확인된다.
+
+### 3.1. 텔레마케팅 기법과 비교
+
+오징어 홍보책자를 발송하는 대신에 전화상담원을 활용한
+판촉활동을 수행하면 응답율이 20% 라고 알려져 있다.
+홍보책자를 통한 홍보가 전화상담원을 이용한 텔레마케팅보다 더 좋은 방법인지 데이터를 통한 검정을 해보자
+
+
+~~~{.r}
+sum(posterior > 0.2) /length(posterior)
+~~~
+
+
+
+~~~{.output}
+[1] 0.4049383
+
+~~~
+
+전화상담을 활용한 텔레마케팅 기법과 비교하여 (40.5 %) 구매율이 높을 수 있다는 
+결과가 도출되었다. 베이지안의 장점은 사후 확률을 구하게 되면 이러한 유형의 질문에 즉각 답을 줄 수 있다는 면에서 매력이 크다.
+
+### 3.2. 얼마 많은 고객이 구매를 할까?
+
+텔레마케팅 대신에 오징어에 대한 안내책자를 100명에게 발송한다면,
+얼마나 많은 서울 사람들이 구매를 하게 될까?
+루프와 벡터화 연산을 통해 모두 계산을 할 수 있다. 
+
+
+~~~{.r}
+signups <- rep(NA, length(posterior))
+
+## 3.1. 루프 
+for(i in 1:length(posterior)) {
+  signups[i] <- rbinom(n = 1, size = 100, prob = posterior[i])
+}
+
+## 3.2. 벡터화 연산 
+signups <- rbinom(n = length(posterior), size = 100, prob = posterior)
+quantile(signups, c(0.025, 0.975))
+~~~
+
+
+
+~~~{.output}
+ 2.5% 97.5% 
+    7    33 
+
+~~~
+
+홍보책자를 100개 제작하여 100명에게 발송했을 경우, 95% 신뢰구간을 추정하면 
+[7 명, 33 명]이 된다.
+
+
+## 4. 홍보책자안 A와 홍보책자 + 오징어 B안
+
+속초에 소재한 건어물 식품회사가 서울에서 활로를 모색하고자 
+신제품 오징어 건어물 제품을 만들어서 판촉에 들어갔다.
+앞서 안내책자만 발송한 경우 단 6명만 제품구매를 결정했지만, 
+실제 시식이 가능한 오징어를 포함한 안내책자를 서울소재한 16가구에 배송한 경우 10명이 제품구매를 결정했다.
+
+두가지 캠페인 안을 놓고 어느 방안이 좋은 계량적으로 의사결정을 해보자.
+
+
+전문가의 의견을 반영한 구매율 사후분포를 각기 다른 시나리오 2개를 바탕으로 작성하고 이에 대한 홍보책자안 A와 
+오징어 실물이 포함된 B안을 함께 두고 캠페인의 효과를 비교해본다.
+
+단순히 안내책자 제작 및 배송비용은 30원, 건어물이 포함된 안내책자와
+배송비용은 300원이다. 서울소재 고객이 구매하게 되면 인당 1,000원 
+매출이 기대된다. 마케팅 홍보원가와 신규 구매고객당 수익을 함께 고려하여 
+어느 방안이 좋은지 의사결정을 해본다.
+
+
+
+~~~{.r}
+## 1.1. 캠페인 사후분포 함수
+
+campaign_posterior <- function(n_trial, n_success_A, n_success_B) {
+  
+  ## 1.1. 사전분포 정의
+  n_draws <- 20000000
+  
+  prior <- data.frame(pA = rbeta(n_draws, shape1 = 3.5, shape2 =30),
+                      pB = rbeta(n_draws, shape1 = 3.5, shape2 =30))
+  
+  ## 1.2. 재생모형(generative model)
+  generative_model <- function(pA, pB) {
+    subcribersA <- rbinom(1, n_trial, pA)
+    subcribersB <- rbinom(1, n_trial, pB)
+    c(subcribersA = subcribersA, subcribersB = subcribersB)
+  }
+  
+  sim_data <- as.data.frame(t(sapply(1:n_draws, function(i) {
+    generative_model(prior$pA[i], prior$pB[i])
+  })))
+  
+  ## 1.3. 모수 사후분포: 사전분포와 재생모형을 통해 모의 데이터 생성
+  posteriors <- prior[sim_data$subcribersA == n_success_A & sim_data$subcribersB == n_success_B, ]
+  return(posteriors)  
+}
+
+ptm <- proc.time()
+## 1.2. 캠페인 반응율 시각화
+posteriors <- campaign_posterior(16,  6, 10)
+proc.time() - ptm
+~~~
+
+
+
+~~~{.output}
+   user  system elapsed 
+ 720.13    5.66  737.47 
+
+~~~
+
+
+
+~~~{.r}
+par(mfrow=c(1,1))
+hist(posteriors$pA, xlim = c(0, 0.5), col=rgb(1,0,0,0.5),
+     main="A/B 캠페인 응답률 비교", xlab="응답률", ylab="")
+hist(posteriors$pB, xlim = c(0, 0.5), col=rgb(0,0,1,0.5),  add=TRUE)
+~~~
+
+<img src="fig/bayesian-ab-testing-1.png" style="display: block; margin: auto;" />
+
+~~~{.r}
+## 1.3. 캠페인 중위수와 신뢰구간(Credible Interval)
+median(posteriors$pA)
+~~~
+
+
+
+~~~{.output}
+[1] 0.1610704
+
+~~~
+
+
+
+~~~{.r}
+quantile(posteriors$pA, c(0.025, 0.975))
+~~~
+
+
+
+~~~{.output}
+      2.5%      97.5% 
+0.09584569 0.24973797 
+
+~~~
+
+
+
+~~~{.r}
+median(posteriors$pB)
+~~~
+
+
+
+~~~{.output}
+[1] 0.2706712
+
+~~~
+
+
+
+~~~{.r}
+quantile(posteriors$pB, c(0.025, 0.975))
+~~~
+
+
+
+~~~{.output}
+     2.5%     97.5% 
+0.1441186 0.3699436 
+
+~~~
+
+
+
+~~~{.r}
+## 1.4. A안을 취할 것인가 B안을 취할 것인가?
+mean(posteriors$pA - posteriors$pB)
+~~~
+
+
+
+~~~{.output}
+[1] -0.09526336
+
+~~~
+
+
+
+~~~{.r}
+## 1.5. 기대이익 포함
+
+profitA <-  posteriors$pA * 1000 -30
+profitB <-  posteriors$pB * 1000 -300
+expected_profit_diff <- mean(profitA - profitB)
+
+hist(profitA - profitB)
+abline(v = expected_profit_diff, col = "red", lwd =2)
+~~~
+
+<img src="fig/bayesian-ab-testing-2.png" style="display: block; margin: auto;" />
+
+## 5. 스탠(Stan)을 활용한 베이지안 A/B 검정
+
+아마도 상기 방식으로 돌리게 되면 상당히 속도가 떨어져서 실무에서 사용하기 쉽지않다.
+베이지안 추정을 위해서 앞선 방법은 직관적이고 이해하기 쉬운 반면에 속도가 늦어 이를 보완한 도구를 사용하는 것이 일반적이다. [^three-ways-bayesian]
+
+[^three-ways-bayesian]: [Three Ways to Run Bayesian Models in R](http://www.sumsar.net/blog/2013/06/three-ways-to-run-bayesian-models-in-r/)
+
+- [JAGS, Just Another Gibbs Sampler](https://en.wikipedia.org/wiki/Just_another_Gibbs_sampler)
+- [Stan](http://mc-stan.org/)
+- [LaplacesDemon](https://github.com/ecbrown/LaplacesDemon)
+
+`rstan` 라이브러리르 설치하게 하고 나서 Bugs 시절부터 이어온 베이지안 문법에 맞춰 모형을 설정한다. 그리고 나서 
+MCMC, HMC 방법을 적용하여 사후확률을 구하게 되는데 속도가 무척 빠르다.
+
+
+~~~{.r}
+## 2.1 모형 설정
+model_string <- "
+# 데이터 
+data {
+  int nA;  # 실험 횟수
+  int nB;  # 실험 횟수
+  int sA;  # 성공 횟수
+  int sB;  # 성공 횟수
+}
+
+# 모수
+parameters {
+  real<lower=0, upper=1> rateA;
+  real<lower=0, upper=1> rateB;
+}
+
+# 재생 모형
+model {
+  rateA ~ beta(3, 25);
+  rateB ~ beta(3, 25);
+  sA ~ binomial(nA, rateA);
+  sB ~ binomial(nB, rateB);
+}
+
+generated quantities {
+  real rate_diff;
+  rate_diff = rateB - rateA;
+}
+"
+
+## 2.2 데이터
+data_list <- list(nA = 16, nB = 16, sA = 6, sB = 10)
+
+## 2.3 사후분포 표본 추출
+
+stan_samples <- stan(model_code = model_string, 
+                     data = data_list)
+~~~
+
+
+
+~~~{.r}
+## 2.4. 사후분포 표본 검증 작업
+stan_samples
+~~~
+
+
+
+~~~{.output}
+Inference for Stan model: e6319c148f5441856c2e4d27989af7c5.
+4 chains, each with iter=2000; warmup=1000; thin=1; 
+post-warmup draws per chain=1000, total post-warmup draws=4000.
+
+            mean se_mean   sd   2.5%    25%    50%    75%  97.5% n_eff
+rateA       0.21    0.00 0.06   0.10   0.16   0.20   0.24   0.34  3350
+rateB       0.30    0.00 0.07   0.17   0.25   0.29   0.34   0.44  3110
+rate_diff   0.09    0.00 0.09  -0.09   0.03   0.09   0.15   0.26  3338
+lp__      -49.99    0.02 1.00 -52.67 -50.37 -49.68 -49.29 -49.03  1648
+          Rhat
+rateA        1
+rateB        1
+rate_diff    1
+lp__         1
+
+Samples were drawn using NUTS(diag_e) at Sun Jun 25 14:46:22 2017.
+For each parameter, n_eff is a crude measure of effective sample size,
+and Rhat is the potential scale reduction factor on split chains (at 
+convergence, Rhat=1).
+
+~~~
+
+
+
+~~~{.r}
+traceplot(stan_samples)
+~~~
+
+<img src="fig/bayesian-ab-testing-viz-1.png" style="display: block; margin: auto;" />
+
+~~~{.r}
+plot(stan_samples)
+~~~
+
+<img src="fig/bayesian-ab-testing-viz-2.png" style="display: block; margin: auto;" />
+
+~~~{.r}
+## 2.5. 가설 검증
+posterior <- as.data.frame(stan_samples)
+sum(posterior$rate_diff > 0) / length(posterior$rate_diff)
+~~~
+
+
+
+~~~{.output}
+[1] 0.84725
+
+~~~
+
+B안이 A안보다 더 좋은 구매율을 보이고 있다.
+
+# 3. Stan을 활용한 베이지안 구매율 A/B 검정
+
+B안이 A안보다 더 좋은 구매율을 보이고 있지만, 홍보책자만 발송하는 경우 비용이 적게 들고,
+실물 건오징어를 함께 동봉하여 송부하는 경우 비용이 많이 든다. 구매고객당 매출은 동일하지만,
+홍보비용에서 차이가 나고, 구매율에도 차이가 난다. 이런 경우 어떤 방안이 좋을지 의사결정을 해보자.
+
+
+~~~{.r}
+posterior <- as.data.frame(stan_samples)
+profitA <- posterior$rateA * 1000 -30
+profitB <- posterior$rateB * 1000 -300
+# hist(profitA)
+# hist(profitB)
+
+hist(profitA, xlim=c(-300,500), ylim=c(0,500), col=rgb(1,0,0,0.5), main="A/B 캠페인 수익비교", xlab="수익", ylab="", n=30)
+hist(profitB, xlim=c(-300,500), col=rgb(0,0,1,0.5),  add=TRUE, n=30)
+legend("topright", legend=c("A안", "B안"), title="A/B 캠페인",
+       col=c(rgb(1,0,0,0.5), rgb(0,0,1,0.5)), lty=1, cex=0.8)
+~~~
+
+<img src="fig/stan-bayesian-ab-testing-comparison-1.png" style="display: block; margin: auto;" />
+
+~~~{.r}
+hist(profitA - profitB, main="A/B 캠페인 수익차 비교", xlab="A안 - B안", ylab="", n=30)
+expected_profit_diff <- mean(profitA - profitB)
+abline(v = expected_profit_diff, col = "red", lwd =2)
+~~~
+
+<img src="fig/stan-bayesian-ab-testing-comparison-2.png" style="display: block; margin: auto;" />
+
+
 
