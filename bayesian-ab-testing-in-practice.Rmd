@@ -18,9 +18,8 @@ knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
 library(tidyverse)
 library(ggplot2) 
 library(ggthemes)
-library(pwr)
 library(extrafont)
-library(prevalence) # https://gist.github.com/casallas/8411082
+# library(prevalence) # https://gist.github.com/casallas/8411082
 loadfonts()
 
 options(scipen = 999)
@@ -91,7 +90,7 @@ $$p_B \sim \mbox{Beta}(\alpha_B, \beta_B)$$
 
 $${\rm Pr}(p_B > p_A) = \sum_{i=0}^{\alpha_B-1}\frac{B(\alpha_A+i,\beta_A+\beta_B)}{(\beta_B+i) B(1+i, \beta_B) B(\alpha_A, \beta_A) }$$
 
-여기서 $$B$$는 베타함수가 된다. 
+여기서 $B$는 베타함수가 된다. 
 A/B 검정에서 많이 사용되는 베이지안 사전분포는 베타분포고, 응답율을 이항분포를 가정할 경우, 사후분포는 베타분포가 되고 모수는 다음과 같다. 
 
 $$ ~ Beta (\alpha + s, \beta + n - s)$$
@@ -115,15 +114,15 @@ h <- function(alpha_a, beta_a,
 }
 ```
 
-<img src="fig/ab-testing-bayesian-mechanics.png" alt="베이지안 처리절차" width="37%" />
 
 ## 2. 마케팅 홍보 A안의 구매율 효과는 얼마나 될까?
-
 
 가장 먼저 홍보를 전혀 하지 않는 것과 비교하여 건어물을 홍보하는 책자를 제작하여 발송하는 경우, 
 실제구매율이 얼마나 되는지 파악하고자 한다. 
 서울소재한 16가구에 배송하여 6명이 제품구매를 결정했다. 이 데이터를 바탕으로 
 실제 구매율은 얼마나 될지 평균 구매율과 95%신뢰구간을 구해보자.
+
+<img src="fig/ab-testing-bayesian-mechanics.png" alt="베이지안 처리절차" width="37%" />
 
 ### 2.1. 순수 R 코드로 구현한 구매율
 
