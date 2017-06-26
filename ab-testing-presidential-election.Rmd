@@ -106,7 +106,7 @@ xmulti(round(votes_stat_df$득표수/10^6,0), c(4, 2, 2, 1, 1), detail=3, histob
 홍준표/유승민 후보가 2:1로 총 3을 차지하는 가설을 데이터가 뒷받침하고 있다.
 
 
-## 2.2. 홍준표와 안철수
+### 2.2. 홍준표와 안철수
 
 `prop.test` 함수를 통해 두 후보간 득표율 비율을 검정한다.
 
@@ -125,7 +125,7 @@ prop.test(c(hong_voters, ahn_voters), c(voters_n,voters_n))
 
 p-값이 0.05보다 적게 나와 귀무가설 즉 홍준표 득표율과 안철수 득표율이 같다는 가설을 기각한다. 그렇다고 홍준표 후보 득표율이 안철수 후보 득표율보다 반듯이 크다는 주장으로 연결시키는데 한계가 있어 추후 베이지안 가설검정을 통해 보다 수월하게 접근할 수 있다.
 
-## 2.3. 심상정과 유승민
+### 2.3. 심상정과 유승민
 
 유승민과 심상정 후보의 경우도 마찬가지로 `prop.test` 함수를 통해 득표비율 가설검정을 실히한다.
 
@@ -146,7 +146,7 @@ prop.test(c(yoo_voters, sim_voters), c(voters_n, voters_n))
 `rstan` 팩키지는 BUG 베이지안 언어를 이해할 수 있어 베이지안 추론모형을 설정하고 MCMC 방법론을 통해 
 사후분포를 뽑아낸 후에 이를 바탕으로 각 후보별 지지율 차이를 검정한다.
 
-## 3.1. 홍준표와 안철수
+### 3.1. 홍준표와 안철수
 
 두 후보 모두 23% 언저리에 지지율이 위치하고 있기 때문에 베타분포를 사전분포로 잡아 
 이를 모형 넣어 추론을 한다.
@@ -195,7 +195,7 @@ data_list <- list(tlt_hong_votes = voters_n, tlt_ahn_votes = voters_n,
 
 ### 3.1.4 사후분포 표본 추출
 stan_hong_ahn <- stan(model_code = model_string, 
-                     data = data_list)
+                     data = data_list, verbose = FALSE, refresh = 0)
 
 traceplot(stan_hong_ahn)
 plot(stan_hong_ahn)
@@ -208,12 +208,12 @@ sum(posterior$rate_diff > 0) / length(posterior$rate_diff)
 `r paste(sum(posterior$rate_diff > 0) / length(posterior$rate_diff)*100, "%")` 로 나타나고 있어,
 전통적인 빈도주의 의사결정과 마찬가지로 홍준표 후보가 안철수 후보를 앞선 것이라는 평가가 한층 힘을 받는다.
 
-## 3.2. 유승민과 심상정
+### 3.2. 유승민과 심상정
 
 두 후보 모두 6% 언저리에 지지율이 위치하고 있기 때문에 베타분포를 사전분포로 잡아 
 이를 모형 넣어 추론을 한다.
 
-``` {r presidential-election-bayes-hong-ahn}
+``` {r presidential-election-bayes-hong-ahn, warning=FALSE, message=FALSE}
 
 ## 3.2. 유승민 vs. 심상정 --------------------------------
 ### 3.1.1. 사전분포 -----------------------------------------
@@ -257,7 +257,7 @@ data_yoo_sim_list <- list(tlt_yoo_votes = voters_n, tlt_sim_votes = voters_n,
 
 ### 3.1.4 사후분포 표본 추출
 stan_yoo_sim <- stan(model_code = model_yoo_sim_string, 
-                      data = data_yoo_sim_list)
+                      data = data_yoo_sim_list, verbose = FALSE, refresh = 0)
 
 traceplot(stan_yoo_sim)
 plot(stan_yoo_sim)

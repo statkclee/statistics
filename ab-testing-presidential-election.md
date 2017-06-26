@@ -43,8 +43,8 @@ datatable(votes_stat_df) %>%
   formatCurrency(c(4), currency="", interval=3, mark=",", digits=0)
 ~~~
 
-<!--html_preserve--><div id="htmlwidget-b2ec7a2f56bcbaa606f7" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-b2ec7a2f56bcbaa606f7">{"x":{"filter":"none","data":[["1","2","3","4","5"],["1","2","3","4","5"],["문재인","홍준표","안철수","유승민","심상정"],["더불어민주당","자유한국당","국민의당","바른정당","정의당"],[13423800,7852849,6998342,2208771,2017458],[0.411,0.24,0.214,0.068,0.062],["1위","2위","3위","4위","5위"],["당선","낙선","낙선","낙선","낙선"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>기호<\/th>\n      <th>후보<\/th>\n      <th>정당<\/th>\n      <th>득표수<\/th>\n      <th>득표율<\/th>\n      <th>순위<\/th>\n      <th>당선여부<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"crosstalkOptions":{"key":null,"group":null},"columnDefs":[{"className":"dt-right","targets":[4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatCurrency(this, row, data, 4, '', 0, 3, ',', '.', true);\nDTWidget.formatPercentage(this, row, data, 5, 1, 3, ',', '.');\n}"},"selection":{"mode":"multiple","selected":null,"target":"row"}},"evals":["options.rowCallback"],"jsHooks":[]}</script><!--/html_preserve-->
+<!--html_preserve--><div id="htmlwidget-900443a54212ede33553" style="width:100%;height:auto;" class="datatables html-widget"></div>
+<script type="application/json" data-for="htmlwidget-900443a54212ede33553">{"x":{"filter":"none","data":[["1","2","3","4","5"],["1","2","3","4","5"],["문재인","홍준표","안철수","유승민","심상정"],["더불어민주당","자유한국당","국민의당","바른정당","정의당"],[13423800,7852849,6998342,2208771,2017458],[0.411,0.24,0.214,0.068,0.062],["1위","2위","3위","4위","5위"],["당선","낙선","낙선","낙선","낙선"]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>기호<\/th>\n      <th>후보<\/th>\n      <th>정당<\/th>\n      <th>득표수<\/th>\n      <th>득표율<\/th>\n      <th>순위<\/th>\n      <th>당선여부<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"crosstalkOptions":{"key":null,"group":null},"columnDefs":[{"className":"dt-right","targets":[4,5]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false,"rowCallback":"function(row, data) {\nDTWidget.formatCurrency(this, row, data, 4, '', 0, 3, ',', '.', true);\nDTWidget.formatPercentage(this, row, data, 5, 1, 3, ',', '.');\n}"},"selection":{"mode":"multiple","selected":null,"target":"row"}},"evals":["options.rowCallback"],"jsHooks":[]}</script><!--/html_preserve-->
 
 > ### 관심있는 대선 가설 {.callout}
 >
@@ -103,7 +103,7 @@ Total number of tables:  58905
 홍준표/유승민 후보가 2:1로 총 3을 차지하는 가설을 데이터가 뒷받침하고 있다.
 
 
-## 2.2. 홍준표와 안철수
+### 2.2. 홍준표와 안철수
 
 `prop.test` 함수를 통해 두 후보간 득표율 비율을 검정한다.
 
@@ -163,7 +163,7 @@ sample estimates:
 
 p-값이 0.05보다 적게 나와 귀무가설 즉 홍준표 득표율과 안철수 득표율이 같다는 가설을 기각한다. 그렇다고 홍준표 후보 득표율이 안철수 후보 득표율보다 반듯이 크다는 주장으로 연결시키는데 한계가 있어 추후 베이지안 가설검정을 통해 보다 수월하게 접근할 수 있다.
 
-## 2.3. 심상정과 유승민
+### 2.3. 심상정과 유승민
 
 유승민과 심상정 후보의 경우도 마찬가지로 `prop.test` 함수를 통해 득표비율 가설검정을 실히한다.
 
@@ -203,7 +203,7 @@ sample estimates:
 `rstan` 팩키지는 BUG 베이지안 언어를 이해할 수 있어 베이지안 추론모형을 설정하고 MCMC 방법론을 통해 
 사후분포를 뽑아낸 후에 이를 바탕으로 각 후보별 지지율 차이를 검정한다.
 
-## 3.1. 홍준표와 안철수
+### 3.1. 홍준표와 안철수
 
 두 후보 모두 23% 언저리에 지지율이 위치하고 있기 때문에 베타분포를 사전분포로 잡아 
 이를 모형 넣어 추론을 한다.
@@ -257,7 +257,7 @@ data_list <- list(tlt_hong_votes = voters_n, tlt_ahn_votes = voters_n,
 
 ### 3.1.4 사후분포 표본 추출
 stan_hong_ahn <- stan(model_code = model_string, 
-                     data = data_list)
+                     data = data_list, verbose = FALSE, refresh = 0)
 ~~~
 
 
@@ -271,7 +271,7 @@ In file included from C:/Program Files/R/R-3.4.0/library/BH/include/boost/config
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-                 from file203012436860.cpp:8:
+                 from file3bd42d6659d7.cpp:8:
 C:/Program Files/R/R-3.4.0/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: "BOOST_NO_CXX11_RVALUE_REFERENCES" redefined
  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
  ^
@@ -286,7 +286,7 @@ In file included from C:/Program Files/R/R-3.4.0/library/BH/include/boost/multi_
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:11,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-                 from file203012436860.cpp:8:
+                 from file3bd42d6659d7.cpp:8:
 C:/Program Files/R/R-3.4.0/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function 'static void boost::multi_array_concepts::detail::idgen_helper<N>::call(Array&, const IdxGen&, Call_Type)':
 C:/Program Files/R/R-3.4.0/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef 'index_range' locally defined but not used [-Wunused-local-typedefs]
        typedef typename Array::index_range index_range;
@@ -305,110 +305,54 @@ In file included from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/sta
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-                 from file203012436860.cpp:8:
+                 from file3bd42d6659d7.cpp:8:
 C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
 C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: 'void stan::math::set_zero_all_adjoints()' defined but not used [-Wunused-function]
      static void set_zero_all_adjoints() {
                  ^
 
-SAMPLING FOR MODEL 'dba6c099177c0a264dae73eed5bafca3' NOW (CHAIN 1).
-
 Gradient evaluation took 0 seconds
 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
 Adjust your expectations accordingly!
 
 
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 0.019 seconds (Warm-up)
-               0.018 seconds (Sampling)
-               0.037 seconds (Total)
-
-
-SAMPLING FOR MODEL 'dba6c099177c0a264dae73eed5bafca3' NOW (CHAIN 2).
-
-Gradient evaluation took 0 seconds
-1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
-Adjust your expectations accordingly!
-
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
 
  Elapsed Time: 0.015 seconds (Warm-up)
-               0.012 seconds (Sampling)
-               0.027 seconds (Total)
+               0.059 seconds (Sampling)
+               0.074 seconds (Total)
 
-
-SAMPLING FOR MODEL 'dba6c099177c0a264dae73eed5bafca3' NOW (CHAIN 3).
 
 Gradient evaluation took 0 seconds
 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
 Adjust your expectations accordingly!
 
 
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
+
+ Elapsed Time: 0.014 seconds (Warm-up)
+               0.02 seconds (Sampling)
+               0.034 seconds (Total)
+
+
+Gradient evaluation took 0 seconds
+1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Adjust your expectations accordingly!
+
+
+
+ Elapsed Time: 0.014 seconds (Warm-up)
+               0.012 seconds (Sampling)
+               0.026 seconds (Total)
+
+
+Gradient evaluation took 0 seconds
+1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Adjust your expectations accordingly!
+
+
 
  Elapsed Time: 0.016 seconds (Warm-up)
-               0.014 seconds (Sampling)
-               0.03 seconds (Total)
-
-
-SAMPLING FOR MODEL 'dba6c099177c0a264dae73eed5bafca3' NOW (CHAIN 4).
-
-Gradient evaluation took 0 seconds
-1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
-Adjust your expectations accordingly!
-
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 0.015 seconds (Warm-up)
-               0.03 seconds (Sampling)
-               0.045 seconds (Total)
+               0.013 seconds (Sampling)
+               0.029 seconds (Total)
 
 ~~~
 
@@ -434,15 +378,15 @@ sum(posterior$rate_diff > 0) / length(posterior$rate_diff)
 
 
 ~~~{.output}
-[1] 0.994
+[1] 0.9955
 
 ~~~
 
 거의 홍준표 후보가 안철수 후보를 앞서는 확률이 거의 100%에 육박하는 
-99.4 % 로 나타나고 있어,
+99.55 % 로 나타나고 있어,
 전통적인 빈도주의 의사결정과 마찬가지로 홍준표 후보가 안철수 후보를 앞선 것이라는 평가가 한층 힘을 받는다.
 
-## 3.2. 유승민과 심상정
+### 3.2. 유승민과 심상정
 
 두 후보 모두 6% 언저리에 지지율이 위치하고 있기 때문에 베타분포를 사전분포로 잡아 
 이를 모형 넣어 추론을 한다.
@@ -495,7 +439,7 @@ data_yoo_sim_list <- list(tlt_yoo_votes = voters_n, tlt_sim_votes = voters_n,
 
 ### 3.1.4 사후분포 표본 추출
 stan_yoo_sim <- stan(model_code = model_yoo_sim_string, 
-                      data = data_yoo_sim_list)
+                      data = data_yoo_sim_list, verbose = FALSE, refresh = 0)
 ~~~
 
 
@@ -509,7 +453,7 @@ In file included from C:/Program Files/R/R-3.4.0/library/BH/include/boost/config
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-                 from file203063a33def.cpp:8:
+                 from file3bd478f8341b.cpp:8:
 C:/Program Files/R/R-3.4.0/library/BH/include/boost/config/compiler/gcc.hpp:186:0: warning: "BOOST_NO_CXX11_RVALUE_REFERENCES" redefined
  #  define BOOST_NO_CXX11_RVALUE_REFERENCES
  ^
@@ -524,7 +468,7 @@ In file included from C:/Program Files/R/R-3.4.0/library/BH/include/boost/multi_
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:11,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-                 from file203063a33def.cpp:8:
+                 from file3bd478f8341b.cpp:8:
 C:/Program Files/R/R-3.4.0/library/BH/include/boost/multi_array/concept_checks.hpp: In static member function 'static void boost::multi_array_concepts::detail::idgen_helper<N>::call(Array&, const IdxGen&, Call_Type)':
 C:/Program Files/R/R-3.4.0/library/BH/include/boost/multi_array/concept_checks.hpp:42:43: warning: typedef 'index_range' locally defined but not used [-Wunused-local-typedefs]
        typedef typename Array::index_range index_range;
@@ -543,110 +487,54 @@ In file included from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/sta
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/mat.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math.hpp:4,
                  from C:/Program Files/R/R-3.4.0/library/StanHeaders/include/src/stan/model/model_header.hpp:4,
-                 from file203063a33def.cpp:8:
+                 from file3bd478f8341b.cpp:8:
 C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp: At global scope:
 C:/Program Files/R/R-3.4.0/library/StanHeaders/include/stan/math/rev/core/set_zero_all_adjoints.hpp:14:17: warning: 'void stan::math::set_zero_all_adjoints()' defined but not used [-Wunused-function]
      static void set_zero_all_adjoints() {
                  ^
 
-SAMPLING FOR MODEL '043c81aa73f02e3e5bf27f46f287cc58' NOW (CHAIN 1).
-
 Gradient evaluation took 0 seconds
 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
 Adjust your expectations accordingly!
 
 
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
 
- Elapsed Time: 0.013 seconds (Warm-up)
-               0.016 seconds (Sampling)
-               0.029 seconds (Total)
-
-
-SAMPLING FOR MODEL '043c81aa73f02e3e5bf27f46f287cc58' NOW (CHAIN 2).
-
-Gradient evaluation took 0 seconds
-1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
-Adjust your expectations accordingly!
-
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 0.013 seconds (Warm-up)
-               0.012 seconds (Sampling)
-               0.025 seconds (Total)
-
-
-SAMPLING FOR MODEL '043c81aa73f02e3e5bf27f46f287cc58' NOW (CHAIN 3).
-
-Gradient evaluation took 0 seconds
-1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
-Adjust your expectations accordingly!
-
-
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
-
- Elapsed Time: 0.013 seconds (Warm-up)
-               0.013 seconds (Sampling)
+ Elapsed Time: 0.015 seconds (Warm-up)
+               0.011 seconds (Sampling)
                0.026 seconds (Total)
 
 
-SAMPLING FOR MODEL '043c81aa73f02e3e5bf27f46f287cc58' NOW (CHAIN 4).
+Gradient evaluation took 0 seconds
+1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Adjust your expectations accordingly!
+
+
+
+ Elapsed Time: 0.013 seconds (Warm-up)
+               0.017 seconds (Sampling)
+               0.03 seconds (Total)
+
 
 Gradient evaluation took 0 seconds
 1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
 Adjust your expectations accordingly!
 
 
-Iteration:    1 / 2000 [  0%]  (Warmup)
-Iteration:  200 / 2000 [ 10%]  (Warmup)
-Iteration:  400 / 2000 [ 20%]  (Warmup)
-Iteration:  600 / 2000 [ 30%]  (Warmup)
-Iteration:  800 / 2000 [ 40%]  (Warmup)
-Iteration: 1000 / 2000 [ 50%]  (Warmup)
-Iteration: 1001 / 2000 [ 50%]  (Sampling)
-Iteration: 1200 / 2000 [ 60%]  (Sampling)
-Iteration: 1400 / 2000 [ 70%]  (Sampling)
-Iteration: 1600 / 2000 [ 80%]  (Sampling)
-Iteration: 1800 / 2000 [ 90%]  (Sampling)
-Iteration: 2000 / 2000 [100%]  (Sampling)
 
- Elapsed Time: 0.014 seconds (Warm-up)
-               0.015 seconds (Sampling)
+ Elapsed Time: 0.012 seconds (Warm-up)
+               0.017 seconds (Sampling)
                0.029 seconds (Total)
+
+
+Gradient evaluation took 0 seconds
+1000 transitions using 10 leapfrog steps per transition would take 0 seconds.
+Adjust your expectations accordingly!
+
+
+
+ Elapsed Time: 0.012 seconds (Warm-up)
+               0.013 seconds (Sampling)
+               0.025 seconds (Total)
 
 ~~~
 
@@ -672,12 +560,12 @@ sum(posteriors$rate_diff > 0) / length(posteriors$rate_diff)
 
 
 ~~~{.output}
-[1] 0.817
+[1] 0.83
 
 ~~~
 
 유승민 후보가 심상정 후보를 앞서는 확률이 80%를 넘어
-81.7 % 로 나타나고 있어,
+83 % 로 나타나고 있어,
 전통적인 빈도주의 의사결정과정에서는 두 후보간 차이가 없다라는 가설이 베이지안 가설 검증에서는 
 다른 결과가 도출된다.
 
