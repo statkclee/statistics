@@ -209,3 +209,18 @@ best_hitter_df %>%
                      labels=c("서건창", "김선빈", "나성범", "이대호"))
 ```
 
+올해 확률 4할을 넘길 확률은 어떻게 될까? 이 문제 답을 하기 위해서 앞선 사후분포확률에서 4할 이상 칠 확률은 오히려 김선빈 서건창선수보다 약간 앞선다.
+
+``` {r best-hitter-2017-bayesian-400}
+
+## 3.5. 4할을 넘을 확률 ------------------------
+seo_400  <- 1-pbeta(0.4, hitter_beta$alpha+100, hitter_beta$beta+170)
+kim_400  <- 1-pbeta(0.4, hitter_beta$alpha+90, hitter_beta$beta+153)
+na_400   <- 1-pbeta(0.4, hitter_beta$alpha+77, hitter_beta$beta+134)
+lee_400  <- 1-pbeta(0.4, hitter_beta$alpha+93, hitter_beta$beta+169)
+
+big_four_400 <- data.frame("서건창" = seo_400, "김선빈"=kim_400, "나성범"=na_400, "이대호"=lee_400)
+ 
+big_four_400 %>% gather(선수, 타율4할) %>% 
+  dplyr::mutate(타율4할 = scales::percent(타율4할))
+```
