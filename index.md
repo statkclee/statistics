@@ -30,6 +30,7 @@ title: 데이터 과학 -- 기초 통계
     - [A/B 검정 -- A안 혹은 B안 선정](ab-testing-in-practice.html)
         - [기호 2번과 3번, 기호 4번과 5번 순위가 의미가 있나?](ab-testing-presidential-election.html)
     - [베이지안 A/B 검정](bayesian-ab-testing-in-practice.html)
+        - [올해(2017년) 최고수위 타자](bayesian-best-hitter-2017.html)
 1. [통계 모형(Statistical models)](stat-modeling.html)
     - [탐색적 시계열 데이터 분석](stat-time-series-eda.html)
     - [시계열 모형 식별 도구](stat-time-series-tools.html)
