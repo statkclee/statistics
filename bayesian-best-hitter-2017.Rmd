@@ -111,18 +111,24 @@ hitter_tbl %>%
 $\alpha$, $\beta$ 모수는 이를 반영하여야 된다.
 
 계산의 편의성을 위해 베타분포는 2010년대 최고타율 분포를 맞출 수 있도록 $\alpha$, $\beta$를 데이터에서 추정한다. [^stackexchange-beta-parameters]
+$\alpha$, $\beta$를 추정하는데 적률법(Method of Moments)을 비롯하여 다양한 방법이 존재한다.
+적률법을 적용할 경우 `MASS::fitdistr` 함수를 활용하여 $\alpha$, $\beta$를 추정한다.
+
 
 [^stackexchange-beta-parameters]: [Calculating the parameters of a Beta distribution using the mean and variance](https://stats.stackexchange.com/questions/12232/calculating-the-parameters-of-a-beta-distribution-using-the-mean-and-variance  )
 
 ``` {r best-hitter-all-prior}
-# 3. 베타분포 ------------------------------------
-## 3.1. 최고타자 사전분포 ------------------------
-hitter_tbl %>% 
+## 3.1. 최고타자 사전분포 모수추정 ------------------------
+hitter_avg_decade <- hitter_tbl %>% 
   mutate(시대 = cut(연도, breaks = c(0, 1990, 2000, 2010, 2020), labels=c("80년", "90년", "00년", "10년"))) %>% 
-  group_by(시대) %>% 
-  dplyr::summarise(hitter_avg = mean(타율),
-                   hitter_var = var(타율))
+  dplyr::filter(시대 %in% c("10년"))
 
+## 3.1. 적률법 ------------------------
+hitter_mom <- MASS::fitdistr(hitter_avg_decade$"타율", dbeta,
+                    start = list(shape1 = 560, shape2 = 970))
+hitter_mom
+
+## 3.2. 평균과 분산을 활용 ------------------------
 # https://stats.stackexchange.com/questions/12232/calculating-the-parameters-of-a-beta-distribution-using-the-mean-and-variance  
 estBetaParams <- function(mu, var) {
   alpha <- ((1 - mu) / var - 1 / mu) * mu ^ 2
@@ -130,7 +136,8 @@ estBetaParams <- function(mu, var) {
   return(params = list(alpha = alpha, beta = beta))
 }
 
-## 3.2. 최고타자 사전분포 시각화 ------------------------
+## 3.3. 최고타자 사전분포 시각화 ------------------------
+
 hitter_beta <- estBetaParams(0.3658333, 0.0001509667)
 
 gg_x <- seq(0.3, 0.45, .001)
@@ -160,7 +167,7 @@ beta_df %>%
 긁어온다. 
 
 ``` {r best-hitter-2017}
-## 3.3. 최고타자 타율 데이터 가져오기 ------------------------
+## 3.4. 최고타자 타율 데이터 가져오기 ------------------------
 baseball_url <- "http://score.sports.media.daum.net/record/baseball/kbo/brnk.daum"
 baseball_html <- xml2::read_html(baseball_url)
 
@@ -185,7 +192,7 @@ DT::datatable(baseball_hitter)
 $$Beta (\alpha_0 + \text{안타}, \beta_0 + \text{범타} )$$
 
 ``` {r best-hitter-2017-bayesian}
-## 3.4. 최고타자 타율 시각화 ------------------------
+## 3.5. 최고타자 타율 시각화 ------------------------
 
 gg_x <- seq(0.3, 0.45, .001)
 seo_dens  <- dbeta(gg_x, hitter_beta$alpha+100, hitter_beta$beta+170)
@@ -213,7 +220,7 @@ best_hitter_df %>%
 
 ``` {r best-hitter-2017-bayesian-400}
 
-## 3.5. 4할을 넘을 확률 ------------------------
+## 3.6. 4할을 넘을 확률 ------------------------
 seo_400  <- 1-pbeta(0.4, hitter_beta$alpha+100, hitter_beta$beta+170)
 kim_400  <- 1-pbeta(0.4, hitter_beta$alpha+90, hitter_beta$beta+153)
 na_400   <- 1-pbeta(0.4, hitter_beta$alpha+77, hitter_beta$beta+134)
