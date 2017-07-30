@@ -1,0 +1,138 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 확률 법칙(law of probability)
+output:
+  html_document: 
+    keep_md: yes
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+library(tidyverse)
+library(stringr)
+library(DT)
+library(rstan)
+library(ggthemes)
+library(extrafont)
+loadfonts()
+
+options(scipen = 999)
+options(dplyr.width = 120)
+options(dplyr.print_max = 1e9)
+```
+
+
+## 1. 확률의 덧셈법칙
+
+두 사건 중 적어도 하나만 발생할 확률을 "또는(or)" 연산으로 표현할 수 있는데, 두 사건이 독립을 가정($Pr(\text{A and B}) = Pr(A) \times Pr(B)$)하면 다음과 같이 표현할 수 있다.
+이를 **확률의 덧셈법칙(addition law of probability)**이라고 부른다.
+
+$\begin{aligned}
+ Pr(\text{A or B}) &= Pr(A) + Pr(B) - Pr(\text{A and B})\\
+                   &= Pr(A) + Pr(B) - Pr(A) \times Pr(B)
+ \end{aligned}$
+
+### 1.1. 넥슨 두 타자
+
+타자의 정규타석은 소속팀의 경기수 $\times$ 3.1로 정의된다. 보통 한 경기에서
+타자가 4 혹은 5번 타석에 들어서고 슬럼프 등으로 2군에 내려가는 것을 감안하여 
+붙박이 주전급 선수를 가늠하는 기준이다. 이제 넥슨의 수위 타자 두명을 놓고 
+두 선수가 매번 타석에서 안타를 치거나 두 선수 중 한 선수가 안타를 치는 확률을 
+확률의 덧셈법칙을 통해 확인해 보자. 규정타석을 446 타석으로 놓고 안타를 `1`, 범타를 `0`으로 
+정해놓고 타율은 최근 타율[^daum-hitter] 데이터를 참조한다.
+
+[^daum-hitter]: [다음 KBO 리그 타율(2017-07-21)](http://score.sports.media.daum.net/record/baseball/kbo/brnk.daum)
+
+``` {r nexen-two-players}
+# 1. 넥센 두 타자 ------------
+서건창 <- rbinom(446, 1, 0.344)
+이정후 <- rbinom(446, 1, 0.333)
+
+# 두선수가 모두 안타를 칠 확률
+mean(서건창&이정후)
+
+mean(서건창|이정후)
+mean(서건창==1) + mean(이정후==1) - mean(서건창&이정후)
+```
+
+두 선수가 동시에 안타를 칠 확률은 `r round(mean(서건창&이정후), 2)`이 되고, 
+두 선수 중 적어도 한 선구가 안타를 칠 확률은 `r round(mean(서건창|이정후),2)`이 된다.
+
+### 1.2. 200 안타를 향해서
+
+충분한 타석(540)이 주어졌다고 가정하고 200안타 이상을 때릴 확률은 얼마나 될까? $\frac{200}{540}$ = `r 200/540` 단순 계산해도 3할 7푼이 넘는 고타율이다.
+
+서건창, 이정후 선수를 100,000번 KBO 시즌을 돌리는데 540번 타석에 세워 타율은 현재 타율이라고 가정한다.
+이런 가정을 두고 두 선수 중 적어도 한 선수가 200 안타를 칠 확률은 얼마나 될까? 이를 풀기 위해서 한번은 난수를 발생하여 모의실험으로 계산하고, 다른 한번은 누적이항분포 확률을 사용해서 계산한다.
+
+``` {r nexen-200}
+# 2. 200 안타  ------------
+서건창 <- rbinom(100000, 540, 0.344)
+이정후 <- rbinom(100000, 540, 0.333)
+
+# 두선수 중 적어도 한 선수가 200 안타를 칠 확률
+mean(서건창 > 200 | 이정후 > 200)
+
+서건창_확률 <- 1 - pbinom(200, 540, 0.344)
+이정후_확률 <- 1 - pbinom(200, 540, 0.333)
+
+서건창_확률 + 이정후_확률 - 서건창_확률*이정후_확률
+```
+
+
+## 2. 확률변수 합
+
+두 확률변수를 곱하거나 더하는 경우를 생각할 수 있다. 이항분포에서 나온 두 변수를 더하여 만들어진 새로운 변수는 어떤 특성을 갖게 되는지 살펴보자
+
+$$Z \sim X + Y$$
+여기서, $X \sim \text{이항분포}(n, p)$를 따르고, $Y \sim \text{이항분포}(m, p)$를 따를 때 두 확률변수를 합한 $Z$를 살펴보자. [^stackexchange-sum-binom]
+
+[^stackexchange-sum-binom]: [Sum of two independent binomial variables](https://math.stackexchange.com/questions/1176385/sum-of-two-independent-binomial-variables)
+
+$$X + Y \sim \text{이항분포}(n+m, p)$$
+
+### 2.1. 두 변수 합에 대한 기대값과 분산
+
+독립인 두 변수에 대한 기대값과 분산은 다음과 같다.
+
+- $E[X+Y] = E[X] + E[Y]$
+- $Var[X+Y] = Var[X] + Var[Y]$
+
+### 2.2. R 코드을 통한 시각화 및 수치 검정
+
+$X \sim \text{이항분포}(n, p) = \text{이항분포}(10, 0.5)$로 두고, 
+$Y \sim \text{이항분포}(m, p) = \text{이항분포}(20, 0.5)$을 놓게 되면,
+이론적으로 $X+Y \sim \text{이항분포}(n+m, p) = \text{이항분포}(10+20, 0.5)$이 되고,
+`rbinom`함수를 통해 난수를 만들고, 두 변수를 합하여 시각화한다.
+
+``` {r binomial-sum-viz}
+binom_df <- data.frame(x = rbinom(10000, 10, 0.5),
+                       y = rbinom(10000, 20, 0.5))
+
+binom_df %>% mutate(z = x + y) %>% 
+  gather(key=binom_dist, value=cnt, x, y, z) %>% 
+  ggplot(aes(x=cnt, y=binom_dist, color=binom_dist)) +
+  geom_bar(stat="identity") +
+  facet_wrap(~binom_dist, nrow=3) +
+  theme_bw(base_family = "NanumGothic") +
+  theme(legend.position = "none") +
+  labs(x="성공횟수", y="빈도수", title="두 확률변수의 합")
+```
+
+이론값과 난수를 생성하여 두 변수를 합한 결과를 비교한다.
+
+``` {r binom-sum-numerics}
+mean(binom_df$x)
+mean(binom_df$y)
+
+binom_df %>% mutate(z = x + y) %>% 
+  summarise(mean_z = mean(z))
+```
+
