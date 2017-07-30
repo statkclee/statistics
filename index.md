@@ -26,6 +26,7 @@ title: 데이터 과학 -- 기초 통계
 1. **확률 모형**
     - [이항분포](stat-binomial.html)
     - [확률 법칙(law of probability)](stat-law-of-probability.html)
+    - [이항분포 근사 - 정규분포, 포아송 분포](stat-approx-normal-poisson.html)
 1. [실험 유형 구분](stat-coursera-doe.html)
     - [측정 척도(Scales of Measurement)](stat-measurement.html)
     - [A/B 검정(A/B Testing)](stat-ab-testing.html)

@@ -1,0 +1,115 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 이항분포 근사 - 정규분포, 포아송 분포
+output:
+  html_document: 
+    keep_md: yes
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+library(tidyverse)
+library(stringr)
+library(DT)
+library(ggthemes)
+library(extrafont)
+loadfonts()
+
+options(scipen = 999)
+options(dplyr.width = 120)
+options(dplyr.print_max = 1e9)
+```
+
+
+## 1. 정규 분포로 근사
+
+$n, np, n(1-p)$가 클 경우 이항분포를 정규분포로 근사할 수 있다. 즉, 이항분포 대신에 일부 차이가 있지만 정규분포를 사용해도 크게 무리가 없다.
+
+$$X \sim \text{정규분포}(\mu, \sigma)$$
+
+$\mu, \sigma$는 이항분포에서 다음 기대값과 표준편차값을 구해 사용한다.
+
+- $\mu = np$
+- $\sigma = \sqrt{np(1-p)}$
+
+### 1.1. 정규분포 근사 R 시각화
+
+이항분포에서 나온 평균과 표준편차를 정규분포에 넣어 난수를 뽑고, 이항분포 난수와 시각적으로 비교하면 이항분포인지 정규분포인지 시각적으로 구분이 쉽지 않다.
+
+
+``` {r normal-to-binomial}
+# 1. 이항분포를 정규분포에 근사 ------------
+size <- 1000
+prob <- 0.5
+
+binom_smpl <- rbinom(100000, size, prob)
+
+expected_value <- size * prob
+variance <- size * prob * (1-prob)
+stdev <- sqrt(variance)
+
+normal_smpl <- rnorm(100000, expected_value, stdev)
+
+approx_normal <- function(rv_01, rv_02){
+  rv_01_df <- data.frame(value = rv_01, random_variable = "첫번째 확률변수")
+  rv_02_df <- data.frame(value = rv_02, random_variable = "두번째 확률변수")
+  rv_df <- bind_rows(rv_01_df, rv_02_df)
+  
+  rv_df %>% 
+    ggplot(aes(value)) + 
+      geom_histogram(aes(y = ..density..)) + 
+      stat_function(fun=dnorm, args = list(mean=expected_value, sd=stdev), color="red") +
+      facet_wrap(~random_variable,nrow = 2)
+}
+
+approx_normal(binom_smpl, normal_smpl)
+```
+
+## 2. 포아송 분포로 근사
+
+시행횟수 크고, 확률이 적은 경우 이항분포 대신에 포아송 분포에 근사가 된다. 따라서, 이항분포 대신 포아송분포를 사용해도 크게 무리가 없다.
+
+$$X \sim \text{포아송}(\lambda)$$
+
+포아송분포는 평균과 분산이 동일하게 $\lambda$다. 즉,
+
+- $E(X) = \lambda$
+- $Var(X) = \lambda$
+
+### 2.1. 포아송 근사 R 시각화
+
+시행횟수가 상당히 크고(1000), 확률이 매우 적은 (0.1%) 이항분포에서 표본을 뽑고, 
+동일한 기대값을 갖는 포아송분포에서 표본을 뽑아 시각적으로 비교한다.
+
+``` {r approximatin-to-poisson}
+# 2. 이항분포를 포아송분포에 근사 ------------
+size <- 1000
+prob <- 0.001
+
+binom_smpl <- rbinom(100000, size, prob)
+
+pois_smpl <- rpois(100000, 1)
+
+expected_value <- size * prob
+
+approx_poisson <- function(rv_01, rv_02){
+  rv_01_df <- data.frame(value = rv_01, random_variable = "첫번째 확률변수")
+  rv_02_df <- data.frame(value = rv_02, random_variable = "두번째 확률변수")
+  rv_df <- bind_rows(rv_01_df, rv_02_df)
+  
+  rv_df %>% 
+    ggplot(aes(value)) + 
+    geom_histogram(aes(y = ..count..)) + 
+    facet_wrap(~random_variable, nrow = 2)
+}
+
+approx_poisson(binom_smpl, pois_smpl)
+```
+
