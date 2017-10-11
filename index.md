@@ -40,6 +40,7 @@ title: 데이터 과학 -- 기초 통계
         - [1타수 1안타, 2타수 무안타... 타율은?](bayesian-empirical-bayes.html)
         - [장효조, 김태균 누가 더 타율이 높은가?](bayesian-ab-testing.html)
 1. [통계 모형(Statistical models)](stat-modeling.html)
+    - [통계모형 시각화](stat-model-visualization.html) 
     - [탐색적 시계열 데이터 분석](stat-time-series-eda.html)
     - [시계열 모형 식별 도구](stat-time-series-tools.html)
     - [자기회귀이동평균(ARMA) 모형](stat-time-series-arma.html)
