@@ -359,7 +359,6 @@ ggplot(height_df, aes(연령, 신장)) +
   theme(legend.position = "none",
         axis.line.x=element_blank(),
         axis.ticks.x=element_blank(),
-        axis.title.x=element_blank(),
         panel.grid.minor.x=element_blank(),
         panel.grid.major.x=element_blank(),
         panel.grid.minor.y=element_blank(),
@@ -372,4 +371,149 @@ ggplot(height_df, aes(연령, 신장)) +
 상기 함수를 수식으로 표현하면 다음과 같다.
 
 - `r paste0("신장=", round(coef(height_lm)[1],1), " ", round(coef(height_lm)[2],1), "연령", " ", round(coef(height_lm)[3],1), "연령^2", " ", round(coef(height_lm)[4],1), "연령^3")`
+
+## 5. 빠른 증가와 느린 증가 [^wiki-exponentiation] {#log-exponent}
+
+[^wiki-exponentiation]: [위키백과 - 거듭제곱](https://ko.wikipedia.org/wiki/%EA%B1%B0%EB%93%AD%EC%A0%9C%EA%B3%B1)
+
+중고등학교 시절에 지수와 로그를 배웠을텐데, 이번에 다시 기억을 빨리 데이터과학을 위한 기초지식으로 이끌어내보자.
+**거듭제곱(exponentiation)**은 주어진 수를 주어진 횟수만큼 곱하는 연산으로, 주어진 수를 **밑(base)**, 주어진 횟수를 **지수(exponentiation)**라고 정의한다. 밑이 $a$, 지수가 $n$인 거듭제곱을 $a$의 $n$(거듭)제곱이라고 읽고, $a^{n}$으로 표현한다.
+
+### 5.1. 정수, 유리수, 실수 제곱 그리고 로그 {#from-integer-exponentiation}
+
+실수 밑 $a$ 및 양의 정수 $n$에 대한 거듭제곱을 다음과 같이 표현한다.
+
+$$a^n=\overbrace{a\times a\times a\times\cdots \times a}^n$$
+
+지수가 유리수인 거듭제곱은 거듭제곱근을 사용해서 정의한다. 먼저 유리수인 지수를 기약분수 형태로 다음과 같이 정의한다.
+
+$$\frac mn\qquad(m,n\in\mathbb Z;\;n>0;\;\text{최대공약수}\{m,n\}=1)$$
+따라서, 유리수 거듭제곱은 다음과 같이 정의된다.
+
+$$a^\frac mn=\sqrt[n]{a^m}$$
+
+실수 거듭제곱은 유리수 제곱 근사를 통한 정의와 로그를 통한 정의가 있다.
+실수 지수 함수는 서로 동치인 두가지 형태로 정의할 수 있다.
+
+$\mathbb R\to(0,+\infty)$, $x\mapsto e^x$,
+
+- 수열의 극한: $e^x=\lim_{n\to\infty}\left(1+\frac xn\right)^n$
+- 거듭제곱 급수: $e^x=\sum_{n=0}^\infty \frac{x^n}{n!}$
+
+지수함수의 역함수가 실수 로그 함수다.
+
+$$\ln=\exp^{-1}$$
+
+
+### 5.2. R 코드와 단리-복리 이자 [^wiki-interest] {#simple-compound-interest}
+
+[^wiki-interest]: [위키백과 - Interest](https://en.wikipedia.org/wiki/Interest#Types_of_interest)
+
+가장 먼저 단리 이자(Simple interest)는 원금(principle)에 붙는 이자에 대해서 기간이 경과하게 됨에 따라 발생하는 이자에 대해서는 고려하지 않는 것이다.
+
+단리 이자는 다음 공식으로 정의된다.
+
+$$\frac {P \cdot r \cdot m}{n}$$
+
+- $r$ :  이자율
+- $P$ :  원금
+- $m$ :  이자를 받기로 한 경과 기간 수
+- $n$ :  이자 적용 빈도수
+
+예를 들어, 원금 2500원 이자율 12.99%로 매월($n$ = 12) 이자를 낸다면 한달($m$ = 1)에 단리 금리를 적용했을 때 얼마나 내야할까? 석달치 이자는 얼마일까? 3번씩 나눠내는 것과 석달치를 한번에 내는 금액은 동일한가?
+
+``` {r simple-interest}
+# 2. 단리 -----------------------
+principle <- 2500      # 원금 
+interest_rate <- 0.1299  # 이자율
+m <- 1                 # 경과기간 횟수 
+n <- 12                # 이자 적용 빈도수
+
+## (principle * interest_rate * m) / n
+## 1회차 지급
+(principle * interest_rate * m) / n
+
+## 3회차 지급
+(principle * interest_rate * 3) / n
+
+3* (principle * interest_rate * m) / n == (principle * interest_rate * 3) / n
+```
+
+이번에는 복리 이자를 생각해보자. [^r-code-compound-interest]
+
+[^r-code-compound-interest]: [Code for interest calculation in R for systematic investments
+](# https://stackoverflow.com/questions/24595890/code-for-interest-calculation-in-r-for-systematic-investments)
+
+$e$ 를 발견하게 된 것도 복리 이자를 연구하면서 발견된 것이다.
+원금을 1원, 이자율을 100%로 가정하고 이자 지급기간을 매월(12회), 매주(52회),
+매일(365회), 매시간(8,760회), 매초(31,622,400회) 지급한다면 이자는 얼마나 될까?
+
+매월(12회), 매주(52회), 매일(365회), 매시간(8,760회), 매초(31,622,400회) 지급하게 되면 
+이자 지급금액이 늘어나게 되지만 결국 $\lim_{n\to\infty}\left(1+\frac xn\right)^n = e^x$에 수렴하게 된다.
+
+``` {r compound-interest-rate}
+# 3. 복리 -----------------------
+principle <- 1       # 원금 
+interest_rate <- 1  # 이자율
+
+## 3.1. 복리공식 ----------------
+# principle * (1 + interest_rate / n)^{n*t}
+
+1 * (1 + 1/12)**12
+1 * (1 + 1/52)**52
+1 * (1 + 1/365)**365
+1 * (1 + 1/8760)^8760
+1 * (1 + 1/31622400)^31622400
+
+## 3.2. 복리함수: 비연속 ----------------
+calculate_compound <- function(principle, interest_rate, n, t) {
+  principle * (1 + (interest_rate / n))**(n*t)
+}
+calculate_compound(1,1,12,1)
+calculate_compound(1,1,52,1)
+calculate_compound(1,1,365,1)
+calculate_compound(1,1,8760,1)
+calculate_compound(1,1,31622400 ,1)
+## 3.3. 복리함수: 연속 ----------------
+
+calculate_compound_exp <- function(principle, interest_rate, t) {
+  principle * exp(interest_rate*t)
+}
+
+calculate_compound_exp(1,1,1)
+```
+
+위키백과사전에 나와 있는 [연습문제](https://en.wikipedia.org/wiki/Compound_interest)를 풀어보자.
+
+원금 $1,500 달러를 은행에 예치했는데 이자율은 4.3%, 분기마다 이자를 지급하는 상품에 가입했는데,
+6년 후 원금에 붙은 이자는 얼마나 될까? 
+
+- 원금 = 1500
+- 이자율 = 0.043 (4.3%)
+- 이자를 받기로 한 경과 기간 수 = 4
+- 이자 적용 빈도수 = 6
+
+``` {r wiki-compound-interest-example-01}
+## 3.4. 예제 -------------
+calculate_compound(1500, 0.043, 4, 6)
+```
+
+원금 $1,500 달러를 은행에 예치했는데 이자율은 4.3%, 2년 마다 이자를 지급하는 상품에 가입했는데,
+6년 후 원금에 붙은 이자는 얼마나 될까? 
+
+- 원금 = 1500
+- 이자율 = 0.043 (4.3%)
+- 이자를 받기로 한 경과 기간 수 = 0.5
+- 이자 적용 빈도수 = 6
+
+``` {r wiki-compound-interest-example-02}
+calculate_compound(1500, 0.043, 1/2, 6)
+```
+
+
+
+
+
+
+
 
