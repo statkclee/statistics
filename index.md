@@ -23,6 +23,7 @@ title: 데이터 과학 -- 기초 통계
 
 ## 학습목차 
 
+1. [데이터 과학을 위한 수학적 기초](math-for-data-science.html)
 1. **[확률의 역사](https://statkclee.github.io/r-algorithm/r-history-of-probability.html)**
     - [난수 및 난수 생성기](stat-random-number-generator.html)
     - [이항분포](stat-binomial.html)
@@ -55,7 +56,6 @@ title: 데이터 과학 -- 기초 통계
     - [금융데이터 가져오기](stat-fe-import.html)
     - [시계열 데이터 다루기](stat-time-series-basics.html)    
     - [깔끔한 금융 시장 분석가(tidyquant)](stat-time-series-tidyquant.html)    
-1. [데이터 과학을 위한 수학적 기초](math-for-data-science.html)
 1. [채팅 로그](stat-chatting-log.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
     * [작업장 탐지](stat-gold-farming-detection.html)
