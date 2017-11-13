@@ -1,0 +1,205 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 난수 및 난수 생성기
+output:
+  html_document: 
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+library(tidyverse)
+library(ggthemes)
+library(extrafont)
+loadfonts()
+
+```
+
+
+## 1. 난수(Random Number) [^wiki-randomness-test] [^random-number-wiki] {#ranom-number}
+
+[^wiki-randomness-test]: [위키백과 - Statistical randomness](https://en.wikipedia.org/wiki/Statistical_randomness)
+
+[^random-number-wiki]: [위키백과 - 난수](https://ko.wikipedia.org/wiki/%EB%82%9C%EC%88%98)
+
+**난수(Random Number, 亂數)란 정의된 범위내에서 무작위로 추출된 수를 
+일컫는데, 난수는 누구라도 그 다음에 나올 값을 확신할 수 없어야 한다. 
+특히 난수 추출에 대해 민감할 수 있는 복권 추첨에서는 난수를 발생하기 위하여 컴퓨터를 사용하지 않는다. 
+그 대신 도구를 사용하는 물리적인 방법으로 난수를 추출한다고 하는데, 컴퓨터에의해 추출된 난수는 조작의 여지를 남길 수 있기 때문이라고 한다.
+그렇지만, 난수 생성이 필요한 곳이 생각보다 광범위하고 이럴 때마다 공정성을 위해서 물리적인 기계를 활용하여 난수를 생성하는 것은 
+무리가 있다. 따라서, 적절한 경우에 적절한 난수 품질을 갖는 난수를 컴퓨터를 이용하여 생성하여 실생활에 활용하는 것은 의미가 크다.
+
+Ripley(1990)교수가 정의한 난수생성기에서 나온 난수는 다음 특성을 갖추어야 한다.[^ripley-random-number]
+
+[^ripley-random-number]: [Ripley, B. D. (1990), Stochastic Simulation, John Wiley & Sons](https://cran.r-project.org/web/packages/randtoolbox/vignettes/shortintro.pdf)
+
+- 난수생성기에서 생성된 숫자는 거의 균일하게 분포되어야 한다.
+- 난수생성기에서 생성된 숫자는 상호 독립적이어야 한다.
+- 난수생성기에서 생성된 동일한 숫자는 충분히 긴 기간을 갖어야만 된다.
+- 씨앗(seed)이 주어지지 않는 경우, 난수생성기에서 생성된 숫자는 예측이 불가능해야만 된다.
+
+### 1.1. 의사난수 생성기와 진정한 난수 생성기 비교 [^random-org-comparison] {#comparison-random-number}
+
+[^random-org-comparison]: [Dr Mads Haahr, Introduction to Randomness and Random Numbers](https://www.random.org/randomness/)
+
+진정한 난수(True Random Number) 생성기와 의사난수(Pseudo Random Number) 생성기를 
+효율성(Efficiency), 결정론(Determinism), 주기성(Periodicity)을 기준으로 비교해보자.
+
+|    특성  |   의사난수 생성기   |   진정한 난수 생성기  |
+|----------|---------------------|-----------------------|
+|  효율성  |     매우 훌륭함     |       나쁨            |
+|  결정론  |     결정론적 특성   |   비결정론적 특성     |
+|  주기성  |     주기성을 띔     |     비주기성을 띔     |
+
+### 1.2. 의사난수 생성기와 진정한 난수 생성기 응용사례 {#application-random-number}
+
+의사난수 생성기와 진정한 난수 생성기는 효율성, 결정론, 주기성 관점에서 서로 다른 특성이 있기 때문에 난수 생성기를 활용하는 응용분야에서 특성에 맞춰 적절히 활용해야만 한다.
+
+|     응용분야    | 가장 적합한 난수 생성기 |
+|-----------------|-------------------------|
+| 복권과 그리기   |  진정한 난수 생성기     |
+| 게임과 도박     |  진정한 난수 생성기     |
+| 표집 (약물검사) |  진정한 난수 생성기     |
+| 모의실험과 모형 |  **의사 난수 생성기**   |
+| 보안(데이터 암호화키) | 진정한 난수 생성기 |
+|     예술        |  상황에 맞춰 선택       |
+
+
+
+## 2. 난수 검정 [^stat-testing-rng] {#randomness-test}
+
+[^stat-testing-rng]: [Statistical Testing of RNGs](https://www.unf.edu/~cwinton/html/cop4300/s09/class.notes/c2-StatisticalTesting%20RNGsx.pdf)
+
+### 2.1. 단변량 난수 검정 {#univariate-randomness-test}
+
+1. 적합도(Goodness of fit) 검정: 경험적 누적분포함수(empirical
+cumulative distribution function)와 균등분포(Uniform Distribution)을 비교하는 검정 
+    - 콜모고로프-스미르노프(Kolmogorov-Smirnov) 검정
+    - 앤더슨-달링(Anderson-Darling) 검정
+1. 간극(Gap) 검정: 간극(Gap)은 난수와 난수 사이의 거리로 다양한 간극의 분포를 시각화하고 검정통계량을 잡아서 검정함.
+    - 카이제곱($\chi^2$) 검정
+1. 순열(Permutation, Order) 검정: $k$ 구간에 포함된 난수들 사이에 순열을 비교하는데, 각 $k!$ 순열은 거의 동일하게 $\frac{1}{k!}$ 확률로 발생되어야 한다.
+    - 카이제곱($\chi^2$) 검정
+1. 빈도(Frequency) 검정: 해당 구간에 난수가 얼마나 떨어지는지 세는데 등간격을 갖는 구간에 대략 동일한 난수가 출현되어야 한다.
+    - 카이제곱($\chi^2$) 검정
+1. 쿠폰 수집가 검정: 적당히 작은 정수 $d$를 골라 $d$ 구간으로 분할하여 난수를 해당구간에 떨어뜨린다. 아이디어는 [쿠폰수집가 문제](https://statkclee.github.io/r-algorithm/r-coupon-collector-problem.html)를 참조한다.
+1. 자기상관(Autocorrelation)검정: 
+
+### 2.2. 다변량 난수 검정 {#multivariate-randomness-test}
+
+1. 순차(Serial) 검정: 앞선 빈도 검정의 다차원 버젼으로 $k-$차원 셀에 $k-$튜플 난수가 얼마나 떨어지는 수를 세어 검정함.
+    - 카이제곱($\chi^2$) 검정
+1. 충돌(collision) 검정    
+1. $\phi-$ 발산 검정
+1. 포커(poker) 검정
+
+
+## 3. 난수 생성 알고리즘 [^packr-data-science-with-r] [^sheldon-ross-simulation] {#r-rng-algorithm}
+
+[^packr-data-science-with-r]: [Matthias Templ(2016), "Simulation for Data Science with R", Packr](https://www.packtpub.com/big-data-and-business-intelligence/simulation-data-science-r)
+
+[^sheldon-ross-simulation]: [Sheldon M. Ross, "Simulation", Academic Press, 5th Edition](https://www.amazon.com/Simulation-Fifth-Sheldon-M-Ross/dp/0124158250)
+
+컴퓨터를 활용한 의사 난수 생성기는 크게 두범주로 나눠진다. 하나는 **산술 난수 생성기(Arithmetic random number generators)**, 다른 하나는 **재귀 산술 난수 생성기(Recursive arithmetic random number generators)**가 있다.
+
+처음 생각해볼 수 있는 의사난수 생성방법은 승법 합동 난수 생성 방법(multiplicative congruential method)으로 다음과 같은 형태를 갖는다.
+
+$$x_n = a \times x_{n-1} \quad \text{법(Modulo)} \quad m $$
+
+$a,m$은 주어진 양의 정수가 되면, $a \times x_{n-1}$을 $m$으로 나눈 나머지가 $x_n$에 대입되는 구조가 된다.
+따라서 $x_n$이 가질 수 있는 값의 범위는 $\{0, 1,2, \cdots, m-1  \}$을 갖게 되고 대략 $\frac{x_n}{m}$으로 나눗셈을 하게 되면 대략 일양분포$(0,1)$를 갖는 난수를 취하게 된다.
+
+따라서, $a,m$을 적절히 잘 취하게 되면 품질 좋은 난수를 갖게 되어 신중히 선정을 해야 되는데 일반적인 선정기준은 다음과 같다.
+
+- 어떤 초기 씨앗값을 선택하더라도, 승법합동 난수생성 방법으로 뽑혀진 난수는 상호 독립적인 일양분포 "형태"를 취해야 한다.
+- 어떤 초기 씨앗값을 선택하더라도, 승법합동 난수생성 방법으로 뽑혀진 난수의 주기성은 충분히 커야만 된다.
+- 승법합동 난수생성 방법으로 생성되는 난수는 컴퓨터로 효율적으로 뽑혀져야만 한다.
+
+또다른 형태의 의사 난수생성방법은 복합 합동 난수생성방법으로 가법항과 승법항이 함께 포함된 형태를 취한다. 즉,
+
+$$x_n = (a \times x_{n-1} + c) \quad \text{법(Modulo)} \quad m $$
+
+예를 들어, $m = 2^{32}$, $a = 69069$, $c = 23606797$ 값을 택하게 되면 나름 품질 좋은 난수를 생성시킬 수 있다.
+
+
+### 3.1. 역산법(Inverse transform sampling) [^inversion-box-and-whisker] {#r-inversion-method}
+
+[^inversion-box-and-whisker]: [특정 확률 분포를 따르는 난수 생성기 만들기](http://www.boxnwhis.kr/2017/04/13/how_to_make_random_number_generator_for_any_probability_distribution.html)
+
+[역산법(Inverse transform sampling)](https://en.wikipedia.org/wiki/Inverse_transform_sampling)은 확률변수를 넣으면 확률이 계산되는 것을 반대로 확률을 넣어 확률변수를 구하는 방식이다. 즉, 누적확률분포는 항상 $[0,1]$에서 정의되기 때문에 품질좋은 일양균등분포 난수 생성기가 있고, 역함수를 수식으로 표현할 수 있다면 역산법을 활용하여 난수를 생성할 수 있다.
+
+누적분포함수 $F_X$는 함수가 입력값으로 임의 $x$가  $X \leq x$보다 적은 확률은 $p$가 되고 이를 표현하면 다음과 같다.
+
+$$ F_X(x) = \Pr(X \leq x) = p $$
+
+$p \sim U$를 활용하여 일양균등분포를 역함수에 입력값으로 넣으면 난수를 생성시킬 수 있다.
+
+$$ F_X^{-1}(u) = x $$
+
+누적정규분포함수(`qnorm`)에 일양균등분포난수를 넣으면 정규분포를 따르는 난수를 생성시킬 수 있다.
+동일한 방식으로 지수분포를 따르는 난수도 동일하게 생성시킬 수 있고, 이를 `fitdistrplus::descdist` 함수를 통해 확인을 할 수 있다.
+
+
+``` {r random-sampling-inversion-method}
+# 1. 난수생성 -----------------------
+
+unif_random_v <- runif(100000)
+
+normal_random_v <- qnorm(unif_random_v)
+exp_random_v <- qexp(unif_random_v)
+
+# 2. 생성된 난수 검정 -----------------------
+
+par(mfrow=c(1,2))
+fitdistrplus::descdist(normal_random_v, discrete = FALSE, obs.col = "lightpink")
+fitdistrplus::descdist(exp_random_v, discrete = FALSE, obs.col = "lightpink")
+```
+
+
+지수함수를 $f(x;\lambda) =\lambda e^{-\lambda x}$와 같이 정의하면 누적분포함수는 $F(x;\lambda) = 1-e^{-\lambda x}$와 같이 구할 수 있다.  $F_X^{-1}(u)$를 구하기 위해 $F(x;\lambda)=U$로 둔다.
+
+$$F(x;\lambda)= U = 1-e^{-\lambda x}$$
+이것을 $x$에 대해서 정리하면 다음과 같다.
+
+$$e^{-\lambda x}=1-U \\
+  -\lambda x = log(1-U) \\
+  x = - \frac{1}{\lambda} log(1-U) = \frac{1}{\lambda} log(U) \\
+  F_X^{-1}(u) = - \frac{1}{\lambda} log(u)
+$$
+
+
+지수분포의 역함수를 R코드로 작서아고 난수슬 생성하여 히스토그램과 분포곡선, 지수분포검정, 분위수-분위수그림(QQ plot)을 통해 역산법을 통해서 일양균등분포에서 지수분포를 따르는 표본을 추출할 수 있다는 것을 확인할 수 있다.
+
+``` {r inversion-exponetial-distribution}
+# 3. 지수분포 난수 -----------------------
+## 3.1. 지수분포 난수 생성 ---------------
+inv_exp <- function(sample_size, lambda = 1) {
+    unif_random_v <- runif(sample_size)
+    exp_random_v <- -(1/lambda) * log(unif_random_v)
+    return(exp_random_v)
+}
+
+exp_random_v <-  inv_exp(100000, 1)
+
+## 3.2. 지수분포 난수 시각화 ---------------
+par(mfrow=c(1,3))
+#### 3.2.1. 히스토그램과 분포 곡선  
+MASS::truehist(exp_random_v, nbins = 20, col = "limegreen", main = "지수분포", xlab = "")
+curve(dexp(x), from = 1e-10, add = TRUE)
+
+#### 3.2.2. 지수분포검정
+fitdistrplus::descdist(exp_random_v, discrete = FALSE, obs.col = "lightpink")
+
+#### 3.2.3. 분위수-분위수 그림
+p <- ppoints(100)                
+q <- quantile(exp_random_v, p=p) 
+plot(qexp(p) ,q, main="지수분포 분위수-분위수 그림(Q-Q Plot)",
+     xlab="이론 분위수",ylab="난수 분위수")
+qqline(q, distribution=qexp,col="blue", lty=2)
+```
