@@ -127,7 +127,7 @@ month_df %>%
   labs(x="", y="산모숫자") +
   scale_y_continuous(labels = scales::comma) +
   theme(legend.position = "top")
-``
+```
 
 ## 4.2. 손씻기 실험 전후 사망률표 {#handwashing-experiment-table}
 
@@ -137,7 +137,7 @@ month_df %>%
 ``` {r experiment-experiment-table}
 ### 손씻기 전후 산모사망률 비교
 month_df %>% 
-  mutate(손씻기_전후 = ifelse(date >= lubridate::ymd('1847-06-01'), "깨끗한 손", "더러운 손")) %>% 
+  mutate(손씻기_전후 = ifelse(date >= as.Date('1847-06-01'), "깨끗한 손", "더러운 손")) %>% 
   group_by(손씻기_전후) %>% 
   summarize(산모사망 = sum(deaths),
             산모출산 = sum(births)) %>% 
@@ -161,7 +161,7 @@ month_df %>%
 # 4. 통계적 유의성 검정 -----
 ## 4.1. 데이터 -----
 month_df <- month_df %>% 
-  mutate(손씻기_전후 = ifelse(date >= lubridate::ymd('1847-06-01'), "깨끗한 손", "더러운 손")) %>% 
+  mutate(손씻기_전후 = ifelse(date >= as.Date('1847-06-01'), "깨끗한 손", "더러운 손")) %>% 
   mutate(산모_사망률 = deaths / births)
 
 ## 4.2. 시각화 -----
