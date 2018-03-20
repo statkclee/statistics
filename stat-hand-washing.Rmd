@@ -1,0 +1,228 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 손씻기 그리고 통계 - 제멜바이스
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_float: true
+    highlight: tango
+    code_folding: hide
+mainfont: NanumGothic
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+
+```
+
+
+# 1. 이그나즈 젬멜바이스와 솟씻기 [^Semmelweis-01] [^Semmelweis-02] {#hand-washing}
+
+아기를 낳은 여성은 출산 전의 몸 상태로 돌아가는데 6주 정도의 시간이 걸리고, 이 산욕기간에 만약 열이 나면 출산 과정에 생긴 감염을 산욕열이라고 부른다.
+**이그나즈 젬멜바이스**(Ignaz Philipp Semmelweis; 1818 ~1865)이 활동한 19세기 중반 병원에서 출산한 여성 3~4명당 한명이 산욕열에 걸려 목숨을 잃고 있었다.
+
+[^Semmelweis-01]: [박지욱의 진료실의 고고학자(2013.09.13), 손씻기의 화신 산부인과 의사 - 01](http://www.docdocdoc.co.kr/news/articleView.html?idxno=139484)
+[^Semmelweis-02]: [박지욱의 진료실의 고고학자(2013.09.13), 손씻기의 화신 산부인과 의사 - 02](http://www.docdocdoc.co.kr/news/articleView.html?idxno=139476)
+
+헝가리 출생의 젬멜바이스는 산욕열로 산모가 생명을 많이 잃고 원인이 그 당시로는 말도 되지 않는 **손 씻기**에 있다는 주장을 했고 이를 데이터로 뒷받침했지만 
+본인 인생은 그리 행복하지는 않았다.
+
+# 2. 산욕열 손씻기 데이터 {#handwashing-data}
+
+[데이터캠프, projects-discovery-of-handwashing-r](https://github.com/datacamp/projects-discovery-of-handwashing-r) Github 사이트에서 산욕열 손씻기 데이터를 다운로드 받는다.
+
+``` {r hand-washing-setup}
+# 0. 환경설정 -----
+library(infer)
+library(tidyverse)
+library(extrafont)
+loadfonts()
+library(ggthemes)
+library(DT)
+library(viridis)
+
+# 1. 데이터  -----
+download.file(url="https://raw.githubusercontent.com/datacamp/projects-discovery-of-handwashing-r/master/datasets/yearly_deaths_by_clinic.csv", destfile = "data/yearly_deaths_by_clinic.csv")
+download.file(url="https://raw.githubusercontent.com/datacamp/projects-discovery-of-handwashing-r/master/datasets/monthly_deaths.csv", destfile = "data/monthly_deaths.csv")
+
+year_df <- read_csv("data/yearly_deaths_by_clinic.csv")
+month_df <- read_csv("data/monthly_deaths.csv")
+```
+
+# 3. 사전 탐색적 데이터 분석 {#handwashing-data-eda}
+
+## 3.1. 연도별 사망율 {#handwashing-data-eda-graph}
+
+이그나즈 젬멜바이스 박사가 손씻기가 산모사망률과 관련이 있다는 사실에 대해서 수년간 병원에 근무하고, 주위에서 발생한 여러 사건에서 영감을 얻게 되었다.
+우선 이그나즈 젬멜바이스 박사가 근무한 병원은 두동으로 구성되어 있는데 `clinic 1`, `clinic 2` 두 병동은 서로 다른 특성이 있었다.
+한 병동은 예비의사가 시체해부를 한 실습을 마치고 바로 현업에 투입되는 병동이고 다른 병동은 일반적인 병동이었다.
+
+두 병동에서 연도별로 산모 출산과 산모사망에 대해서 시각화를 통해 살펴보자.
+
+``` {r hand-washing-eda}
+# 2. 탐색적 데이터 분석 -----
+## 2.1. 시각화 -----
+year_df %>% 
+  gather(출생사망, 산모숫자, -year, -clinic) %>% 
+  ggplot(aes(x=year, y=산모숫자, color=clinic)) +
+    geom_point() +
+    geom_line() +
+    facet_wrap( ~ 출생사망, scales="free") +
+    theme_bw(base_family = "NanumGothic") +
+    labs(x="", y="산모숫자") +
+    scale_y_continuous(labels = scales::comma) +
+    theme(legend.position = "top")
+```
+
+## 3.2. 연도별 사망율표 {#handwashing-data-eda-table}
+
+연도별 시계열 산모사망률을 도식화해보자.
+
+``` {r hand-washing-eda-table}
+## 2.2. 표 -----
+### 연도별 산모사망률
+year_df %>% 
+  mutate(산모_사망률 = deaths / births) %>% 
+  datatable() %>% 
+    formatCurrency(c("births", "deaths"), currency="", digits=0) %>% 
+    formatPercentage(c("산모_사망률"), digits=1)
+```
+
+## 3.3. 병동별 사망율표 {#handwashing-data-eda-table-clinic}
+
+병동별 산모사망률을 표로 비교해보자.
+
+``` {r hand-washing-eda-clinic-table}
+### 병동별 산모사망률
+year_df %>% 
+  group_by(clinic) %>% 
+  summarize(산모사망 = sum(deaths),
+            산모출산 = sum(births)) %>% 
+  mutate(산모_사망률 = 산모사망/산모출산) %>% 
+  datatable() %>% 
+    formatCurrency(c("산모사망", "산모출산"), currency="", digits=0) %>% 
+    formatPercentage(c("산모_사망률"), digits=1)
+```
+
+# 4. 손씻기 실험 {#handwashing-experiment}
+
+## 4.1. 손씻기 실험 전후 사망률 비교 {#handwashing-experiment-graph}
+
+"1847-06-01"을 기점으로 젬멜바이스 박사는 손씻기 실험을 추진하였고 추진 결과를 데이터로 남겼다.
+
+``` {r experiment-experiment-graph, eval=FALSE}
+# 3. 손씻기 실험 결과 -----
+month_df %>% 
+  mutate(손씻기_전후 = ifelse(date >= lubridate::ymd('1847-06-01'), "깨끗한 손", "더러운 손")) %>% 
+  gather(출생사망, 산모숫자, -date, -손씻기_전후) %>% 
+  ggplot(aes(x=date, y=산모숫자, group=출생사망, color=손씻기_전후)) +
+  geom_point() +
+  geom_line() +
+  geom_vline(xintercept = lubridate::ymd('1847-06-01'), color="green", size=1) +
+  facet_wrap( ~ 출생사망, scales="free") +
+  labs(x="", y="산모숫자") +
+  scale_y_continuous(labels = scales::comma) +
+  theme(legend.position = "top")
+``
+
+## 4.2. 손씻기 실험 전후 사망률표 {#handwashing-experiment-table}
+
+"1847-06-01"을 기점으로 젬멜바이스 박사는 손씻기 실험을 추진한 결과를 표로 정리해보자.
+손씻은 것이 효과가 있는 것으로 보인다. 과연 그런가?
+
+``` {r experiment-experiment-table}
+### 손씻기 전후 산모사망률 비교
+month_df %>% 
+  mutate(손씻기_전후 = ifelse(date >= lubridate::ymd('1847-06-01'), "깨끗한 손", "더러운 손")) %>% 
+  group_by(손씻기_전후) %>% 
+  summarize(산모사망 = sum(deaths),
+            산모출산 = sum(births)) %>% 
+  mutate(산모_사망률 = 산모사망/산모출산) %>% 
+  datatable() %>% 
+  formatCurrency(c("산모사망", "산모출산"), currency="", digits=0) %>% 
+  formatPercentage(c("산모_사망률"), digits=1)
+```
+
+# 5. 손씻기 효과 검정 {#handwashing-experiment-testing}
+
+"1847-06-01"을 기점으로 젬멜바이스 박사는 손씻기 실험을 추진한 결과를 두개의 집단으로 나눠 
+두집단간의 사망률의 차이가 있는지를 통계검정으로 확인해보자.
+두집단간의 평균 사망률 차이 검정을 위해 $t$-검정을 수행한다.
+
+## 5.1. 손씻기 전후 시각화 {#handwashing-experiment-testing-viz}
+
+본격적인 $t$-검정을 수행하기에 앞서서 시각화를 해서 "깨끗한 손"과 "더러운 손" 두 집단간의 사망률 차이를 시각화해 본다.
+
+``` {r experiment-experiment-testing-viz}
+# 4. 통계적 유의성 검정 -----
+## 4.1. 데이터 -----
+month_df <- month_df %>% 
+  mutate(손씻기_전후 = ifelse(date >= lubridate::ymd('1847-06-01'), "깨끗한 손", "더러운 손")) %>% 
+  mutate(산모_사망률 = deaths / births)
+
+## 4.2. 시각화 -----
+ggplot(data = month_df, mapping = aes(x = 산모_사망률, fill=손씻기_전후)) +
+  geom_density(alpha = 0.7) +
+  scale_x_continuous(labels = scales::percent) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_bw(base_family="NanumGothic") +
+  labs(title="손씻기 전후 산모사망률 비교",
+       x="산모사망률", y="빈도수", fill="손씻기 전후")
+```
+
+## 5.2. 손씻기 효과 검정 {#handwashing-experiment-testing-stat}
+
+전동적인 $t$-검정을 수행해서 "깨끗한 손"과 "더러운 손" 두 집단간의 사망률 차이를 통계적으로 검정해 본다.
+
+``` {r experiment-experiment-testing-stat}
+## 4.3. 전통적인 통계검정 -----
+t.test( 산모_사망률 ~ 손씻기_전후, data = month_df)
+```
+
+p-값이 거의 0에 가까이 나오기 때문에 두 집단간에 평균사망률 없다는 것을 부정하지는 못한다.
+
+## 5.3. 손씻기 효과 코딩 기반 검정 {#handwashing-experiment-testing-permute}
+
+전동적인 $t$-검정 대신 코딩 기반 검정을 통해서 "깨끗한 손"과 "더러운 손" 두 집단간의 사망률 차이가 있는지도 살펴보자.
+두집단간의 평균차이를 구하고 이것이 두집단이 독립이라는 가정하에 두집단에서 표본을 뽑아 차이를 계산해서 쉽게 센다.
+p-갑도 계산하고 95% 신뢰구간은 백분위수(Percentile) 방법을 사용해서 계산한다.
+
+``` {r experiment-experiment-testing-permute}
+## 4.4. 코딩 기반 검정 -----
+### 4.4.1. 데이터에서 두 집단 간 차이 산출
+hand_diff <- month_df %>% 
+  group_by(손씻기_전후) %>% 
+  summarise(mean = mean(산모_사망률)) %>% 
+  summarise(abs(diff(mean))) %>% 
+  pull
+
+### 4.4.2. 귀무가설 모형에서 모의실험을 통해서 통계량 산출
+null_model <- month_df %>%
+  specify(산모_사망률 ~ 손씻기_전후) %>%
+  hypothesize(null = "independence") %>% 
+  generate(reps = 1000, type = "permute") %>% 
+  calculate(stat = "diff in means", order = c("깨끗한 손", "더러운 손"))
+
+### 4.4.3. p-갑과 95% 신뢰구간: 백분위수(Percentile) 방법
+null_model %>%
+  summarize(p_value = mean(stat > hand_diff))
+
+null_model %>%
+  summarize(l = quantile(stat, 0.025),
+            u = quantile(stat, 0.975))
+
+### 4.4.4. 시각화
+ggplot(null_model, aes(x = stat, fill="gray75")) +
+  geom_density(aes(y=..count..), alpha=0.7) +
+  geom_vline(xintercept = hand_diff, color = "red", size=1.5) +
+  scale_x_continuous(limits=c(-0.05,0.1)) +
+  scale_fill_viridis(discrete = TRUE) +
+  theme_bw(base_family="NanumGothic") +
+  theme(legend.position = "none") +
+  labs(title="손씻기 전후 산모사망률 비교",
+       x="산모사망률", y="빈도수", fill="손씻기 전후")
+```
