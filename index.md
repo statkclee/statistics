@@ -41,7 +41,7 @@ title: 데이터 과학 -- 기초 통계
         - [올해(2017년) 최고수위 타자 타율은?](bayesian-best-hitter-ci.html)
         - [1타수 1안타, 2타수 무안타... 타율은?](bayesian-empirical-bayes.html)
         - [장효조, 김태균 누가 더 타율이 높은가?](bayesian-ab-testing.html)
-    - [손씻기 그리고 통계 - 제멜바이스](hand-washing.html)
+    - [손씻기 그리고 통계 - 제멜바이스](stat-hand-washing.html)
 1. [코딩 기반 통계적 추론(Statistical Inference)](stat-inference.html)
 1. [통계 모형(Statistical models)](stat-modeling.html)
     - [통계모형 시각화](stat-model-visualization.html) 
