@@ -114,7 +114,7 @@ year_df %>%
 
 "1847-06-01"을 기점으로 젬멜바이스 박사는 손씻기 실험을 추진하였고 추진 결과를 데이터로 남겼다.
 
-``` {r experiment-experiment-graph, eval=FALSE}
+``` {r experiment-experiment-graph, eval=TRUE}
 # 3. 손씻기 실험 결과 -----
 month_df %>% 
   mutate(손씻기_전후 = ifelse(date >= lubridate::ymd('1847-06-01'), "깨끗한 손", "더러운 손")) %>% 
