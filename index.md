@@ -46,18 +46,7 @@ title: 데이터 과학 -- 기초 통계
 1. [통계 모형(Statistical models)](stat-modeling.html)
     - [통계모형 시각화](stat-model-visualization.html) 
     - [로지스틱 회귀모형(logistic regression)](stat-logistic-regression.html) 
-    - **시계열 모형**
-        - [탐색적 시계열 데이터 분석](stat-time-series-eda.html)
-        - [시계열 모형 식별 도구](stat-time-series-tools.html)
-        - [자기회귀이동평균(ARMA) 모형](stat-time-series-arma.html)
-        - [계절 자기회귀이동평균(SARIMA)](stat-time-series-sarima.html)
-        - [시계열 데이터 예측(forecast)](stat-time-series-forecast.html)
-        - [시계열 예측 자동화](stat-forecast-automation.html)
-1. **금융공학(Financial Engineering)**
-    - [금융공학을 위한 R 언어 기초](stat-fe-r.html)
-    - [금융데이터 가져오기](stat-fe-import.html)
-    - [시계열 데이터 다루기](stat-time-series-basics.html)    
-    - [깔끔한 금융 시장 분석가(tidyquant)](stat-time-series-tidyquant.html)    
+    - **[시계열 모형](https://statkclee.github.io/finance/)**: "2018-07-01" 이전 
 1. [채팅 로그](stat-chatting-log.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
     * [작업장 탐지](stat-gold-farming-detection.html)
