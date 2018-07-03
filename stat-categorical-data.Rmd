@@ -1,0 +1,143 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 범주형 데이터 분석
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_float: true
+    highlight: tango
+    code_folding: show
+mainfont: NanumGothic
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+
+# 코딩기반 범부형 데이터 분석 {#stat-categorical-data-analysis}
+
+코딩기반 통계적 추론을 살펴보자. 범주형 데이터의 가장 기본은 **비율(Proportion, $p$)**부터 시작한다.
+성별을 얘기할 때, 남성과 여성의 비율이 대표적일 수 있다.
+미국의 `GSS(General Socail Survey)`에 견주는 대한민국 [한국복지패널 데이터](https://www.koweps.re.kr:442/main.do)를 
+얻을 수 있는데, `stata`, `spss`, `sas` 등 상용통계팩키지에 의존성이 있어 이를 R과 같은 오픈소스 소프트웨어에서 작업할 경우
+`haven` 팩키지를 동원해야 한다. 그리고 상당량의 변환작업과정과 데이터사전을 보고 일일이 데이터와 대조하는 과정을 거쳐야 한다.
+
+그래서 `forcats` 팩키지에 내장되어 있는 `gss_cat` 범주형 데이터를 가지고 작업을 진행한다.
+
+
+## 데이터 가져오기 {#stat-categorical-data-analysis-forcasts}
+
+`gss_cat` 데이터에서 2014년 데이터만 뽑아내서 범주형 데이터 분석을 위한 샘플데이터로 준비한다.
+
+``` {r stat-categorical-data-analysis-forcasts}
+# 0. 환경설정 -----
+library(infer)
+library(haven)
+library(tidyverse)
+
+# data(package="forcats")
+
+gss_cat_df  <- gss_cat %>% 
+    filter(year==2014)
+```
+
+## 탐색적 데이터분석 {#stat-categorical-data-analysis-eda}
+
+본격적인 데이터 분석에 들어가기 앞서 가장 먼저 데이터에 익숙해지는 과정이 필요하다.
+이를 위해서 탐색적 데이터 분석을 진행하는데, 데이터를 `glimpse`로 살펴보고, `ggplot`으로 시각화하고, 
+범주형 데이터에 대한 기술통계량을 뽑아보는 것부터 시작한다. 
+
+그리고 나서, 혼인상태(marital)에 대한 현재 혼인비율을 추정한다.
+
+``` {r stat-categorical-data-analysis-eda}
+# 2. 탐색적 데이터 분석 -----
+## 2.1. 시각화 ----
+gss_cat_df %>% 
+    ggplot(aes(x=fct_infreq(marital) %>% fct_rev)) +
+    geom_bar()
+
+## 2.2. 기술통계량 ----
+gss_cat_df %>% 
+    count(marital, sort=TRUE) %>% 
+    mutate(pcnt = scales::percent(n/sum(n)))
+
+## 2.3. 이혼율 ----
+(married_hat <- gss_cat_df %>% 
+    summarise(p = mean(marital == "Married")) %>% 
+    pull())
+```
+
+
+## 혼인비율 신뢰구간 {#stat-categorical-data-analysis-marital-ci}
+
+`fct_lump()` 함수는 가장 큰 범주를 중심으로 범주를 자동으로 줄여줘서 코딩량을 획기적으로 줄일 수 있다.
+혼인상태 범주형 변수를 두가지 수준 혼인(`Married`)와 그외로 나눌 경우 `infer` 팩키지를 통해 부츠트랩 표본추출을 할 수 있다.
+
+이를 바탕으로 `ggplot`의 `geom_density` 함수로 부츠트랩 표본으로부터 혼인비율을 시각화하고, 표준편차를 계산할 수 있으니,
+신뢰구간도 쉽게 구할 수 있다.
+
+``` {r stat-categorical-data-analysis-marital-ci}
+# 3. 신뢰구간 구하기 -----
+## 3.1. 부츠트랩: 결혼과 비혼으로 구분
+married_boots <- gss_cat_df %>%
+    mutate(marital = fct_lump(marital, 1)) %>%
+    specify(response = marital, success = "Married") %>%
+    generate(reps = 500, type = "bootstrap") %>%
+    calculate(stat = "prop")
+
+## 3.2. 시각화
+married_boots %>% 
+    ggplot(aes(x=stat)) +
+      geom_density()
+
+## 3.3. 신뢰구간
+### 3.3.1. 부츠트랩 신뢰구간
+married_se <- married_boots %>%
+    summarize(se = sd(stat)) %>%
+    pull()
+
+c(married_hat - 2 * married_se, married_hat + 2 * married_se)
+```
+
+## 정규분포 가정 신뢰구간 {#stat-categorical-data-analysis-marital-ci-normal}
+
+비율($p$)가 $n \times \hat{p} $\geq$ 10$ 혹은 $n \times (1 - \hat{p}) $\geq$ 10$인 경우 정규분포로 근사하여 신뢰구간을 계산할 수 있다. 그리고 표준오차는 다음 공식으로 계산이 가능하다.
+
+$$\text{표준오차(SE)}=\sqrt{\frac{\hat{p}\times(1-\hat{p})}{n}}$$
+
+이를 바탕으로 부츠트랩 혼인비율에 대한 신뢰구간을 시각화하고, 계산하면 다음과 같다.
+부츠트랩으로 산출한 혼인비율에 대한 추정값과 신뢰구간이 근사적으로 동일함이 확인된다.
+
+
+``` {r stat-categorical-data-analysis-marital-ci-normal}
+### 3.3.2. 정규분포 신뢰구간
+### 가정 검사
+nrow(gss_cat_df) * married_hat >= 10
+nrow(gss_cat_df) * (1 - married_hat) >= 10
+
+### SE 계산
+married_approx_se <- sqrt(married_hat * (1 - married_hat) / nrow(gss_cat_df))
+c(married_hat - 2 * married_approx_se, married_hat + 2 * married_approx_se)
+
+## 3.4. 시각화
+married_boots %>% 
+    ggplot(aes(x=stat)) +
+    geom_density() +
+    stat_function(fun = dnorm, args = list(mean = married_hat, sd=married_approx_se), color = "red")
+```
+
+
+
+
+# 비율 검정  {#stat-categorical-data-analysis-proportion}
+
+| 표본 | 반응 범주 |                     검정                                 |
+|------|-----------|----------------------------------------------------------|
+|  1   |     2     | 단일 표본 $\chi^2$ 검정, 이항 검정(Binomial Test)    |
+|  1   |   2 이상  | 단일 표본 $\chi^2$ 검정, 다항 검정(multinomial Test)     |
+| 1이상|   2 이상  | $N$ 표본 $\chi^2$ 검정, G-검정, 피셔의 정확검정      |
