@@ -1,0 +1,253 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: tidyverse 통계적 추론
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_float: true
+    number_section: true
+    highlight: tango
+    code_folding: show
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+library(tidyverse)
+library(ggthemes)
+library(extrafont)
+loadfonts()
+
+```
+
+
+# `tidyverse` 컴퓨팅 통계적 추론 [^tidyverse-datacamp-inference] [^infer-chi-squared-vignettes] [^infer-t-test-vignettes] {#computer-age-statistical-inference}
+
+[^tidyverse-datacamp-inference]: [William Surles (2017-09-11), "Foundations of Inference"](http://rstudio-pubs-static.s3.amazonaws.com/308326_f3706219dfb14ccd8f530185631e8abf.html)
+
+[^infer-chi-squared-vignettes]: [Chester Ismay(2018-05-14), "Chi-squared test example using nycflights13 flights data"](https://cran.r-project.org/web/packages/infer/vignettes/chisq_test.html)
+
+[^infer-t-test-vignettes]: [Chester Ismay (2018-05-14), "Two sample t test example using nycflights13 flights data"](https://cran.r-project.org/web/packages/infer/vignettes/two_sample_t.html)
+
+
+# 진급 성차별 사례연구 {#r-gender-case-study}
+
+`http://bit.ly/2DffE7b` 사이트에서 `infer` 팩키지 사례로 자주 언급되는 성차별 데이터를 다운로드 받는다.
+진급 성차별 사례연구는 카이제곱 통계량을 바탕으로 두 범주형 변수간에 관계가 있는지를 검정하고 두 집단간의 비율의 차이가 있는지를 검정하는 목적으로 사용된다.
+
+``` {r gender-discrimination-case-study}
+# 0. 환경설정 -----
+library(infer)
+library(tidyverse)
+library(cowplot)
+library(extrafont)
+loadfonts()
+
+# 1. 성차별(Gender Discrimination) -----
+## 1.1. 데이터 -----
+load(url("http://bit.ly/2DffE7b"))
+```
+
+## 탐색적 데이터 분석 {#r-gender-case-study-eda}
+
+성차별데이터는 범주형 변수 2개와 `r nrow(bankstudy)`행으로 구성되어 있어 표형태로 살펴보고,
+기술통계량 비율도 뽑아보고, `ggplot`으로 시각화해서 데이터와 친숙해진다.
+
+``` {r gender-discrimination-case-study-eda}
+## 1.2. 탐색적 데이터분석 -----
+### 교차표 
+bankstudy %>% 
+    count(promote, gender) %>% 
+    spread(gender, n)
+
+bankstudy %>%
+    group_by(gender) %>%
+    summarize(promote_prob = mean(promote == "yes"))
+
+### 시각화
+bankstudy %>% 
+    ggplot(aes(x=gender, fill = promote)) +
+      geom_bar()
+```
+
+## 통계적 검정 {#r-gender-case-study-testing}
+
+남녀간에 승진의 차별이 없다고 귀무가설($H_0$)을 설정하고 나서 이를 전통적인 방식으로 
+`chisq.test()` 함수를 사용해서 통계검정한다. `infer` 팩키지 `chisq_test()` 함수를 사용해서 
+`tidvyerse` 방식으로 깔끔하게 통계적 검정을 수행하는 것도 가능하다.
+
+``` {r gender-discrimination-case-study-testing}
+## 1.3. 통계적 검정 -----
+### 기본 통계검정
+chisq.test(bankstudy$gender, bankstudy$promote)
+
+### tidyverse 통계검정
+bankstudy %>% 
+    chisq_test(promote ~ gender)
+```
+
+## tidyverse + 컴퓨팅 통계검정 {#r-gender-case-study-testing-tidyverse}
+
+`infer` 팩키지를 활용하여 남성과 여성간의 승진 비율에 대한 차이(`dsex_hat`)를 계산해서 기록해 둔다.
+그리고 나서, 성별에 따른 승진의 차이가 없다는 귀무가설을 따르는 분포를 가정하고 남성과 여성간의 승진 비율차이를 
+통계량으로 계산하는 모의실험을 `1,000`회 반복한다. 
+
+`ggplot`으로 시각화하고, `p-값`을 귀무가설을 따르는 통계량과 성별의 차이에 따른 승진비율 차이를 `stat > dsex_hat` 수식으로 산출해서
+계산한다.
+
+``` {r gender-discrimination-case-study-testing-tidyverse}
+### tidyverse + 컴퓨팅 통계검정
+dsex_hat <- bankstudy %>%
+    group_by(gender) %>%
+    summarize(prob = mean(promote == "yes")) %>%
+    pull(prob) %>% diff()
+
+dsex_null <- bankstudy %>%
+    specify(promote ~ gender, success = "yes") %>%
+    hypothesize(null = "independence") %>%
+    generate(reps = 1000, type = "permute") %>%
+    calculate(stat = "diff in props", order = c("male", "female"))
+
+ggplot(dsex_null, aes(x = stat)) +
+    geom_density(bw=0.05) +
+    geom_vline(xintercept = dsex_hat, color="red") +
+    scale_x_continuous(limits = c(-0.5, 0.5))
+
+dsex_null %>%
+    summarize(mean(stat > dsex_hat)) %>%
+    pull() * 2 
+```
+
+## 신뢰구간 {#r-gender-case-study-testing-tidyverse-ci}
+
+`generate()` 함수의 `type`을 `permute`에서 `bootstrap`으로 바꾸고, `hypothesize()`를 제거해서
+부츠트랩 표본을 산출해서 신뢰구간을 산출한다.
+
+
+``` {r gender-discrimination-case-study-testing-tidyverse-ci}
+## 1.4. 신뢰구간 -----
+### tidyverse + 컴퓨팅
+dsex_boot <- bankstudy %>%
+    specify(promote ~ gender, success = "yes") %>%
+    generate(reps = 1000, type = "bootstrap") %>%
+    calculate(stat = "diff in props", order = c("female", "male"))
+
+c(lower = dsex_hat - 2 * sd(dsex_boot$stat), 
+  upper = dsex_hat + 2 * sd(dsex_boot$stat))
+
+
+### 전통적 방식
+# n <- nrow(bankstudy)
+# dsex_prop <- bankstudy %>%
+#     group_by(gender) %>%
+#     summarize(prob = mean(promote == "yes")) %>%
+#     pull(prob)
+# 
+# prop.test(x=c(dsex_prop[2], dsex_prop[1]) * n, n = c(n, n),  alternative = "two.sided", correct=FALSE) %>% 
+#     broom::tidy()
+```
+
+# 신약효과 사례연구 {#r-drug-case-study}
+
+`http://bit.ly/2mDUX9K` 사이트에서 `infer` 팩키지 사례로 자주 언급되는 신약효과 데이터를 다운로드 받는다.
+신약효과 사례연구는 실험군과 대조군간의 신약효과가 있는지를 검정하는 `t-검정`의 사례로 사용된다.
+
+``` {r drug-case-study}
+# 2. 신약 효과 -----
+## 1.1. 데이터 -----
+load(url("http://bit.ly/2mDUX9K"))
+```
+
+## 탐색적 데이터 분석 {#r-drug-case-study-eda}
+
+신약효과 데이터는 범주형 변수 1개와 연속형변수 1개로 구성되고, `r nrow(drugstudy)`행으로 구성되어 있어,
+기술통계량 비율도 뽑아보고, `ggplot`으로 시각화해서 데이터와 친숙해진다.
+
+``` {r drug-case-study-eda}
+## 1.2. EDA -----
+### 시각화
+ggplot(drugstudy, aes(x = time, fill = group)) +
+    geom_dotplot()
+
+### 기술통계량
+drugstudy %>% 
+    group_by(group) %>% 
+    summarise(mean(time))
+```
+
+## 통계적 검정 {#r-drug-case-study-testing}
+
+실험군과 대조군간에 신약효과가 없다는 귀무가설($H_0$)을 설정하고 나서 이를 전통적인 방식으로 
+`t.test()` 함수를 사용해서 통계검정한다. `infer` 팩키지 `t.test()` 함수를 사용해서 
+`tidvyerse` 방식으로 깔끔하게 통계적 검정을 수행하는 것도 가능하다.
+
+``` {r drug-case-study-testing}
+## 1.3. 통계적 검정 -----
+### 기본 통계검정
+g1 <- drugstudy %>% 
+    filter(group == "treatment") %>% 
+    select(time) %>%  pull
+
+g2 <- drugstudy %>% 
+    filter(group == "control") %>% 
+    select(time) %>%  pull
+
+t.test(g1, g2, conf.level = 0.95, alternative = "two.sided")
+
+### tidyverse 통계검정
+drugstudy %>% 
+    t_test(time ~ group)
+```
+
+## tidyverse + 컴퓨팅 통계검정 {#r-drug-case-study-testing-tidyverse}
+
+`infer` 팩키지를 활용하여 실험군과 대조군간에 대한 차이(`drug_diff_hat`)를 계산해서 기록해 둔다.
+그리고 나서, 실험군과 대조군간 신약효과가 없다는 귀무가설을 따르는 분포를 가정하고 실험군과 대조군간의 신약효과 차이를 
+통계량으로 계산하는 모의실험을 `1,000`회 반복한다. 
+
+`ggplot`으로 시각화하고, `p-값`을 귀무가설을 따르는 통계량과 실험군과 대조군간의 신약효과 차이를 `stat > drug_diff_hat` 수식으로 산출해서
+계산한다.
+
+``` {r drug-case-study-testing-tidyverse}
+### tidyverse + 컴퓨팅 통계적 검정
+drug_diff_hat <- drugstudy %>%
+    group_by(group) %>%
+    summarize(xbar = mean(time)) %>%
+    pull(xbar) %>%
+    diff()
+
+drug_null <- drugstudy %>%
+    specify(time ~ group) %>%
+    hypothesize(null = "independence") %>%
+    generate(reps = 1000, type = "permute") %>%
+    calculate(stat = "diff in means", order = c("treatment", "control"))
+
+ggplot(drug_null, aes(x = stat)) +
+    geom_density() +
+    geom_vline(xintercept = drug_diff_hat, color="red")
+
+drug_null %>%
+    summarize(mean(stat > drug_diff_hat)) %>%
+    pull() * 2
+```
+
+## 신뢰구간 {#r-drug-case-study-testing-tidyverse-ci}
+
+`generate()` 함수의 `type`을 `permute`에서 `bootstrap`으로 바꾸고, `hypothesize()`를 제거해서
+부츠트랩 표본을 산출해서 신뢰구간을 산출한다.
+
+
+``` {r drug-case-study-testing-tidyverse-ci}
+## 1.4. 신뢰구간 -----
+drug_boot <- drugstudy %>%
+    specify(time ~ group) %>%
+    generate(reps = 1000, type = "bootstrap") %>%
+    calculate(stat = "diff in means", order = c("treatment", "control")) 
+
+c(lower = drug_diff_hat - 2 * sd(drug_boot$stat), 
+  upper = drug_diff_hat + 2 * sd(drug_boot$stat))
+```
+
