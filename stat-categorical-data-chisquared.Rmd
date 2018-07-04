@@ -1,0 +1,172 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 교차표 - $\chi^2$ 검정
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_float: true
+    number_section: true
+    highlight: tango
+    code_folding: show
+mainfont: NanumGothic
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+
+# 코딩기반 범부형 데이터 분석 {#stat-categorical-data-analysis}
+
+코딩기반 통계적 추론을 살펴보자. 범주형 데이터의 가장 기본은 **비율(Proportion, $p$)**부터 시작한다.
+성별을 얘기할 때, 남성과 여성의 비율이 대표적일 수 있다.
+미국의 `GSS(General Socail Survey)`에 견주는 대한민국 [한국복지패널 데이터](https://www.koweps.re.kr:442/main.do)를 
+얻을 수 있는데, `stata`, `spss`, `sas` 등 상용통계팩키지에 의존성이 있어 이를 R과 같은 오픈소스 소프트웨어에서 작업할 경우
+`haven` 팩키지를 동원해야 한다. 그리고 상당량의 변환작업과정과 데이터사전을 보고 일일이 데이터와 대조하는 과정을 거쳐야 한다.
+
+그래서 `forcats` 팩키지에 내장되어 있는 `gss_cat` 범주형 데이터를 가지고 작업을 진행한다.
+
+
+# 교차표 $\chi^2$ 검정 [^data-science-plus-chi] [^chi-squared-infer] {#stat-categorical-data-chisquared}
+
+[^data-science-plus-chi]: [Chi-Squared Test– The Purpose, The Math, When and How to Implement?](https://datascienceplus.com/chi-squared-test-in-r/)
+
+[^chi-squared-infer]: [Chester Ismay(2018-05-14), Chi-squared test example using nycflights13 flights data](https://cran.r-project.org/web/packages/infer/vignettes/chisq_test.html)
+
+## 탐색적 데이터 분석 {#stat-categorical-data-chisquared-eda}
+
+인종(`race`)에 따라 혼인상태(`marital`)가 관계가 있는지 살펴보기 위해서 
+교차표(crosstabulation), 막대그래프를 그려서 시각적으로 기술통계량으로 확인한다.
+
+``` {r stat-categorical-data-chisquared, fig.width=9}
+# 0. 환경설정 -----
+library(infer)
+library(tidyverse)
+library(cowplot)
+library(extrafont)
+loadfonts()
+
+# 1. 데이터 -----
+## 1.1. 데이터 정제작업 -----
+gss_cat_df  <- gss_cat %>% 
+    filter(year==2014) %>% 
+    mutate(marital = fct_lump(marital, 1),
+           race = fct_lump(race, 1)) %>% 
+    mutate(marital = fct_recode(marital, Non_Married = "Other"),
+           race    = fct_recode(race, Non_White = "Other"))
+
+## 1.2. 교차표 -----
+gss_cat_df %>% 
+    count(marital, race) %>% 
+    spread(marital, n)
+
+## 1.3. 시각화 -----
+marital_orig_g <- gss_cat_df %>% 
+    ggplot(aes(x=race, fill=marital)) +
+      geom_bar() +
+      theme(legend.position = "none")
+
+marital_fill_g <- gss_cat_df %>% 
+    ggplot(aes(x=race, fill=marital)) +
+    geom_bar(position = "fill")
+
+plot_grid(marital_orig_g, marital_fill_g)
+```
+
+## 교차표 $\chi^2$ 검정 - 기존 방식 {#stat-categorical-data-chisquared-testing}
+
+`chisq.test()` 함수를 통해서 혼인상태와 인종간의 차이를 검정할 수 있다.
+작성된 `chisq.test()`함수도 오래되었고, 여러사람에 의해 저작되다 보니, 문법에 일관성도 없고 
+사용법도 제각기다. 
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "blue">
+
+
+- 잘못된 사례
+    - `chisq.test(data = car_stop, x = stop_type, y = vehicle_type)`
+    - `chisq.test(data = car_stop, formula = vehicle_type ~ stop_type)`
+
+</div>
+
+상기 어려움을 극복하고 최종적으로 `데이터프레임$변수명` 다음 문법에 따라 `chisq.test()` 함수를 넣어 
+돌리면 쉽게 어려움이 극복된다. 
+
+더불어 tidyverse 방식에서 널리 쓰이는 `broom` 팩키지를 통계적 추론에 도입하여 `infer` 팩키지에서 
+제공하는 `chisq_test()` 함수를 사용해도 가능하다. 
+
+
+``` {r stat-categorical-data-chisquared-testing}
+## 2. 통계검정 -----
+### 2.1. Base 함수 
+chisq.test(gss_cat_df$marital, gss_cat_df$race)
+
+### 2.2. tidyverse 방식
+gss_cat_df %>% 
+    infer::chisq_test(formula = marital ~ race)
+```
+
+## 교차표 $\chi^2$ 검정 - 컴퓨팅 방식 {#stat-categorical-data-chisquared-testing-computing}
+
+컴퓨팅 방식을 사용하면 하나의 프레임워크 내에 이를 담아낼 수 있다.
+`specify()`에 공식을 입력한다. 범주형 변수 수준이 2개인 경우 `success=`에서 범주 수준을 지정한다.
+`calculate()`에는 설명변수(`race`)의 수준을 적시한다.
+그리고 `visualize()` 함수를 통해서 시각화도 가능하고 `summarize()` 함수로 `p-값`도 산출이 가능하다.
+
+``` {r stat-categorical-data-chisquared-testing-computing}
+## 3. 코딩기반 통계 검정 -----
+### 3.1. 관측점 통계량
+obs_chisq <- gss_cat_df %>% 
+    infer::chisq_test(formula = marital ~ race) %>% 
+    select(statistic) %>% 
+    pull()
+
+### 3.2. 귀무가설 통계량
+chisq_null <- gss_cat_df %>%
+    specify(marital ~ race, success = "Married") %>%
+    hypothesize(null = "independence") %>%
+    generate(reps = 1000, type = "permute") %>%
+    calculate(stat = "Chisq", order=c("White", "Non_White"))
+
+chisq_null %>% visualize(obs_stat = obs_chisq, direction = "greater")
+
+### 3.3. p-값 계산
+chisq_null %>% 
+    summarize(p_value = mean(stat >= obs_chisq)) %>% 
+    pull()
+```
+
+## 교차표 $\chi^2$ 검정 시각화 - 컴퓨팅 방식 {#stat-categorical-data-chisquared-testing-computing-viz}
+
+이론으로부터 도출된 귀무가설 통계량 분포를 컴퓨팅 방식으로 산출한 통계량과 겹쳐서 시각화도 가능하다. 
+
+``` {r stat-categorical-data-chisquared-testing-computing-viz, fig.width=10}
+### 3.4. 이론 분포
+gss_chisq_g <- gss_cat_df %>%
+    specify(marital ~ race, success = "Married") %>%
+    hypothesize(null = "independence") %>%
+    # generate(reps = 1000, type = "permute") %>%
+    calculate(stat = "Chisq", order=c("White", "Non_White")) %>% 
+    visualize(method = "theoretical", obs_stat = obs_chisq, direction = "right") +
+        labs(title="이론적인 카이제곱 귀무가설 분포") +
+        theme_bw(base_family = "NanumGothic")
+    
+### 3.5. 두 그래프 겹치기
+gss_chisq_gg <- gss_cat_df %>%
+    specify(marital ~ race, success = "Married") %>%
+    hypothesize(null = "independence") %>%
+    generate(reps = 1000, type = "permute") %>%
+    calculate(stat = "Chisq", order=c("White", "Non_White")) %>% 
+    visualize(method = "both", obs_stat = obs_chisq, direction = "right") +
+        labs(title="이론+컴퓨팅 카이제곱 귀무가설 분포", x="") +
+        theme_bw(base_family = "NanumGothic")
+
+plot_grid(gss_chisq_g, gss_chisq_gg, nrow=1)
+```
+
