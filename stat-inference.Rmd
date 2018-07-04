@@ -4,13 +4,12 @@ title: 데이터 과학 -- 기초 통계
 subtitle: 코딩 기반 통계적 추론(Statistical Inference)
 output:
   html_document: 
+    theme: journal
     toc: yes
+    toc_float: true
+    number_section: true
     highlight: tango
-    code_folding: hide
-    css: css/swc.css
-  pdf_document:
-    latex_engine: xelatex
-mainfont: NanumGothic
+    code_folding: show
 ---
 
 ``` {r, include=FALSE}
@@ -25,14 +24,22 @@ loadfonts()
 ```
 
 
-## 1. 코딩을 통한 통계가설 검정 [^allen-downey-test]  {#computer-age-statistical-inference}
+# 코딩을 통한 통계가설 검정 [^allen-downey-test]  {#computer-age-statistical-inference}
 
 [^allen-downey-test]: [Allen Downey (2016), There is still only one test](http://allendowney.blogspot.kr/2016/06/there-is-still-only-one-test.html)
 
 컴퓨터가 활발히 사용되기 전에 통계적 검정에 대한 필요성은 과거에도 존재했다. 하지만, 그 당시에는 컴퓨터가 너무 희귀한 자원이고 
 컴퓨터를 잘 다둘 수 있는 사람도 극도로 적었기 때문에 수학을 바탕으로한 통계적 추론 방법(Analytic Method)이 발달했지만 여전히 진입장벽은 높기만 했다.
 
-### 1.1. 통계적 가설검정 [^wiki-statistical-testing] {#computer-age-statistical-inference}
+하지만, 수많은 연구자들과 개발자의 기여로 코딩을 통해서 직관적으로 다양한 통계가설 검정을 할 수 있는 시대가 열리고 있다.
+[`infer`](https://cran.r-project.org/web/packages/infer/) 팩키지에 최근 기능이 많이 추가되고 있어 이에 대한 기대가 크다.
+
+기본적으로 모집단에 대해 알고자 하는 경우 표본을 추출하여 이를 기반으로 모집단에 대한 추론을 한다.
+뽑혀진 표본에 대해서 컴퓨팅 기술을 활용하여 재표본추출을 반복하여 모집단에 대해 추론을 하는 방법에 대해 주로 살펴보자.
+
+<img src="fig/sampling-inference.png" alt="표본추출과 추론" width="100%" />
+
+## 통계적 가설검정 [^wiki-statistical-testing] {#computer-age-statistical-inference}
 
 [^wiki-statistical-testing]: [위키 백과 - 가설 검정](https://ko.wikipedia.org/wiki/%EA%B0%80%EC%84%A4_%EA%B2%80%EC%A0%95)
 
@@ -50,14 +57,12 @@ loadfonts()
 
 통계적 가설검정(Statistical Testing)은 기존 통계학 전공자의 전유물이었으나, 
 컴퓨터의 일반화와 누구나 코딩을 할 수 있는 현재(`r Sys.Date()`)는 더 이상 기존 통념이 통용되지는 않게 되었다. 
-특히 [파이썬](https://www.python.org/) 진영에서 이런 움직임이 활발하다. 그렇다고 [R](https://www.r-project.org/) 진영에서도 기존의 방식을 고수하는 것은 아니다. 
+특히 [파이썬](https://www.python.org/) 진영에서 이런 움직임이 
+활발하다. 그렇다고 [R](https://www.r-project.org/) 진영에서도 기존의 방식을 고수하는 것은 아니다. 
 
+## tidyverse 가설검정 [^tidyverse-manifesto] {#computer-age-statistical-inference}
 
-|      Allen Downey(2011)       |      John Rauser(2014)        |     Jake VanderPlas (2016)    |
-|-------------------------------|-------------------------------|-------------------------------|  
-|<iframe width="300" height="180" src="https://www.youtube.com/embed/S41zQEshs5k" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> |<iframe width="300" height="180" src="https://www.youtube.com/embed/5Dnw46eC-0o" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> |<iframe width="300" height="180" src="https://www.youtube.com/embed/-7I7MWTX0gA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> |
-
-### 1.2. 통계 가설 검정 구현 {#computer-age-statistical-inference-language}
+[^tidyverse-manifesto]: [Hadley Wickham(2017-11-13), The tidy tools manifesto](https://cran.r-project.org/web/packages/tidyverse/vignettes/manifesto.html)
 
 데이터 과학을 이끌어 나가는 있는 R과 파이썬 진영의 현재 주도적인 흐름을 살펴보자. 
 우선 다소 차이가 있지만, `for` 반복루프를 이해하고 이를 코드로 구현할 수만 있다면 컴퓨터를 활용한 가설검정이 가능한 것은 사실이다.
@@ -68,12 +73,38 @@ loadfonts()
 코딩기반 가설검정은 우선 데이터로부터 시작된다. 데이터를 컴퓨터의 기능을 활용하여 모의실험 표본을 생성하고 나서 귀무가설($H_0$) 모형에서 검정통계량을 추출하여 
 이를 바탕으로 $p-값$을 계산하여 의사결정을 추진한다.
 
-## 2. 맥주를 마시는 성인은 모기에게 매력적으로 보일까? [^beer-mosquitoes] {#mosquitoes-love-beer-drinkers}
+
+|      Allen Downey(2011)       |      John Rauser(2014)        |
+|-------------------------------|-------------------------------|
+|<iframe width="300" height="180" src="https://www.youtube.com/embed/S41zQEshs5k" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> | <iframe width="300" height="180" src="https://www.youtube.com/embed/5Dnw46eC-0o" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> |
+
+|     Jake VanderPlas (2016)    |  **Andrew Bray and Chester Ismay(2018)** |
+|-------------------------------|------------------------------------------|  
+|<iframe width="300" height="180" src="https://www.youtube.com/embed/-7I7MWTX0gA" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> | <iframe width="300" height="180" src="https://www.youtube.com/embed/kTGtgO2WcAw" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe> |
+
+통계검정에도 `tidyverse`를 반영하고 `Allen Downey` 교수가 주창한 통계검정 프레임워크를 도입하여 
+극단적으로 말하며 딥러닝 모형이 거의 모든 통계, 기계학습 모형을 통일해 나가듯이 다양한 통계검정에 대해서도 비숫한 위치를 점할 것으로 예측된다.
+
+## 가설검정과 신뢰구간 {#computer-age-statistical-inference-ho-ci}
+
+`infer` 팩키지는 `tidyverse` 철학(?)에 따라 가설검정과 신뢰구간을 추정하는 목적으로 개발되었다.
+크게 통계적 추론은 가설검정과 신뢰구간 추정이 주된 작업이다. 이를 위해서 5가지 동사(verb)를 새로 익혀야 한다.
+
+- `specify()`
+- `hypothesize()`
+- `generate()`
+- `calculate()`
+- `visualize()`
+
+<img src="fig/infer_framework.png" alt="가설검정과 신뢰구간" width="100%" />
+
+
+# 사례: 맥주를 마시는 성인은 모기에게 매력적으로 보일까? [^beer-mosquitoes] {#mosquitoes-love-beer-drinkers}
 
 [^beer-mosquitoes]: [Lefèvre, Thierry, et al. “Beer consumption increases human attractiveness to malaria mosquitoes.” PloS one
 5.3 (2010): e9546. http://dx.doi.org/10.1371/journal.pone.0009546](http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0009546)
 
-### 2.1. 가설검정 환경설정 {#mosquitoes-love-beer-drinkers-setup}
+## 가설검정 환경설정 {#mosquitoes-love-beer-drinkers-setup}
 
 데이터 전처리와 시각화, 한글설정을 위한 팩키지를 준비한다.
 특히 `infer` 코딩기반 가설검정을 위해 필수적인 팩키지로 활용하는데 기본적인 사용방법은 `mtcars`, `flights` 데이터를 활용한 사례를 살펴본다.
@@ -99,7 +130,7 @@ beer_df <- beer_dat %>%
     mutate(treatment = factor(treatment, levels = c("beer", "water"), labels=c("맥주", "맹물"))) 
 ```
 
-### 2.2. 탐색적 데이터 분석 {#mosquitoes-love-beer-drinkers-eda}
+## 탐색적 데이터 분석 {#mosquitoes-love-beer-drinkers-eda}
 
 탐색적 데이터 분석을 통해서 말라리아 모기가 맥주를 마신 사람과 맹물을 마신 사람 어디에 더 많이 접근을 하는지 개체수 차이를 살펴본다.
 평균적으로 4.38 모기개체수 만큼 차이가 나는데 이런 차이가 우연에 의한 것인지 아니면 맥주가 더 모기에게 섹시하게 반응하는 역할을 하기 때문인지 살펴본다.
@@ -144,12 +175,12 @@ beer_boxplot_g <- ggplot(data = beer_df, mapping = aes(x = treatment, y = count,
 grid.arrange(beer_density_g, beer_boxplot_g, nrow=2)
 ```
 
-### 2.3. 의사결정 - 가설검정 {#mosquitoes-love-beer-drinkers-infer}
+## 의사결정 - 가설검정 {#mosquitoes-love-beer-drinkers-infer}
 
 맥주를 마신 집단과 맹물을 마신 집단간에 평균적으로 4.38 모기개체수 만큼 차이가 나는데 
 이런 차이가 유의적인지 전통적인 t-검정과 코딩기반 모의실험을 통해서 살펴보자.
 
-#### 2.3.1. 전통적인 t-검정 {#mosquitoes-love-beer-drinkers-infer-ttest}
+### 전통적인 t-검정 {#mosquitoes-love-beer-drinkers-infer-ttest}
 
 t-검정 결과 유의적인 차이가 나타나느 것으로 나타난다. p-값이 무척이나 작게 나온다.
 
@@ -159,7 +190,7 @@ t-검정 결과 유의적인 차이가 나타나느 것으로 나타난다. p-�
 t.test(count ~ treatment, beer_df, null = 0, var.equal = TRUE, alternative="greater")
 ```
 
-#### 2.3.1. 코딩기반 t-검정 {#mosquitoes-love-beer-drinkers-infer-computer}
+### 코딩기반 t-검정 {#mosquitoes-love-beer-drinkers-infer-computer}
 
 코딩기반 t-검정은 다음 절차를 통해 준비한다.
 
