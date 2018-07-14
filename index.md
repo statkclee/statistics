@@ -37,6 +37,7 @@ title: 데이터 과학 -- 기초 통계
     - [교차표 - $\chi^2$ 검정](stat-categorical-data-chisquared.html)
     - [tidyverse 통계적 추론 사례](stat-tidyverse-inference.html)
 1. [실험 유형 구분](stat-coursera-doe.html)
+    + [일원배치 분산분석(Anova) - 타이어 브랜드별 연비](stat-tire-anova.html)
     + [A/B 검정(A/B Testing)](stat-ab-testing.html)
     + [실무에서 자주 활용되는 검정($t$-검정)](stat-testing.html)
     + [A/B 검정 -- A안 혹은 B안 선정](ab-testing-in-practice.html)
