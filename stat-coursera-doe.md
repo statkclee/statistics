@@ -1,9 +1,22 @@
-# 데이터 과학 -- 기초 통계
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 실험 유형 구분
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_float: true
+    highlight: tango
+    section_number: true
+    code_folding: show
+mainfont: NanumGothic
+---
 
 
 
 
-## 1. 실험과 관찰 [^coursera-doe]
+# 실험과 관찰 [^coursera-doe]
 
 [^coursera-doe]: [Designing, Running, and Analyzing Experiments](https://www.coursera.org/learn/designexperiments)
 
@@ -22,12 +35,21 @@
 
 <iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fjaekwang.kim.125%2Fposts%2F1856505211031977&width=500" width="500" height="382" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true"></iframe>
 
-1. 의학적 지식은 종종 업데이트 된다. 술이 몸에 나쁘다고 했다가 한두잔은 괜찮다고 했다가 또 그것 틀렸다고 했다가 자꾸 바뀐다. 또 물도 많이 먹는게 좋다고 했다가 아니라고 했다가 자꾸 헷갈리게 한다. 왜 그럴까?
-1. 두가지 이유를 생각해 볼수 있는데 하나는 관찰연구의 한계이다. 인간을 대상으로는 통제된 실험을 하기 어렵다. (인권 문제 등등 때문에.) 따라서 많은 결론들이 실험이 아닌 관찰 연구 (observational study)를 통해서 얻어지기 때문에 관찰 연구의 한계가 적용된다. 관찰 연구로는 원칙적으로 인과 관계를 규명하는 것이 불가능하다. (그때문에 논문이 자꾸 나올수 있는지도 모르겠다.)
-1. 다른 또 하나의 이유는 인간의 생물학적 다양성 때문이다. 인간으로부터 얻어지는 자료는 물리적 자료와는 근본적인 차이가 있는데 그건 같은 인간 종족 내에서도 엄청난 다양성이 있다는 것이다. 기계에서 얻어지는 물리적 자료는 기본적으로 동질적이다. (이는 물리학이나 공대에서 통계학을 우습게 보는것과도 연결되어 있다. physical 한 물질을 대상으로 하는 자료는 샘플링이 필요없다. 자료가 어차피 동질적이므로. ) 하지만 생물학 자료는 그렇지 않다. 똑같은 부모 밑에서도 엄청 다른 자녀가 탄생한다.
-1. 따라서 인간을 대상으로 관찰을 하고 이를 통해 일반화를 하는 모든 지식은 어느 정도 한계가 있다는 것을 감안해서 받아 들어야한다. 측정기술이 발달하면 예전에 맞는 것으로 믿어졌던 이론이 틀린 것으로 밝혀진다. 절대적인 지식이 아니라는 것이다. 뇌과학 이런것도 마찬가지.
+1. 의학적 지식은 종종 업데이트 된다. 술이 몸에 나쁘다고 했다가 한두잔은 괜찮다고 했다가 또 그것 틀렸다고 했다가 자꾸 바뀐다. 
+또 물도 많이 먹는게 좋다고 했다가 아니라고 했다가 자꾸 헷갈리게 한다. 왜 그럴까?
+1. 두가지 이유를 생각해 볼수 있는데 하나는 관찰연구의 한계이다. 
+인간을 대상으로는 통제된 실험을 하기 어렵다. (인권 문제 등등 때문에.) 따라서 많은 결론들이 실험이 아닌 관찰 연구 (observational study)를 통해서 얻어지기 때문에 관찰 연구의 한계가 적용된다. 
+관찰 연구로는 원칙적으로 인과 관계를 규명하는 것이 불가능하다. (그때문에 논문이 자꾸 나올수 있는지도 모르겠다.)
+1. 다른 또 하나의 이유는 인간의 생물학적 다양성 때문이다. 
+인간으로부터 얻어지는 자료는 물리적 자료와는 근본적인 차이가 있는데 그건 같은 인간 종족 내에서도 엄청난 다양성이 있다는 것이다. 
+기계에서 얻어지는 물리적 자료는 기본적으로 동질적이다. (이는 물리학이나 공대에서 통계학을 우습게 보는것과도 연결되어 있다. 
+physical 한 물질을 대상으로 하는 자료는 샘플링이 필요없다. 자료가 어차피 동질적이므로. ) 하지만 생물학 자료는 그렇지 않다. 똑같은 부모 밑에서도 엄청 다른 자녀가 탄생한다.
+1. 따라서 인간을 대상으로 관찰을 하고 이를 통해 일반화를 하는 모든 지식은 어느 정도 한계가 있다는 것을 감안해서 받아 들어야한다. 
+측정기술이 발달하면 예전에 맞는 것으로 믿어졌던 이론이 틀린 것으로 밝혀진다. 절대적인 지식이 아니라는 것이다. 뇌과학 이런것도 마찬가지.
 
-### 1.1. 비율 검정
+
+
+## 비율 검정
 
 | 표본 | 반응 범주 |                     검정                                 |
 |------|-----------|----------------------------------------------------------|
@@ -36,7 +58,7 @@
 | 1이상|   2 이상  | $N$ 표본 $\chi^2$ 검정, G-검정, 피셔의 정확검정      |
 
 
-### 1.2. 분산 분석과 일반화 선형모형
+## 분산 분석과 일반화 선형모형
 
 | 요인  |   수준  | 군간(B)/군내(W) |     모수 검정      |          비모수 검정                 |
 |-------|---------|-----------|--------------------------|--------------------------------------|
@@ -48,37 +70,150 @@
 | 1이상 |  2 이상 | 군간(W)   | 요인 반복측정 분산분석, 선형혼합모형  | Aligned Rank Transform(ART), 일반화선형혼합모형(GLMM)|
 
 
-## 2. 비율 검정
+# 비율 검정
 
-### 2.1. 사용자 선호도(User Preference) 
+## 사용자 선호도(User Preference) 
 
 * 단일 표본 비율 검정(One-Sample Test of Proportions)
 * 단일표본 비율검정 (More One-Sample Tests of Proportions)
 * 이표본 비율검정(Two-Sample Tests of Proportions)
 
 
-### A/B 테스트 -- $t-$검정
+## A/B 테스트 -- $t-$검정
 
 * $t-$검정
 
-### 작업 완수 시간 -- 분산분석
+## 작업 완수 시간 -- 분산분석
 
 * 일원 분산분석 (One-way Analysis of Variance)
     * 군간(Between) 요인 분석
 
-### 사용자 검색 -- 반복 측정
+## 사용자 검색 -- 반복 측정
 
 * 반복측정 분산분석(Repeated Measures ANOVA)
     * 군내(Within) 요인 분석
 
-### 핸드폰 자판 입력 -- 요인 실험 설계 
+## 핸드폰 자판 입력 -- 요인 실험 설계 
 
 * 요인 실험 설계 (Factorial Design of Experiment)
     * 한가지 이상 요인에 대한 실험 설계
 
-### 일반화 선형 (혼합) 모형
+## 일반화 선형 (혼합) 모형
 
 * 일반화 선형 모형(Generalized Linear Models, GLM)
 * 일반화 선형 혼합 모형(Generalized Linear Mixed Models, GLMM)
+
+# 실험의 핵심 구성요소 {#doe-key-component}
+
+실험(Experiment)의 3대 구성요소에는 임의화(Randomization), 반복(Replication), 블록화(Blocking)가 있다.
+
+- 임의화(Randomization): 처리집단에 걸친 외부 효과를 차단하기 위해서 관심을 갖는 결과값의 변동성을 동일하게 배분한다. 
+    - 이중 맹검 의학실험 (double blind trial)
+    - 신약 개발에서 환자나 의사나 어느 집단에 배정되는지 알지 못하게 함.
+    - 제3자가 배정되는 그룹을 지정
+- 반복(Replication): 변동성을 충분히 잴 수 있도록 실험을 반복해야 함.
+    - 환자 1명에게 신약효과를 추정하는 실험을 하다면, 해당 신약에 대한 일반화를 할 수 있는 방법은 없음.
+- 블록화(Blocking): 처리집단을 유사하게 함으로써 변동성을 제어하는데 도움이 됨.
+    - 그룹내에는 차이가 적어야 하고, 그룹간에는 차이가 커야한다.
+    - 성별이나 연령대를 기준으로 블록
+
+# 검정력과 표본 크기 [^pwr-vignette] {#doe-power-sample-size}
+
+[^pwr-vignette]: [Clay Ford(2018-03-03), Getting started with the pwr package](https://cran.r-project.org/web/packages/pwr/vignettes/pwr-vignette.html)
+
+검정력과 효과크기, 표본크기는 실험 계량화를 위해 필수적으로 동원되는 기초개념이다.
+
+- 검정력(power): 대립가설이 사실일 때 귀무가설을 올바르게 기각할 확률
+- 효과크기(effect size): 탐지하고자 하는 차이에 대한 표준측도.
+- 표본크기: 지정한 검정력으로 지정한 차이를 탐지하고자 할 때 필요한 실험횟수.
+
+이를 위해서 `pwr` 팩키지를 사용한다. 사용법이 다른 팩키지와 다른데 일반적으로 `pwr` 팩키지를 통해서 검정력, 효과크기, 표본크기를 계산하고자 
+다음 다양한 검정 함수에 매개변수로 해당 매개변수를 빼고 넘기게 된다.
+예를 들어, 검정력(power)을 계산하고자 하면 `power` 매개변수를 빼고 나머지 매개변수를 채워 넣으면 겸정력이 계산되어 나온다.
+산출하고자 검정력, 효과크기, 표본크기를 고르고 나서 수행하고자 하는 검정에 대한 함수를 선정하는 과정을 거친다.
+
+- `pwr.p.test`: 일표본 비율검정(one-sample proportion test)
+- `pwr.2p.test`: 이표본 비율검정(two-sample proportion test)
+- `pwr.2p2n.test`: (표본크기 다른) 이표본 비율검정(two-sample proportion test (unequal sample sizes))
+- `pwr.t.test`: t-검정(two-sample, one-sample and paired t-tests)
+- `pwr.t2n.test`: (표보크기 다른 t-검정(two-sample t-tests (unequal sample sizes))
+- `pwr.anova.test`: 일원배치 분산분석(one-way balanced ANOVA)
+- `pwr.r.test`: 상관검정(correlation test)
+- `pwr.chisq.test`: 카이검정(chi-squared test (goodness of fit and association))
+- `pwr.f2.test`: 일반화 선형모형 검정(test for the general linear model)
+
+각 검증별 일반적인 효과크기 산출표
+
+Test                        | `small` | `medium` | `large`
+----------------------------|-------|--------|-------
+tests for proportions (`p`) | 0.2   | 0.5    | 0.8
+tests for means (`t`)       | 0.2   | 0.5    | 0.8
+chi-square tests (`chisq`)  | 0.1   | 0.3    | 0.5
+correlation test (`r`)      | 0.1   | 0.3    | 0.5 
+anova (`anov`)              | 0.1   | 0.25   | 0.4 
+general linear model (`f2`) | 0.02  | 0.15   | 0.35 
+
+## 동전 던지기 비율검정 {#doe-power-coin}
+
+공정한 동전이라면 앞면이 나올 확률이 0.5 즉, $p=0.5$가 된다. 그런데 대립가설로 0.75가 나오는 동전을 검정력 0.8로 잡고
+귀무가설을 기각하는데 동전을 얼마나 던져야 할까?
+일표본 비율검정 `pwr.p.test()` 함수로 잡고, 귀무가설과 대립가설을 각각 설정하고 $\alpha=0.05$, 검정력 `power = 0.8`,
+대립가설은 `alternative = "greater"`으로 지정하면 빠진 표본크기가 산출된다.
+`plot` 함수를 통해 표본크기와 검정력에 대한 시각화도 가능하다.
+
+
+~~~{.r}
+library(pwr)
+~~~
+
+
+
+~~~{.output}
+Error in library(pwr): there is no package called 'pwr'
+
+~~~
+
+
+
+~~~{.r}
+coin_pwr <- pwr.p.test(h = ES.h(p1 = 0.75, p2 = 0.50), 
+           sig.level = 0.05, 
+           power = 0.80, 
+           alternative = "greater")
+~~~
+
+
+
+~~~{.output}
+Error in pwr.p.test(h = ES.h(p1 = 0.75, p2 = 0.5), sig.level = 0.05, power = 0.8, : 함수 "pwr.p.test"를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
+coin_pwr
+~~~
+
+
+
+~~~{.output}
+Error in eval(expr, envir, enclos): 객체 'coin_pwr'를 찾을 수 없습니다
+
+~~~
+
+
+
+~~~{.r}
+plot(coin_pwr) +
+  labs(x="표본크기", y= "검정력")
+~~~
+
+
+
+~~~{.output}
+Error in plot(coin_pwr): 객체 'coin_pwr'를 찾을 수 없습니다
+
+~~~
 
 
