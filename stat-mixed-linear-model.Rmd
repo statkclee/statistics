@@ -1,0 +1,88 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 계층적 혼합 선형모형(hierarchical & mixed linear model)
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_float: true
+    highlight: tango
+    code_folding: show
+mainfont: NanumGothic
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+```
+
+
+# 계층 모형(Hierarchical Model) {#hierarchical-model}
+
+계층모형(Hierarchical Model)을 고려해야 되는 상황은 데이터 자체의 생성과정 뿐만 아니라 최근 기계학습 모형 개발단계에서도 흔히 관측된다.
+각 관측점이 그룹(group)으로 묶여지는 경우는 계층형 혹은 중첩구조도 있지만, 종적(longitudinal)인 경우와 공간적(spatial)인 경우도 망라되어 
+정말 다양하다.
+
+- 데이터 자체가 중첩되는 경우
+- 작은 표본을 합동(pooling)하는 경우
+- 집단이나 개인을 반복적으로 측정하는 경우
+- 종적(longitudinal)인 경우와 공간적(spatial)인 경우
+- 기계학습 모형을 부츠트랩 혹은 $k-fold$ 교차검증표본을 추출하여 모형성능을 평가하는 경우.
+
+임의효과(random effect) 모형이 이와 같은 그룹 구조를 갖는 데이터를 모형화하는 일반적이고 편리한 방법이다.
+계층 모형에 대해서 다른 명칭으로 회자되는데 사례를 들면 다음과 같다.
+
+- 반복적인 표본 추출: 쌍체 t-검정(paired t-test), 반복측정(Repeated Measure)
+- 계층 모형: 중첩 모형(nested model), 다수준 모형(multi-level model)
+- 회귀모형 프레임워크 
+    - 임의효과 모형(random effect model) vs. 고정효과(fixed effect model)
+    - Generalized Linear Mixed-effect Model(GLMM)
+    - Linear mixed-effect regression (lmer)
+
+계층모형이 유용할 수 있는 한가지 사례를 들며, 신약을 개발할 때 관심있는 것은 신약의 효과에 영향을 미치는 요인이지,
+실험에 뽑힌 피시험자 표본은 아니다. 이런 상황에서 신약의 요인은 고정효과(fixed effect), 피시험자는 임의효과(random effect)로 
+놓게 되는데 피시험자는 사실 모집단에서 뽑힌 하나의 임의표본에 불과하기 때문이다.
+
+# 혼합 모형 수식 {#hierarchical-model-math}
+
+[^lme4-syntax]: [R lmer cheat sheet](https://stats.stackexchange.com/questions/13166/rs-lmer-cheat-sheet/13173#13173)
+
+혼합효과(mixed effect)는 고정효과와 임의효과를 모두 갖는 모형을 지칭한다. 가장 간단한 사례가 이원배치 분산분석(two-way ANOVA)를 들 수 있다.
+
+$$y_{ijk} = \mu + \tau_i + \nu_j + \epsilon_{ijk}$$
+
+여기서 $\mu + \tau_i$는 고정효과, $\nu_j$는 독립적이고 동일한 분포 $N(0,\sigma_{\nu}^{2})$을 따르고, 마찬가지로 $\epsilon_{ijk}$는 $N(0,\sigma^{2})$을 동일하게 따른다.
+실제로 하고자하는 바는 $\tau_i$를 추정하여 귀무가설 $H_0 : \tau_i = 0$을 검정하고자 하는데 
+$\sigma_{\nu}^{2}$을 추정하고 $H_0 : \sigma_{\nu}^{2}$ 귀무가설도 검정도 동시 진행해야 한다.
+
+# 모형 공식 [^lme4-syntax] {#hierarchical-model-formula}
+
+일반적인 공식을 표현하는 방법은 `종속변수(dependent) ~ 독립변수(independent) | 그룹변수(grouping)`으로 
+표현하는데 `그룹변수(grouping)`는 임의효과(random factor)가 된다.
+요인들간 `+` 표시는 교호작용(interaction)이 없다고 가정하고, `*`은 교호작용을 표현한다.
+
+임의요인(random factor)에 대해서 다음 세가지 변종이 존재한다; 
+
+1. 임의 요인으로 절편만: `(1 | random.factor)`
+1. 임의 요인으로 기울기만: `(0 + fixed.factor | random.factor)`
+1. 임의 요인으로 기울기와 절편: `(1 + fixed.factor | random.factor)`
+
+- `lme4` 모델공식 구문:
+    1. $Y_{si} = \beta_0 + \beta_{1}X_{i} + e_{si}$
+        - 혼합효과모형(mixed-effects model)이 아님.
+    1. $Y_{si} = \beta_0 + S_{0s} + \beta_{1}X_{i} + e_{si}$
+        - `Y ∼ X+(1|Subject)`
+    1. $Y_{si} = \beta_0 + S_{0s} +  (\beta_{1} + S_{1s})Xi + e_{si}$            
+        - `Y ∼ X+(1 + X|Subject)`
+    1. $Y_{si} = \beta_0 + S_{0s} + I_{0i} +  (\beta_{1} + S_{1s})Xi + e_{si}$   
+        - `Y ∼ X+(1 + X|Subject)+(1|Item)`
+    1. $Y_{si} = \beta_0 + S_{0s} + I_{0i} + \beta_{1}X_{i} + e_{si}$            
+        - `Y ∼ X+(1∣Subject)+(1∣Item)`
+    1. (4)와 동일하지만, $S_{0s}$와 $S_{1s}$은 독립
+        - `Y ∼ X+(1∣Subject)+(0 + X|Subject)+(1|Item)`
+    1. $Y_{si} = \beta_0 + I_{0i} +  (\beta_{1} + S_{1s})Xi + e_{si}$            
+        - `Y ∼ X+(0 + X|Subject)+(1|Item)`
+
+
