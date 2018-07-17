@@ -1,0 +1,78 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 설문조사 기초
+output:
+  html_notebook: 
+    theme: journal
+    toc: yes
+    toc_float: true
+    number_section: true
+    highlight: tango
+    code_folding: show
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE)
+
+
+```
+
+
+# 밀린 병원비 [^survey-elementary-sampling] {#밀린_병원비_추정}
+
+[^survey-elementary-sampling]: [Richard L. Scheaffer, III  William Mendenhall, R. Lyman Ott, Kenneth G. Gerow - "Elementary Survey Sampling"](https://www.amazon.com/Elementary-Survey-Sampling-Richard-Scheaffer/dp/0840053614)
+
+모집단이 1,000명($N=1,000$) 환자 중에서 임의표본추출로 200명($n=200$)을 뽑았다.
+병원에 484계정($N=484$) 중에서 9계정($n=9$)을 임의표본추출 방식으로 뽑아서, 평균적으로 얼마의 병원비가 밀렸는지 추정하고자 한다.
+이를 위해서 표본 9명을 뽑아서 밀린 평균 병원비를 조사해 보니 다음과 같다.
+
+```{r hosp-survey}
+library(tidyverse)
+hosp_df <- tribble(
+    ~account, ~amount,
+"y1", 33.50,
+"y2", 32.00,
+"y3", 52.00,
+"y4", 43.00,
+"y5", 40.00,
+"y6", 41.00,
+"y7", 45.00,
+"y8", 42.50,
+"y9", 39.00)
+
+hosp_df %>% 
+    summarise(amount_est = mean(amount),
+              amount_var = var(amount))
+
+```
+
+이를 바탕으로 밀린 평균병원비를 추정해 보자.
+계정 9개로부터 나온 평균 병원비는 다음 공식으로 통해서 계산이 가능하다.
+
+$$\bar{y} = \frac{\sum_{i=1}^{9}y_i}{9} = \frac{368}{9} = 40.89 $$
+추정치의 오차를 계산하기 위해서 표본분산을 다음과 같이 먼저 계산한다.
+
+$$s^2 = \frac{\sum_{i=1}^{n} (y_i - \bar{y})^2} {n-1} = 35.67 $$
+
+그리고 나서, 추정오차의 한계를 다음과 같이 구한다.
+
+- $N$: 1,000
+- $n$: 200
+- $s^2$: 445.21
+
+$$2 \sqrt{\hat{V}(\bar{y})} = 2 \sqrt{(1- \frac{n}{N}) \frac{s^2}{n}} = 2 \sqrt{(1- \frac{200}{1000}) \frac{445.21}{200}} = 3.94$$
+
+따라서 평균적으로 밀린 병원비 $\mu = 40.89$으로 산출되는데 $\mu$가 $\bar{y}$와의 얼마나 가까운가를 나타내는 추정오차는 3.94로 산출해낼 수 있다.
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "blue">
+
+비복원 추출 때문에 발생되는 분산의 감소량을 **FPC(유한모집단수정, Finite population correction)**로 나타내는데,
+복원추출인 경우 FPC는 없어지고, 모집단 $N$이 매우 커서 $n$이 작은 경우 $\frac{n}{N} \approx 0$, 따라서,
+$1 - \frac{n}{N} \approx 1$이 된다.
+
+</div>

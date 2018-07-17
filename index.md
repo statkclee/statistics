@@ -32,6 +32,8 @@ title: 데이터 과학 -- 기초 통계
     - [확률 법칙(law of probability)](stat-law-of-probability.html)
     - [이항분포 근사 - 정규분포, 포아송 분포](stat-approx-normal-poisson.html)
     - [독일 V2로켓 영국 폭격 - 포아송 분포](stat-flying-bomb-poisson.html)    
+1. **설문조사(Survey)**
+    - [설문조사 기초](survey-sampling-basic.html)
 1. [코딩 기반 통계적 추론(Statistical Inference)](stat-inference.html)    
     - [범주형 데이터 분석](stat-categorical-data.html)
     - [교차표 - $\chi^2$ 검정](stat-categorical-data-chisquared.html)
