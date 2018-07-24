@@ -35,6 +35,7 @@ title: 데이터 과학 -- 기초 통계
 1. **표본추출(Sampling) & 설문조사(Survey)**
     - [설문조사 기초](survey-sampling-basic.html)
     - [`tidycensus` 기초](tidycensus-basic.html)
+    - [kosis와 tidycensus 비교](tidycensus-kosis-comparison.html)
 1. [코딩 기반 통계적 추론(Statistical Inference)](stat-inference.html)    
     - [범주형 데이터 분석](stat-categorical-data.html)
     - [교차표 - $\chi^2$ 검정](stat-categorical-data-chisquared.html)
