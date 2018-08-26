@@ -484,3 +484,41 @@ pwr.t.test(power = 0.8,
 ```
   </div>
 </div>
+
+
+## 순차 분석(Sequential Analysis) {#ab-testing-sequential}
+
+순차분석은 데이터를 수집하면서 반복적으로 유의성 통계검정을 수행하는 절차로 다음 세가지 중 하나를 택일한다.
+
+1. 데이터 수집 중단: 통계적 유의성이 있어 귀무가설을 기각하고 실험을 중단.
+1. 데이터 수집 중단: 통계적 유의성이 없어 귀무가설을 기각하지 못하고 실험을 중단.
+1. 데이터 수집 계속: 결론을 내리기에 충분하지 못해서 실험을 계속진행.
+
+[gsDesign](https://cran.r-project.org/web/packages/gsDesign/index.html) 팩키지를 사용해서 순차분석을 통해 
+실험에 대한 결론도 도출하고 표본크기도 산정한다.
+
+`k = 4`는 3번 중간 분석을 수행하고 마지막 4번째 모든 데이터를 가지고 분석을 수행한다.
+`test.type`은 단축, 양측 검정 등을 설정하는 것이고, `alpha`는 유의수준, `beta`는 검정력과 관계되어 0.2는 
+검정력이 0.8을 나타내고 `sfu`는 Spending 함수로 여러 방법론이 있지만, `Pocock`을 지정하여 순차분석을 수행한다.
+
+최대 가능 표본수가 1000개라고 가정하면 두집단이 되어 이를 `seq_analysis$timing`에 반영하면 중간중간 살펴봐야하는 
+표본을 산출할 수 있다.
+
+
+``` {r ab-testing-stopping-rule}
+library(gsDesign)
+
+# 1. 중단 규칙(stopping rule) ----
+seq_analysis <- gsDesign(k = 4,
+                         test.type = 2,
+                         alpha = 0.05,
+                         beta = 0.2,
+                         sfu = "Pocock")
+
+max_n <- 1000 
+max_n_per_group <- max_n / 2
+stopping_points <- max_n_per_group * seq_analysis$timing
+stopping_points
+
+plot(seq_analysis)
+```
