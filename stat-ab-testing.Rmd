@@ -156,46 +156,6 @@ MAB 알고리즘은 A/B 검정과 달리 연속적으로 가장 좋은 대안을
 <img src="fig/stat-mab-algorithm.png" alt="MAB 알고리즘 배경" width="87%" />
 
 
-# A/B 검정 효과 분석 [^google-causal-impact] [^google-causal-impact-paper]
-
-[^google-causal-impact]: [CausalImpact](http://google.github.io/CausalImpact/CausalImpact.html)
-[^google-causal-impact-paper]: [Inferring causal impact using Bayesian structural time-series models](http://research.google.com/pubs/pub41854.html)
-
-A/B 검정의 효과를 베이지안 시계열 팩키지를 활용하여 계량화한다. 
-[CausalImpact](https://github.com/google/CausalImpact) 팩키지에 나온 예제는 ARIMA 모형에서 표본을 추출하여 
-'2014-01-01' 이후 100일을 기간으로 놓고, 70 일을 사전 기간, 30 일을 사후 기간을 비교하여 `CausalImpact` 함수에 넣어
-A/B 검정 사전,사후 기간 효과를 시각화하고 보고서로 요약한다.
-
-
-``` {r ab-testing-causal-impact}
-# 0. 환경설정----------------------------------------------
-# install.packages("BoomSpikeSlab") # CausalImpact 의존성으로 사전 설치
-# devtools::install_github("google/CausalImpact")
-library(CausalImpact)
-library(xts)
-
-# 1. 데이터 생성----------------------------------------------
-set.seed(1)
-x1 <- 100 + arima.sim(model = list(ar = 0.999), n = 100)
-y <- 1.2 * x1 + rnorm(100)
-y[71:100] <- y[71:100] + 10
-data <- cbind(y, x1)
-
-time_points <- seq.Date(as.Date("2014-01-01"), by = 1, length.out = 100)
-data_zoo <- zoo(data, time_points)
-
-head(data_zoo)
-
-# 2. A/B 검정 기간 설정----------------------------------------------
-pre_period <- as.Date(c("2014-01-01", "2014-03-11"))
-post_period <- as.Date(c("2014-03-12", "2014-04-10"))
-
-# 3. A/B 검정 효과 분석----------------------------------------------
-impact <- CausalImpact(data_zoo, pre_period, post_period)
-plot(impact)
-
-summary(impact, "report")
-```
 
 # A/B 검정 사례연구 {#ab-testing-case-study}
 
@@ -356,4 +316,171 @@ ab_df %>%
 
 glm(time_spent ~ testing, family = "gaussian", data = ab_df) %>%
   tidy()
-```  
+```
+
+# A/B 검정 기타주제 {#ab-testing-topics}
+
+## A/B 검정 효과분석 [^google-causal-impact] [^google-causal-impact-paper] {#ab-testing-topics-effect}
+
+[^google-causal-impact]: [CausalImpact](http://google.github.io/CausalImpact/CausalImpact.html)
+[^google-causal-impact-paper]: [Inferring causal impact using Bayesian structural time-series models](http://research.google.com/pubs/pub41854.html)
+
+A/B 검정의 효과를 베이지안 시계열 팩키지를 활용하여 계량화한다. 
+[CausalImpact](https://github.com/google/CausalImpact) 팩키지에 나온 예제는 ARIMA 모형에서 표본을 추출하여 
+'2014-01-01' 이후 100일을 기간으로 놓고, 70 일을 사전 기간, 30 일을 사후 기간을 비교하여 `CausalImpact` 함수에 넣어
+A/B 검정 사전,사후 기간 효과를 시각화하고 보고서로 요약한다.
+
+
+``` {r ab-testing-causal-impact}
+# 0. 환경설정----------------------------------------------
+# install.packages("BoomSpikeSlab") # CausalImpact 의존성으로 사전 설치
+# devtools::install_github("google/CausalImpact")
+library(CausalImpact)
+library(xts)
+
+# 1. 데이터 생성----------------------------------------------
+set.seed(1)
+x1 <- 100 + arima.sim(model = list(ar = 0.999), n = 100)
+y <- 1.2 * x1 + rnorm(100)
+y[71:100] <- y[71:100] + 10
+data <- cbind(y, x1)
+
+time_points <- seq.Date(as.Date("2014-01-01"), by = 1, length.out = 100)
+data_zoo <- zoo(data, time_points)
+
+head(data_zoo)
+
+# 2. A/B 검정 기간 설정----------------------------------------------
+pre_period <- as.Date(c("2014-01-01", "2014-03-11"))
+post_period <- as.Date(c("2014-03-12", "2014-04-10"))
+
+# 3. A/B 검정 효과 분석----------------------------------------------
+impact <- CausalImpact(data_zoo, pre_period, post_period)
+plot(impact)
+
+summary(impact, "report")
+```
+
+
+## A/B 검정 표본크기 [^stat-testing] {#ab-testing-topics-sample-size}
+
+[^stat-testing]: [데이터 과학 – 기초 통계, 실무에서 자주 활용되는 검정(t-검정)](https://statkclee.github.io/statistics/stat-testing.html)
+
+A/B 실험을 진행하고자 할 때 표본크기를 설정해야한다.
+표본크기는 검정력(Statistical Power)와 밀접한 연관이 있다.
+
+[Power Calculations – relationship between test power, effect size and sample size](https://imdevsoftware.wordpress.com/2013/01/17/255/) 내용을 참조하여 
+검정력(power), 유의수준(Significance Level), 효과크기(Effect Size)에 따른 표본크기를 살펴보고 나서 
+가장 많이 사용하는 검정력 0.8($1-\beta$), 유의수준 $\alpha$ 0.05, 중간 효과크기 0.5를 두고 표본크기도 산출한다.
+
+### 표본크기 데이터 생성 {#ab-testing-topics-sample-size-data}
+
+효과크기, 검정력, 유의수준을 정의하고 나서 `pwr` 팩키지 `power.t.test()` 함수를 사용해서 
+표본크기를 계산한다. 표본크기가 효과크기, 검정력, 유의수준에 따라 어떤 변화가 있는지 살펴보고 표본크기를 효과적으로 증가시키기 위한 
+지표로 사용한다. [stackoverflow, Power.t.test error](https://stackoverflow.com/questions/33379962/power-t-test-error) 오류에 대해서 
+작업이 필요하여 `try()` 함수로 간단히 처리하고 표본크기를 후처리한다.
+
+``` {r ab-testing-power-sample-size}
+library(pwr)
+
+# 1. 검정력 데이터 생성 ----
+d     <- seq(.1, 2, by=.1)    # 효과크기(Effect Size)
+power <- seq(.1, 0.9, by=.1)    # 검정력(Power)
+alpha <- c(0.01, seq(0.05, 0.5, 0.05)) # 유의수준(Significance Level)
+
+sample_size_df <- expand.grid(power=power, effect_size=d, alpha=alpha) %>% 
+  tbl_df
+
+for(i in 1:nrow(sample_size_df)) {
+  sample_size_df$sample_size[i] <- try(power.t.test(n        = NULL,
+                                                d        = sample_size_df$effect_size[i],
+                                                sig.level= sample_size_df$alpha[i],
+                                                power = sample_size_df$power[i],
+                                                type  = "two.sample")$n)
+}
+
+# https://stackoverflow.com/questions/33379962/power-t-test-error
+sample_size_df <- sample_size_df %>% 
+  mutate(sample_size = as.integer(sample_size))
+```
+
+### 검정력  {#ab-testing-topics-sample-size-power}
+
+유의수준과 효과크기를 고정한 후에 검정력을 강화할수록 표본크기도 증가한다.
+
+``` {r ab-testing-power-sample-size-power}
+# 2. 검정력  ----
+sample_size_df %>% 
+  filter(alpha == 0.05, effect_size == 0.5) %>% 
+  ggplot(aes(x=power, y=sample_size)) +
+    geom_line() +
+    geom_point() +
+    theme(legend.position = "none") +
+    labs(x="검정력(Power)", y="표본크기(Sample Size",
+         title="검정력 강화에 따른 표본크기 변화",
+         subtitle="유의수준(0.05)과 효과크기(0.5)를 고정") +
+    theme_minimal(base_family = "NanumGothic")
+```
+
+### 유의수준  {#ab-testing-topics-sample-size-alpha}
+
+효과크기와 검정력을 고정한 후에 유의수준을 높게할수록 표본크기는 감소한다.
+
+
+``` {r ab-testing-power-sample-size-alpha}
+# 2. 유의수준  ----
+sample_size_df %>% 
+  filter(effect_size == 0.5, power == 0.80) %>% 
+  ggplot(aes(x=alpha, y=sample_size)) +
+  geom_line() +
+  geom_point() +
+  theme(legend.position = "none") +
+  labs(x="유의수준(Significance Level)", y="표본크기(Sample Size",
+       title="검정력과 효과크기를 고정한 뒤 유의수준별 표본크기",
+       subtitle="유의수준(0.05)과 효과크기(0.8)를 고정") +
+  theme_minimal(base_family = "NanumGothic")
+```
+
+### 효과크기  {#ab-testing-topics-sample-size-effect}
+
+유의수준과 검정력을 고정한 후에 효과크기를 높게 할수록 표본크기는 감소한다.
+
+``` {r ab-testing-power-sample-size-effect}
+# 3. 효과크기  ----
+sample_size_df %>% 
+  filter(alpha == 0.01, power ==0.8) %>% 
+  ggplot(aes(x=effect_size, y=sample_size, group=1)) +
+  geom_line() +
+  geom_point() +
+  theme(legend.position = "none") +
+  labs(x="효과크기(Effect Size)", y="표본크기(Sample Size",
+       title="검정력과 유의수준을 고정한 뒤 효과크기별 표본크기",
+       subtitle="유의수준(0.05)과 검정력(0.8)를 고정") +
+  theme_minimal(base_family = "NanumGothic")
+
+```
+
+### 표본크기 추출 사례  {#ab-testing-topics-sample-size-example}
+
+<div class = "row">
+  <div class = "col-md-6">
+**큰 효과크기에 필요한 표본크기**
+
+```{r ab-testing-pwr-effect-size-big}
+pwr.t.test(power = 0.8,
+           sig.level = 0.05,
+           d = 0.8)
+```
+
+
+  </div>
+  <div class = "col-md-6">
+**작은 효과크기에 필요한 표본크기**
+
+```{r ab-testing-pwr-effect-size-small}
+pwr.t.test(power = 0.8,
+           sig.level = 0.05,
+           d = 0.1)
+```
+  </div>
+</div>
