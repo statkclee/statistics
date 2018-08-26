@@ -207,19 +207,27 @@ summary(impact, "report")
 <img src="fig/ab-testing-website.png" alt="A/B 검정 사례" width="77%" />
 
 특정일을 기준으로 사용자별로 체류시간을 총합내고 `좋아요`, `공유`, `기사` 클릭을 했는지 기록한다.
+또한, `체류시간`과 교락요인(Confounding effect)와 부작용(Side effect) 측정을 위해서 페이지 로딩시간과 
+체류시간도 함께 기록한다.
 이를 바탕으로 A/B 검정의 효과를 추정한다.
 
 ``` {r ab-testing-case-study-data}
+# 0. 환경설정 ----
+library(tidyverse)
+library(DT)
+library(lubridate)
+library(extrafont)
+library(broom)
+loadfonts()
+
 # 1. 데이터 ----
-ab_dat <- read_delim("data/ab_df.txt", delim=' ') 
+ab_df <- read_csv("data/website_sample.csv")
 
-# 2. 탐색적 데이터 분석 ----
-
-ab_dat %>% 
+ab_df %>% 
   sample_n(10) %>% 
-  DT::datatable()
-
+  datatable()
 ```
+
 
 
 ## 탐색적 데이터 분석 {#ab-testing-case-study-trend}
@@ -228,14 +236,124 @@ ab_dat %>%
 
 
 ``` {r ab-testing-case-study-data-trend}
-ab_dat %>% 
-  mutate(month = month(play_date, label = TRUE)) %>% 
-  group_by(month) %>% 
-  summarise(좋아요율 = mean(like_click)) %>% 
-    ggplot(aes(x=month, y=좋아요율, group=1)) + 
-      geom_line() +
-      geom_point(size=3) +
-      scale_y_continuous(limits = c(0,1), labels = scales::percent) +
-      labs(x="월", y="좋아요 비율(%)", title="월별 전환율 추세") +
-      theme_minimal(base_family = "NanumGothic")
+# 2. 탐색적 데이터 분석 ----
+
+ab_df %>% 
+  mutate(day = day(date)) %>% 
+  group_by(day) %>% 
+  summarise(conversion = mean(like)) %>% 
+  ggplot(aes(x=day, y=conversion)) +
+  geom_line() +
+  geom_point(size=2) +
+  scale_y_continuous(limits = c(0,0.2), labels = scales::percent) +
+  labs(x="일자별", y="전환율(%)", title="강아지/고양이 사진 A/B 검정 일별 전환율 추세",
+       color="A/B검정") +
+  theme_minimal(base_family = "NanumGothic")
+
 ```
+
+
+## A/B 검정 - 범주형 {#ab-testing-case-study-testing}
+
+한달 동안 실험한 데이터를 불러와서 실험군(test)과 대조군(control) 유의적인 차이가 있는지 즉, 개와 고양이를 바꾼 사진의
+차이가 전환율을 높이는데 기여를 했는지 통계적 데이터 분석을 통해 확인한다.
+
+### A/B 검정 - 기술통계 {#ab-testing-case-study-testing-descriptive}
+
+실험군(test)과 대조군(control) 두 집단을 담고 있는 `testing`에 따라 전환율을 산출해본다.
+
+
+``` {r ab-testing-experiment-data-analysis-descriptive}
+# 3. A/B 검정: 범주형 -----
+## 3.1. 기술 통계량 -----
+ab_df %>% 
+  group_by(testing) %>% 
+  summarise(conversion = mean(like)) 
+```
+
+
+### A/B 검정 - 시각화 {#ab-testing-case-study-testing-viz}
+
+실험군(test)과 대조군(control) 두 집단을 담고 있는 `testing`에 따라 전환율을 
+일자별로 시각화해서 시각으로 다시 한번 확인한다.
+
+
+``` {r ab-testing-experiment-data-analysis-viz}
+## 3.2. 시각화 -----
+ab_df %>% 
+  mutate(day = day(date)) %>% 
+  group_by(day, testing) %>% 
+  summarise(conversion = mean(like)) %>% 
+  ggplot(aes(x=day, y=conversion, color=testing, group=testing)) +
+  geom_line() +
+  geom_point(size=2) +
+  scale_y_continuous(limits = c(0,1), labels = scales::percent) +
+  labs(x="일자별", y="전환율(%)", title="강아지/고양이 사진 A/B 검정 일별 전환율 추세",
+       color="A/B검정") +
+  theme_minimal(base_family = "NanumGothic")
+```
+
+
+### A/B 검정 - 통계검정 {#ab-testing-case-study-testing-testing}
+
+`t.test()` 함수로 통계검정을 수행해도 되지만, 일반화 선형모형(GLM)을 통해 
+두집단간의 차이가 유의적인 차이가 있는지를 확인한다.
+
+``` {r ab-testing-experiment-data-analysis-testing}
+## 3.3. 통계검정 -----
+
+glm(like ~ testing, family = "binomial", data = ab_df) %>%
+  tidy()
+```
+
+## A/B 검정 - 연속형 {#ab-testing-case-study-testing-continuous}
+
+좋아요, 공유, 해당 글을 클릭했는지 않았는지 못지않게 페이지 체류시간 혹은 결재금액 등 연속형 변수를 
+검정하는 경우도 있다. 두집단일 경우 `t.test` 혹은 동일집단 A/A 검정일 경우 짝(paired) t-검정이 되기도 하고, 
+실험을 두개이상 진행하는 경우 분산분석 모형이 되기도 하지만 동일하게 일반화 선형모형을 사용한다.
+
+### A/B 검정 - 기술통계 {#ab-testing-case-study-testing-descriptive-cont}
+
+실험군(test)과 대조군(control) 두 집단을 담고 있는 `testing`에 따라 전환율을 산출해본다.
+
+
+``` {r ab-testing-experiment-data-analysis-descriptive-cont}
+# 4. A/B 검정: 연속형 -----
+## 4.1. 기술 통계량 -----
+ab_df %>% 
+  group_by(testing) %>% 
+  summarise(time_spent = mean(time_spent)) 
+```
+
+
+### A/B 검정 - 시각화 {#ab-testing-case-study-testing-viz-cont}
+
+실험군(test)과 대조군(control) 두 집단을 담고 있는 `testing`에 따라 체류시간변화를 
+일자별로 시각화해서 시각으로 다시 한번 확인한다.
+
+
+``` {r ab-testing-experiment-data-analysis-viz-cont}
+## 4.2. 시각화 -----
+ab_df %>% 
+  mutate(day = day(date)) %>% 
+  group_by(day, testing) %>% 
+  summarise(time_spent = mean(time_spent))%>% 
+  ggplot(aes(x=day, y=time_spent, color=testing, group=testing)) +
+  geom_line() +
+  geom_point(size=2) +
+  labs(x="일자별", y="체류시간(분)", title="강아지/고양이 사진 A/B 검정 일별 체류시간",
+       color="A/B검정") +
+  theme_minimal(base_family = "NanumGothic")
+```
+
+
+### A/B 검정 - 통계검정 {#ab-testing-case-study-testing-testing-cont}
+
+범주형 변수에 대한 회귀분석 대신 연속형 변수 체류시간(`time_spent`)에 대한 회귀분석을 실시한다.  
+
+``` {r ab-testing-experiment-data-analysis-testing-cont}
+## 4.3. 통계검정 -----
+
+glm(time_spent ~ testing, family = "gaussian", data = ab_df) %>%
+  tidy()
+```  
