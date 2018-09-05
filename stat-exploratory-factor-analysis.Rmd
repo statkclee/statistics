@@ -104,3 +104,90 @@ colnames(X_fa$loadings) <- c("FactorA", "FactorB")
 
 fa.diagram(X_fa)
 ```
+
+# 요인분석 사례 {#factor-analysis-case-study}
+
+[Exploratory Factor Analysis in R](https://www.promptcloud.com/blog/exploratory-factor-analysis-in-r/) 요인분석에 사용된 사례를 준용하여 
+자동차 구입에 중요한 요인을 추출해보자.
+
+## 자동차 설문 데이터 {#factor-analysis-case-study-data}
+
+탐색적 요인분석을 위한 데이터를 다운로드해서 살펴본다.
+[EFA.csv](https://www.promptcloud.com/wp-content/uploads/2017/02/EFA.csv) 파일을 다운로드 받아 로컬 파일에 저장하는 것도 가능하고,
+아니면 직접 `read_csv()` 함수로 데이터를 가져온다.
+
+``` {r fa-car-data}
+# 0. 환경설정 -----
+library(tidyverse)
+library(psych)
+library(GPArotation)
+
+# 1. 데이터 -----
+download.file(url="https://www.promptcloud.com/wp-content/uploads/2017/02/EFA.csv", destfile = "data/EFA.csv")
+
+car_df <- read_csv("https://www.promptcloud.com/wp-content/uploads/2017/02/EFA.csv")
+DT::datatable( options = list(scrollX = TRUE), car_df)
+```
+
+## 요인수 결정 {#factor-analysis-case-study-number-factor}
+
+요인분석에서 가장 답이 없지만 중요한 방식이 적정한 요인수를 결정하는 것이다.
+원데이터에서 상관관계 행렬을 추출한 후에 `scree()` 함수로 요인수를 결정하거나,
+`fa.parallel()` 함수를 활용해서 적절한 요인수를 결정한다. 시각적으로 2~5개 요인이 적절해 보인다.
+
+``` {r fa-car-decide-factor-number}
+# 2. 요인분석 -----
+## 2.1. 요인수 결정 -----
+### 2.1.1. 탐색적 요인수 결정 -----
+car_cor <- cor(car_df, use = "pairwise.complete.obs")
+scree(car_cor, factors = FALSE)
+
+car_parallel <- fa.parallel(car_df, fm = 'minres', fa = 'fa')
+```
+
+시각적인 방식을 참조하여 잠정적인 요인수를 결정하고 나서,
+각 요인수에 맞춰 요인분석을 실행한 후에 `anova()` 함수로 요인수에 따른 모형의 차이가 있는지 검정한다.
+4개 요인이 적절해 보인다.
+
+``` {r fa-car-decide-factor-number-stat}
+### 2.1.2. 요인 수 결정 -----
+car_two_fa   <- fa(car_df, nfactors=2, n.obs=N, rotate="varimax")
+car_three_fa <- fa(car_df, nfactors=3, n.obs=N, rotate="varimax")
+car_four_fa  <- fa(car_df, nfactors=4, n.obs=N, rotate="varimax")
+car_five_fa  <- fa(car_df, nfactors=5, n.obs=N, rotate="varimax")
+
+anova(car_two_fa, car_three_fa)
+anova(car_three_fa, car_four_fa)
+anova(car_four_fa, car_five_fa)
+```
+
+
+## 요인분석 적합 {#factor-analysis-case-study-fit}
+
+요인 4개를 선정한 모형을 최종모형으로 하고 `RMSEA`, `TLI` 지표를 바탕으로 탐색적 요인분석 모형의 적합성을 확인한다.
+
+``` {r fa-car-decide-factor-fit}
+## 2.2. 요인모형 적합 -----
+car_fa <- fa(car_df, nfactors = 4, rotate = "oblimin", fm="minres")
+
+car_fa$RMSEA
+car_fa$TLI
+```
+
+## 요인분석 커뮤니케이션 {#factor-analysis-case-study-communication}
+
+선정된 요인 4개를 설문조사 문항과 결합하여 4개 요인에 대한 요인 명칭부여 작업을 수행한다.
+
+- 외관: "Exterior_Looks", "Color"
+- 기능: "Space_comfort", "Technology", "Safety", "After_Sales_Service", "Fuel_Type"
+- 가성비:  "Price", "Maintenance", "Resale_Value", "Fuel_Efficiency"
+- 신뢰성: "Product_reviews", "Testimonials", "Test_drive"
+
+``` {r fa-car-decide-factor-viz}
+## 2.3. 요인모형 시각화 -----
+colnames(car_fa$loadings) <- c("Factor_1", "Factor_2", "Factor_3", "Factor_4")
+print(car_fa$loadings, cutoff = 0.3)
+fa.diagram(car_fa)
+```
+
+
