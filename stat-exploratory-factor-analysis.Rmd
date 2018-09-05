@@ -1,0 +1,106 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 탐색적 요인분석(Exploratory Factor Analysis)
+output:
+  html_document: 
+    theme: journal
+    toc: yes
+    toc_float: true
+    highlight: tango
+    number_section: true
+    code_folding: show
+mainfont: NanumGothic
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,
+                    comment="", digits = 3, tidy = FALSE, prompt = TRUE, fig.align = 'center')
+
+```
+
+# 요인분석(factor analysis) [^factor-analysis-fit-measure] [^factor-analysis-namu] [^factor-analysis-simulation] {#factor-analysis}
+
+[^factor-analysis-simulation]: [StackExchange - Looking for a step through an example of a factor analysis on dichotomous data (binary variables) using R](https://stats.stackexchange.com/questions/31948/looking-for-a-step-through-an-example-of-a-factor-analysis-on-dichotomous-data)
+
+[^factor-analysis-fit-measure]: [David A. Kenny (November 24, 2015), "Measuring Model Fit"](http://davidakenny.net/cm/fit.htm)
+
+[^factor-analysis-namu]: [요인분석 - 나무위키](https://namu.wiki/w/%EC%9A%94%EC%9D%B8%20%EB%B6%84%EC%84%9D)
+
+1904년에 찰스 스피어만(C.Spearman)에 의해 개발되었으며, 어떤 변인 (질문 문항, 측정 대상)들 간에 공통적인 요인이 있다고 가정하고, 
+그 변수들 간의 상호 관련성을 소수의 잠재 요인으로 집약하는 방법이다.
+
+$$X = \Lambda f + \epsilon$$
+
+## 요인분석 데이터 생성{#factor-analysis-simulate-data}
+
+<img src="fig/factor-analysis-formula.png" alt="요인분석 수식" width="100%" />
+
+- `X_mat` : $N \times P$ 행렬($200 \times 6$)
+- `lambda`: $\Lambda$, 요인적재(factor loading) $P \times Q$ 행렬($6 \times 2$)
+- `FF`: 요인점수(Factor Score), $N \times Q$ 행렬($200 \times 2$) 행렬.
+- `E`: 오차 행렬, $N \times P$ 행렬($200 \times 6$)
+
+```{r factor-analysis-simulation}
+# 0. 환경설정 -----
+library(tidyverse)
+library(psych)
+library(GPArotation)
+library(mvtnorm)
+
+# 1. 요인분석 데이터 생성 -----
+
+N <- 200
+P <- 6
+Q <- 2
+lambda <- matrix(c(0.7,-0.4, 0.8,0, -0.2,0.9, -0.3,0.4, 0.3,0.7, -0.8,0.1),
+                  nrow=P, ncol=Q, byrow=TRUE)
+
+FF <- rmvnorm(N, mean = c(5, 15), sigma=diag(Q)) # 요인점수(factor score)
+E  <- rmvnorm(N, mean = rep(0, P), sigma=diag(P))
+X_mat  <- FF %*% t(lambda) + E
+```
+
+## 모의실험 요인분석 {#factor-analysis-simulate-data-fa}
+
+가장 먼저 요인 갯수를 선정한다. 이를 위해서 `scree()` 함수를 사용해서 팔꿈치가 꺾어지는 지점 요인 2개로 선정한다.
+
+```{r fa-simulated-data}
+# 2. 요인분석 -----
+## 2.1. 요인수 결정 -----
+X_cor <- cor(X_mat, use = "pairwise.complete.obs")
+
+scree(X_cor, factors = FALSE)
+```
+
+
+`psych` 팩키지 `fa()` 함수를 사용해서 `nfactors=2`로 지정한 후에 요인분석 모형 적합을 시도한다.
+RMSEA, TLI 값을 통해 적합성을 확인한다.
+
+```{r fa-simulated-data-fit}
+## 2.2. 요인분석 모형 적합 -----
+
+X_fa <- fa(X_mat, nfactors=2, n.obs=N, rotate="varimax")
+
+X_fa$RMSEA
+X_fa$TLI
+```
+
+`fa.plot()` 함수를 통해 6개 변수를 2개 요인으로 축약하는데 각 변수별 요인에 대한 기여분을 시각화한다.
+
+```{r fa-simulated-data-fit-loading}
+## 2.3. 요인분석 모형 -----
+fa.plot(X_fa)
+
+print(X_fa$loadings, cutoff = 0.2)
+```
+
+
+커뮤니케이션을 위해서 측정변수와 요인(Factor)의 관계를 시각적으로 표현한다.
+
+```{r fa-simulated-data-fit-communication}
+colnames(X_fa$loadings) <- c("FactorA", "FactorB")
+
+fa.diagram(X_fa)
+```

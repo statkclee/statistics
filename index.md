@@ -56,6 +56,8 @@ title: 데이터 과학 -- 기초 통계
     - [통계모형 시각화](stat-model-visualization.html) 
     - [로지스틱 회귀모형(logistic regression)](stat-logistic-regression.html) 
     - [시계열 모형](https://statkclee.github.io/finance/): "2018-07-01" 이전 
+1. **다변량 분석**
+    1. [탐색적 요인분석(Exploratory Factor Analysis)](stat-exploratory-factor-analysis.html)
 1. [채팅 로그](stat-chatting-log.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
     * [작업장 탐지](stat-gold-farming-detection.html)
