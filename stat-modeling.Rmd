@@ -261,6 +261,8 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
 
 ## 오프셋(offset) [^glm-offset] {#stat-modeling-GLM-poisson-offset}
 
+[^glm-offset]: [StackExchange, "When to use an offset in a Poisson regression?"](https://stats.stackexchange.com/questions/11182/when-to-use-an-offset-in-a-poisson-regression)
+
 [플로리다 상어공격 데이터](http://people.stern.nyu.edu/jsimonof/AnalCatData/Data/)를 다운로드 받아 일반화선형모형 적합해본다. 포아송 분포를 GLM에 적합하는데 계수(count) 데이터를 선형모형으로 적합시키는데 사용되고 전형적인 수식은 다음과 같다.
 
 $$\log \mu_x = \beta_0 + \beta_1 x$$
