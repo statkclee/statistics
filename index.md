@@ -26,6 +26,7 @@ title: 데이터 과학 -- 기초 통계
 1. [데이터 과학을 위한 수학적 기초](math-for-data-science.html)
     - [손씻기 그리고 통계 - 제멜바이스](stat-hand-washing.html)
     - [측정 척도(Scales of Measurement)](stat-measurement.html)
+    - [심슨의 역설(Simpson's Paradox)](stat-simpson.html)
 1. **[확률의 역사](https://statkclee.github.io/r-algorithm/r-history-of-probability.html)**
     - [난수 및 난수 생성기](stat-random-number-generator.html)
     - [이항분포](stat-binomial.html)
