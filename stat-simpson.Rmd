@@ -40,8 +40,8 @@ loadfonts()
 [심슨의 역설](https://statkclee.github.io/r-algorithm/r-history-of-probability.html#simpson-paradox-1951)은 확률의 역사에서 중요한 주제 중의 하나로 자리를 잡고 있다.
 
 
-$\frac{a_1}{A_1} > \frac{b_1}{B_1}$ 이고 $\frac{a_2/A_2} > \frac{b_2/B_2}$
-이라고 반드시 $\frac{a_1+a_2}{(A_1+A_2)} > \frac{(b_1+b_2)}{(B_1+B_2)} 인 것은 아니다. 
+$\frac{a_1}{A_1} > \frac{b_1}{B_1}$ 이고 $\frac{a_2}{A_2} > \frac{b_2}{B_2}$
+이라고 반드시 $\frac{a_1+a_2}{(A_1+A_2)} > \frac{(b_1+b_2)}{(B_1+B_2)}$ 인 것은 아니다. 
 즉, "각 부분에 대한 평균이 크다고 해서 전체에 대한 평균까지 크지는 않다"는 의미이다.[^namu-simpson]
 
 [^namu-simpson]: [나무위키, "심슨의 역설"](https://namu.wiki/w/%EC%8B%AC%EC%8A%A8%EC%9D%98%20%EC%97%AD%EC%84%A4)
@@ -151,7 +151,7 @@ admin_df %>%
     spread(Admit, total) %>% 
     mutate(Admitted_Pcnt = Admitted/ (Admitted+Rejected),
            Rejected_Pcnt = Rejected/ (Admitted+Rejected)) %>% 
-    DT::datatable() %>% 
+    DT::datatable(options = list(scrollX = TRUE)) %>% 
     DT::formatPercentage(c("Admitted_Pcnt","Rejected_Pcnt"), digits=1)
 ```
   </div>
@@ -165,7 +165,7 @@ admin_df %>%
     spread(Admit, total) %>% 
     mutate(Admitted_Pcnt = Admitted/ (Admitted+Rejected),
            Rejected_Pcnt = Rejected/ (Admitted+Rejected)) %>% 
-    DT::datatable() %>% 
+    DT::datatable(options = list(scrollX = TRUE)) %>% 
     DT::formatPercentage(c("Admitted_Pcnt","Rejected_Pcnt"), digits=1)
 
 ```
@@ -173,39 +173,43 @@ admin_df %>%
   </div>
 </div>
 
+기술통계량을 통해 살펴본 사항을 그래프로 시각화한다. 막대 그래프를 통해 
+남성 합격률이 여성보다 높은 것으로 나타나 성차별이 존재하는 것으로 파악되지만,
+학과별로 놓고 보면 여성 합격률이 더 높거나 남성과 유사한 것으로 시각적으로 나타난다.
 
-
-
-
-
+```{r berkeley-simpson-viz, fig.width=12}
 # A barplot for overall admission percentage for each gender.
-p1 <- ggplot(data = overall, aes(x = Gender, y = Admitted, width = 0.2))
-p1 <- p1 + geom_bar(stat = "identity") + 
-  ggtitle("Overall admission percentage") + ylim(0,1) 
 
-# A 1x6 panel of barplots, each of which represents the 
-# admission percentage for a department
-p2 <- ggplot(data = UCBdt[UCBdt$Admit == "Admitted", ], aes(x = Gender, y = Freq))
-p2 <- p2 + geom_bar(stat = "identity") + facet_grid(. ~ Dept) +
-  ggtitle("Number of admitted students\nfor each department") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+admit_g <- admin_df %>% 
+    group_by(Gender, Admit) %>% 
+    dplyr::summarise(total = sum(n)) %>% 
+    spread(Admit, total) %>% 
+    mutate(Admitted_Pcnt = Admitted/ (Admitted+Rejected),
+           Rejected_Pcnt = Rejected/ (Admitted+Rejected)) %>% 
+    ggplot(aes(x = Gender, y = Admitted_Pcnt, width = 0.2, fill=Gender)) +
+    geom_bar(stat = "identity") +
+    labs(x="성별", y="입학합격율", title="버클리 전체 입학합격률") +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    theme_minimal(base_family = "NanumGothic") +
+    theme(legend.position = "none") 
 
-# A 1x6 panel of barplots, each of which represents the 
-# number of admitted students for a department
-p3 <- ggplot(data = departmentwise, aes(x = Gender, y = Admitted))
-p3 <- p3 + geom_bar(stat = "identity") + facet_grid(. ~ Dept) + ylim(0,1) +
-  ggtitle("Admission percentage\nfor each department") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+admit_dept_g <- admin_df %>% 
+    group_by(Gender, Admit, Dept) %>% 
+    dplyr::summarise(total = sum(n)) %>% 
+    spread(Admit, total) %>% 
+    mutate(Admitted_Pcnt = Admitted/ (Admitted+Rejected),
+           Rejected_Pcnt = Rejected/ (Admitted+Rejected)) %>% 
+    ggplot(aes(x = Gender, y = Admitted_Pcnt, fill=Gender)) +
+    geom_bar(stat = "identity") +
+    facet_grid(. ~ Dept) +
+    labs(x="성별", y="", title="버클리 학과별 입학합격률") +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    theme_bw(base_family = "NanumGothic") +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          legend.position = "none") 
 
-# A 1x6 panel of barplots, each of which represents the 
-# number of applicants for a department
-p4 <- ggplot(data = UCBdt, aes(x = Gender, y = Freq))
-p4 <- p4 + geom_bar(stat = "identity") + facet_grid(. ~ Dept) + 
-  ggtitle("Number of Applicants\nfor each department") + 
-  theme(axis.text.x = element_text(angle = 90, hjust = 1))
-
-# Arrange the four plots on a page.
-grid.arrange(p1, p2, p3, p4, nrow=2, 
-             top = textGrob("Simpson's Paradox: UC Berkeley 1973 Admissions", gp=gpar(fontsize=20)))
+plot_grid(admit_g, admit_dept_g, labels = "")
 ```
+
+
 
