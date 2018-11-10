@@ -1,0 +1,158 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 탐색적 요인분석(Exploratory Factor Analysis)
+output:
+  html_document: 
+    toc: yes
+    toc_float: true
+    highlight: tango
+    number_section: true
+    code_folding: show
+mainfont: NanumGothic
+editor_options: 
+  chunk_output_type: console
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,
+                    comment="", digits = 3, tidy = FALSE, prompt = TRUE, fig.align = 'center')
+
+```
+
+# $t-$분포 정규분포 수렴 {#t-dist-to-normal}
+
+```{r t-dist-to-normal}
+library(tidyverse)
+
+rt_df <- list()
+
+for(i in 1:10) {
+  rt_df[[i]] <- rt(100, df=i)
+}
+
+```
+
+# 단변량 정규분포 {#univariate-normal-dist}
+
+## 수학으로 바라보기 {#univariate-normal-dist-math}
+
+정규분포를 수학적으로 이해하면, 모수 $\mu, \sigma$를 갖는 좌우 대칭 모양을 갖는 함수모양을 갖는다.
+
+$$f(x \mid \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2} } e^{ -\frac{(x-\mu)^2}{2\sigma^2} }$$
+정규분포 모수 $\mu, \sigma$를 조정하게 되면 다음과 같이 변하게 된다.
+
+- $\mu = 0, \sigma =1$ : 표준정규분포 $N(0,1)$ 
+- $\mu = 0, \sigma =2$ : $N(0,2)$
+- $\mu = 2, \sigma =\frac{1}{2}$ : $N(2,\frac{1}{2})$
+
+
+```{r normal-distribution-viz}
+library(tidyverse)
+
+ggplot(data = data.frame(x = c(-5, 5)), aes(x)) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 1)) + 
+  ylab("") +
+  scale_y_continuous(breaks = NULL) +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 0, sd = 2), color="red") +
+  stat_function(fun = dnorm, n = 101, args = list(mean = 2, sd = 0.5), color="blue") +
+  theme_minimal()
+```
+
+## 난수로 알아보기 {#univariate-normal-dist-simulation}
+
+먼저 표준편차($\sigma$)를 $\frac{1}{2} \cdots 3$까지 변화시킬 경우 정규분포가 어떻게 변화하는지 살펴보자. 이를 위해서 표준편차($\sigma$) 값에 따라 난수를 생성시키는 함수를 만들고, 난수를 생성시킨다. 그리고 나서 `ggplot`으로 시각화하는데 `gganimate`로 애니메이션을 통해 변화를 시각적으로 살펴본다.
+
+```{r rnorm-ggplot-gganimation}
+library(gganimate)
+library(extrafont)
+loadfonts()
+
+generate_normal <- function(mu, sigma) {
+  data.frame(
+    univ_rv = rnorm(1000, mu, sigma),
+    t_mu_state = mu,
+    t_sigma_state = sigma
+    )
+}
+
+normal_sigma_df <- purrr::map_df(seq(0.5, 3, 0.5), ~ generate_normal(0, .))
+
+ggplot(normal_sigma_df, aes(univ_rv)) +
+  geom_histogram() + 
+  scale_y_continuous(breaks = NULL) +
+  theme_minimal(base_family = "NanumGothic") +
+  transition_time(t_sigma_state) +
+  labs(x="정규분포 난수", y="", 
+       title ="표준편차 변화에 따른 정규분포 변화",
+       subtitle="표준편차: {round(frame_time,1)}") 
+
+```
+
+이번에는 평균($\mu$)를 $\frac{1}{2} \cdots 3$까지 변화시킬 경우 정규분포가 어떻게 변화하는지 살펴보자. 이를 위해서 평균($\mu$) 값에 따라 난수를 생성시키는 함수를 만들고, 난수를 생성시킨다. 그리고 나서 `ggplot`으로 시각화하는데 `gganimate`로 애니메이션을 통해 변화를 시각적으로 살펴본다.
+
+```{r rnorm-ggplot-gganimation-mu}
+normal_mu_df <- purrr::map_df(seq(0.5, 3, 0.5), ~ generate_normal(.x, 0.5))
+
+ggplot(normal_mu_df, aes(univ_rv)) +
+  geom_histogram() + 
+  scale_y_continuous(breaks = NULL) +
+  theme_minimal(base_family = "NanumGothic") +
+  transition_time(t_mu_state) +
+  labs(x="정규분포 난수", y="", 
+       title ="평균 변화에 따른 정규분포 변화",
+       subtitle="평균: {round(frame_time,1)}") 
+
+```
+
+
+# 데이터 정규분포 근사  {#univariate-normal-dist-from-data}
+
+[Normal Distribution Project - Liam Larsen
+](https://www.kaggle.com/kingburrito666/normal-distribution-project-liam-larsen/notebook) 웹사이트에서 컴퓨터 가격데이터를 가져와서 정규성 검정부터 시작해보자.
+
+```{r normality-computer-data}
+
+computer_df <- read_csv("data/Computers.csv")
+
+DT::datatable(computer_df)
+```
+
+## 정규분포 검정 {#univariate-normal-dist-testing}
+
+정규성 검정에 `qqplot`(quantile-quantile plot)을 시각적인 확인을 위해서 자주 사용된다. 컴퓨터 가격에 대한 `qqplot`을 통해 정규성을 확인하면 가격은 정규분포를 따르지 않지만, 로그 변환한 가격분포는 정규분포를 따르는 것으로 보인다. 
+
+```{r normality-computer-data-eda-plot}
+orig_price_g <- ggplot(computer_df, aes(sample=price)) +
+  stat_qq() +
+  stat_qq_line()
+
+log_price_g <- ggplot(computer_df, aes(sample=log10(price))) +
+  stat_qq() +
+  stat_qq_line()
+  
+cowplot::plot_grid(orig_price_g, log_price_g)
+```
+
+`MVN` 팩키지의 `univariateTest` 인자에 Shapiro-Wilk ("SW"), Cramer-von Mises ("CVM"), Lilliefors ("Lillie"), Shapiro-Francia ("SF"), Anderson-Darling ("AD")을 선택하여 단변량 변수에 대한 정규성을 검정할 수 있다.
+
+```{r normality-computer-data-testing}
+library(MVN)
+
+mvn(computer_df$price, univariateTest = "AD")
+
+mvn(log10(computer_df$price), univariateTest = "AD", univariatePlot = "qq")
+```
+
+## 정규분포 근사 {#univariate-normal-dist-testing-approx}
+
+```{r normality-computer-data-testing-viz}
+library(fitdistrplus)
+descdist(computer_df$price, discrete=FALSE, boot=500)
+
+# normal_fit <- fitdistr(computer_df$price, densfun="normal") 
+```
+
+
+
