@@ -64,18 +64,20 @@ library(readxl)
 marriage <- read_excel("data/statistics.xlsx", sheet="marriage")
 
 marriage %>% 
+  arrange(desc(연도)) %>% 
   DT::datatable() %>% 
   DT::formatPercentage("이혼율", digits=1)
 ```
 
 ## 출생과 사망 {#example-birth-death}
 
-통계청이 2018. 2. 28. 발표한 "2017년 인구동향조사 출생사망통계 잠정 결과"에 따르면,  2017년 출생아 수는 357.7 천명, 사망자수는 285.6천명으로 10명중 7명이 사망하고 있으며 통계청에서 발표한 2007년 이후 사망률이 50%대에서 70%대로 급증했습니다.
+통계청이 2018. 2. 28. 발표한 "2017년 인구동향조사 출생사망통계 잠정 결과"에 따르면,  2017년 출생아 수는 357.7 천명, 사망자수는 285.6천명으로 10명중 7명이 사망하고 있으며 통계청에서 발표한 2007년 이후 사망률이 50%대에서 80%대로 급증했습니다.
 
 ```{r statistics-birth}
 death <- read_excel("data/statistics.xlsx", sheet="birth")
 
 death %>% 
+  arrange(desc(연도)) %>% 
   DT::datatable() %>% 
   DT::formatPercentage("사망률", digits=1)
 ```
