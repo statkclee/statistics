@@ -27,6 +27,7 @@ title: 데이터 과학 -- 기초 통계
     - [손씻기 그리고 통계 - 제멜바이스](stat-hand-washing.html)
     - [측정 척도(Scales of Measurement)](stat-measurement.html)
     - [심슨의 역설(Simpson's Paradox)](stat-simpson.html)
+    - [자영업 개업/폐업 통계](stat-small-business.html)
 1. **[확률의 역사](https://statkclee.github.io/r-algorithm/r-history-of-probability.html)**
     - [난수 및 난수 생성기](stat-random-number-generator.html)
     - [이항분포](stat-binomial.html)

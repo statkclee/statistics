@@ -1,0 +1,81 @@
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: "자영업 개업/폐업 통계"
+author:
+    name: xwMOOC
+    url: https://www.facebook.com/groups/tidyverse/
+    affiliation: Tidyverse Korea
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    toc: yes
+    toc_float: true
+    highlight: tango
+    code_folding: show
+    number_section: true
+    self_contained: true
+editor_options: 
+  chunk_output_type: console
+---
+
+``` {r, include=FALSE}
+source("tools/chunk-options.R")
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE, message=FALSE,
+                    comment="", digits = 3, tidy = FALSE, prompt = TRUE, fig.align = 'center')
+
+```
+
+# 과당 경쟁에 최저임금·금리인상 부담..음식점 10곳 개업때 9곳꼴로 폐업 [^seoul-news] {#seoul}
+
+서울경제, 윤서영 기자가 작성한 기사에서 음식점 10곳 개업때 9곳꼴로 폐업한다는 기사가 있어 통계을 활용한 
+주장을 펼칠 경우 정확한 통계의 활용이 무엇보다 필요한 것으로 파악되어 유사한 사례로 기사를 작성할 때 
+기계학습/인공지능을 활용하면 대량의 가짜 뉴스를 생산하는 것도 가능해 보인다.
+
+[^seoul-news]: [윤서영 (2018-12-17. 09:13), "서울경제 한숨만 늘어가는 자영업자..새해에는 살림 좀 나아질까" 서울경제](https://news.v.daum.net/v/20181217091313137)
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "blue">
+
+‘서민창업’ 업종으로 꼽히는 음식점은 지난해 10곳이 문을 열 때 다른 9.2곳은 문을 닫았다. 
+국세청 국세통계에 따르면 지난해 음식점을 하다가 사업을 접고 폐업 신고를 한 건수는 16만6,751건으로, 
+같은 기간 새로 사업자 등록을 한 음식점의 92.0%에 달한다.
+
+</div>
+
+창업하는 음식점 모집단과 폐업하는 음식점 모집단은 분명히 차이가 난다. 
+
+# 유사한 글쓰기 데이터 만들기 {#example}
+
+
+## 결혼과 이혼 {#example-marriage}
+
+통계청이 2018. 3. 21. 발표한 "2017년 혼인‧이혼 통계"에 따르면 
+2017년 264.5 천건 혼인, 2017년 106.0 천건 이혼으로 결혼 10쌍중 4쌍꼴로 이혼함.
+
+특히, 경제위기가 심했던 2008년 여파로 2009년 이혼율은 급증하고 안정세를 갖다가 최근들어 이혼율이 급증하고 있음. 하지만, 이혼건수 자체로 놓고보면 계속해서 줄어들고 있음.
+
+```{r statistics-marriage}
+library(tidyverse)
+library(readxl)
+
+marriage <- read_excel("data/statistics.xlsx", sheet="marriage")
+
+marriage %>% 
+  DT::datatable() %>% 
+  DT::formatPercentage("이혼율", digits=1)
+```
+
+## 출생과 사망 {#example-birth-death}
+
+통계청이 2018. 2. 28. 발표한 "2017년 인구동향조사 출생사망통계 잠정 결과"에 따르면,  2017년 출생아 수는 357.7 천명, 사망자수는 285.6천명으로 10명중 7명이 사망하고 있으며 통계청에서 발표한 2007년 이후 사망률이 50%대에서 70%대로 급증했습니다.
+
+```{r statistics-birth}
+death <- read_excel("data/statistics.xlsx", sheet="birth")
+
+death %>% 
+  DT::datatable() %>% 
+  DT::formatPercentage("사망률", digits=1)
+```
