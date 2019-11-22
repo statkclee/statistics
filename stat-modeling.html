@@ -1834,6 +1834,12 @@ div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
 <div id="stat-model-case-study" class="section level1">
 <h1><span class="header-section-number">3</span> 집값 예측 사례</h1>
 <p>처음에 벽난로 숫자(<code>fireplaces</code>)로 집값을 예측하고, 평수(<code>living_area</code>)를 추가하고, 벽난로 숫자와 평수간의 교호작용도 추가하고, 땅값(<code>land_value</code>)도 추가하고, 침실숫자(<code>bedrooms</code>)도 넣어가며 좀더 정밀한 집값 예측모형을 이해하면서 만들어 나간다.</p>
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
+</style>
+<div class="blue">
+<p><a href="https://cran.r-project.org/src/contrib/Archive/statisticalModeling/"><code>statisticalModeling</code></a>가 CRAN에서 제거 되어 <code>archived</code> 되었으니 <code>install.packages()</code> 함수 대신 팩키지 파일을 다운로드 받은 후에, <code>install.packages(&quot;~/Downloads/statisticalModeling_0.3.0.tar.gz&quot;, repos = NULL, type = &quot;source&quot;)</code> 명령어로 설치를 대신한다. 그전에 이 팩키지가 <code>mosaic</code> 팩키지 의존성이 있어 이를 먼저 <code>install.packages(mosaic)</code> 으로 설치한다.</p>
+</div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw">library</span>(statisticalModeling)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="kw">data</span>(Houses_for_sale)</a>
 <a class="sourceLine" id="cb3-3" data-line-number="3"></a>

@@ -198,6 +198,16 @@ income_lm <- lm(formula_notation_3, data=income_df)
 벽난로 숫자와 평수간의 교호작용도 추가하고, 땅값(`land_value`)도 추가하고, 
 침실숫자(`bedrooms`)도 넣어가며 좀더 정밀한 집값 예측모형을 이해하면서 만들어 나간다.
 
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "blue">
+
+[`statisticalModeling`](https://cran.r-project.org/src/contrib/Archive/statisticalModeling/)가 CRAN에서 제거 되어 `archived` 되었으니 `install.packages()` 함수 대신 팩키지 파일을 다운로드 받은 후에, `install.packages("~/Downloads/statisticalModeling_0.3.0.tar.gz", repos = NULL, type = "source")` 명령어로 설치를 대신한다. 그전에 이 팩키지가 `mosaic` 팩키지 의존성이 있어 이를 먼저 `install.packages(mosaic)` 으로 설치한다.
+
+</div>
+
+
 
 ``` {r house-prediction-case-study}
 library(statisticalModeling)
