@@ -298,15 +298,15 @@ shark_glm_g <- ggplot(data = shark_df, aes(x = Year, y = Attacks + offset(log(po
     geom_point() +
 	geom_smooth(method = 'glm', method.args = list(family = 'poisson'), se=FALSE, color="red") +
     labs(x="연도", y="상어 공격횟수", title="일반화 선형모형 적합") +
-    theme_bw(base_family="Nanum_Gothic")
+    theme_bw(base_family="AppleGothic")
 
 shark_lm_g <- ggplot(data = shark_df, aes(x = Year, y = Attacks + offset(log(pop_offset)))) + 
     geom_point() +
 	geom_smooth(method = 'lm', se=FALSE, color="red") +
     labs(x="연도", y="상어 공격횟수", title="단순 선형모형 적합") +
-    theme_bw(base_family="Nanum_Gothic")
+    theme_bw(base_family="AppleGothic")
 
-plot_grid(shark_lm_g, shark_glm_g)
+cowplot::plot_grid(shark_lm_g, shark_glm_g)
 ```
 
 
