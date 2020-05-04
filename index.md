@@ -46,13 +46,13 @@ title: 데이터 과학 -- 기초 통계
 1. [**가자 인과관계 (Causal Inference)**](stat-coursera-doe.html)
     + [실무에서 자주 활용되는 통계 검정](stat-testing.html)
     + [일원배치 분산분석(Anova) - 타이어 브랜드별 연비](stat-tire-anova.html)
-    + [계층적 혼합 선형모형(hierarchical & mixed linear model)](stat-mixed-linear-model.html)
     + [A/B 검정(A/B Testing)](stat-ab-testing.html)
     + [A/B 검정 -- A안 혹은 B안 선정](ab-testing-in-practice.html)
         + [기호 2번과 3번, 기호 4번과 5번 순위가 의미가 있나?](ab-testing-presidential-election.html)
 1. [통계 모형(Statistical models)](stat-modeling.html)
     - [통계모형 시각화](stat-model-visualization.html) 
     - [로지스틱 회귀모형(logistic regression)](stat-logistic-regression.html) 
+    - [계층적 혼합 선형모형(hierarchical & mixed linear model)](stat-mixed-linear-model.html)
     - [시계열 모형](https://statkclee.github.io/finance/): "2018-07-01" 이전 
 1. **다변량 분석**
     1. [탐색적 요인분석(Exploratory Factor Analysis)](stat-exploratory-factor-analysis.html)
