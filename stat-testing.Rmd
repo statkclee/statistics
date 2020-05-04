@@ -1,43 +1,48 @@
 ---
 layout: page
 title: 데이터 과학 -- 기초 통계
-subtitle: 실무에서 자주 활용되는 검정($t$-검정)
+subtitle: "실무에서 자주 활용되는 통계검정"
+author:
+    name: "[Tidyverse Korea](https://www.facebook.com/groups/tidyverse/)"
+date: "`r Sys.Date()`"
 output:
   html_document: 
-    keep_md: yes
-  pdf_document:
-    latex_engine: xelatex
-mainfont: NanumGothic
+    toc: yes
+    toc_float: true
+    highlight: tango
+    code_folding: show
+    number_section: true
+    self_contained: true
+mainfont: NanumGothic    
+editor_options: 
+  chunk_output_type: console
 ---
 
 
-```{r, include=FALSE}
-source("tools/chunk-options.R") 
-library(nortest)
-library(tidyverse)
-library(stringr)
-library(ggplot2)
-library(scales)
-library(lsr)
-library(gridExtra) 
-library(broom)
-library(car)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE,
+                      comment="", digits = 3, tidy = FALSE, prompt = FALSE, fig.align = 'center')
+
 ```
 
 
-> ## 학습 목표 {.objectives}
+> # 학습 목표 {-#objectives}
 >
 > * 실무에서 자주 사용하는 검정에 대해 살펴본다.
 > * 세가지 $t-$검정에 대해 이해하고 단계별 확인사항을 점검한다.
-> * $t-$검정과 A/B 검정의 연결점을 파앟ㄱ한다.
+> * $t-$검정과 A/B 검정의 연결점을 파악한다.
+> * 범주형 변수에 대한 통계검정도 확인한다.
 
-## 1. 언제 $z-$검정과 $t-$검정을 사용해야 할까?
+
+**[데이터 과학 `tidyverse` 모형: 통계검정 &rarr;  LM/GLM](https://statkclee.github.io/model/model-glm-testing.html)**
+
+# 언제 $z-$검정과 $t-$검정을 사용해야 할까?
 
 표본평균과 모평균을 비교할 때 $z-$검정과 $t-$검정을 사용하지만 결정적인 차이는 모집단 표준편차(SD)를 아느냐 모르냐에 따라 달라진다. 
 일반적인 경우 모집단 표준편차를 알지 못한다. 
 
 
-### 1.1. 4가지 검정 비교
+## 4가지 검정 비교
 
 $z-$검정, 단일 표본 $t-$검정, 쌍체 $t-$ 검정, 독립 $t-$검정 이 네가지 검정은 평균을 비교하는데 많이 사용되는 통계적 검정이다.
 데이터에서 관측값(Observed)을 얻고, 기대값(Expected)을 빼고 이를 표준오차로 나누어서 평균 비교작업을 수행한다.
@@ -50,7 +55,7 @@ $z-$검정, 단일 표본 $t-$검정, 쌍체 $t-$ 검정, 독립 $t-$검정 이 
 | 독립 $t-$검정      |     두 표본평균 차이     |  두 표본평균 차이   | 평균간 차이 표준오차|
 
 
-### 1.2. 표집 분포
+## 표집 분포
 
 요약 통계량에 대한 가설분포를 표집 분포라고 부른다.  $z-$검정의 경우 표집분포의 평균은 근사적으로 모평균과 같고,
 표집분포의 표준편차는 표준오차가 된다. 중심극한정리에 따라 표본크기가 증가함에 따라 표준오차는 감소한다. 
@@ -64,9 +69,9 @@ $p-$값은 확률값(Probability Value)를 줄인 것으로 귀무가설이 참�
 표준오차는 우연에 의한 차이로 볼 수 있는데, 우연의 차이가 아닌 유의성을 주장하려면 적어도 **$2 \times$ 표준편차** 보다 차이가 나야 된다. 
 
 
-## 2. $t-$검정
+# $t-$검정
 
-### 2.1. 일표본 $t-$검정  [^one-sample-t-test-raccoon]
+## 일표본 $t-$검정  [^one-sample-t-test-raccoon]
 
 [^one-sample-t-test-raccoon]: [1-sample t-test](http://www.quantide.com/raccoon-ch-2-1-1-sample-t-test-with-r/)
 
@@ -79,10 +84,8 @@ $p-$값은 확률값(Probability Value)를 줄인 것으로 귀무가설이 참�
 ``` {r one-sample-t-test-setup, warning=FALSE}
 # devtools::install_github(repo = "quantide/qdata")
 
-require(ggplot2)
-require(dplyr)
+library(tidyverse)
 require(gridExtra)
-require(tidyr)
 require(qdata)
 require(lsr)
 require(nortest)
@@ -114,8 +117,7 @@ print(summary_stat)
 ggp <- ggplot(data = reaction, mapping=aes(x=index, y=reaction)) + 
   geom_point() + 
   ylim(c(177,183)) +
-  ylab("반응 온도") +
-  xlab("") +
+  labs(y="반응 온도", x="") +
   geom_hline(yintercept = 180, color="red") +
   geom_hline(yintercept = mean(reaction$reaction), color="darkgreen")
 
@@ -123,6 +125,7 @@ ggp
 
 # 인덱스 없는 시각화
 reaction$index <- rep(0, times=10)
+
 ggp <- ggplot(data = reaction, mapping=aes(x=reaction, y=index)) + 
   geom_point() + ylim(c(-2,2)) +
   geom_vline(xintercept = 180, color="red") +
@@ -159,13 +162,12 @@ t.test(reaction$reaction, mu = 180)
 ```
 
 
-### 2.2. 독립 $t-$검정 [^two-sample-t-test-raccoon]
+## 독립 $t-$검정 [^two-sample-t-test-raccoon]
 
 [^two-sample-t-test-raccoon]: [2 sample t-test and paired t](http://www.quantide.com/raccoon-ch-2-2-2-sample-t-test-and-paired-t/)
 
 신규 기능이 소프트웨어에 추가되었는데 이에 대해 매출 효과가 발생했는지 측정하는데 있어, 
-한 사용자 집단은 기존 방식대로 기능을 제공하여 매출을 측정하고, 다른 사용자 집단은 신규 기능이 추가된 소프트웨어를 제공하여
-유의적인 매출 증대효과가 있는지 검증할 때 독립 이표본 $t-$검정을 사용한다.
+한 사용자 집단은 기존 방식대로 기능을 제공하여 매출을 측정하고, 다른 사용자 집단은 신규 기능이 추가된 소프트웨어를 제공하여 유의적인 매출 증대효과가 있는지 검증할 때 독립 이표본 $t-$검정을 사용한다.
 
 $t-\textrm{값} = \frac {\textrm{관측값} - \textrm{기대값}}{\textrm{표준오차}}$
 
@@ -173,15 +175,24 @@ $t = \frac{\bar {X}_1 - \bar{X}_2}{s_{X_1X_2} \cdot \sqrt{\frac{2}{n}}}$
 
 여기서 $s_{X_1X_2} = \sqrt{\frac{s_{X_1}^2+s_{X_2}^2}{2}}$
 
-> ### $t-$ 검정 편향 문제 {.callout}
-> 
-> $t-$검정은 표본 크기에 따라 편향되는 문제가 있어 코헨-d (Cohen d)가 일반적인 효과크기 추정치가 된다.
-> 
-> 코헨-d는 다음과 같이 정의된다.
-> 
-> $d = \frac{\bar{x}_1 - \bar{x}_2}{s}$
-> 
-> 여기서, $s = \sqrt{\frac{(n_1-1)s^2_1 + (n_2-1)s^2_2}{n_1+n_2 - 2}}$는 두 표준편차를 합동하여 합친 것이 된다.
+
+<style>
+div.blue { background-color:#e6f0ff; border-radius: 5px; padding: 10px;}
+</style>
+<div class = "blue">
+
+**$t-$ 검정 편향 문제**
+
+$t-$검정은 표본 크기에 따라 편향되는 문제가 있어 코헨-d (Cohen d)가 일반적인 효과크기 추정치가 된다.
+
+코헨-d는 다음과 같이 정의된다.
+
+$d = \frac{\bar{x}_1 - \bar{x}_2}{s}$
+
+여기서, $s = \sqrt{\frac{(n_1-1)s^2_1 + (n_2-1)s^2_2}{n_1+n_2 - 2}}$는 두 표준편차를 합동하여 합친 것이 된다.
+
+</div>
+
 
 두 집단간 평균의 차이를 검증할 때 또 확인해야 되는 사항이 등분산성 검정이다. 
 두 집단의 분산이 동일해야 여기에서 추론하는 결론이 유의미할 수 있다.
@@ -194,7 +205,7 @@ $t = \frac{\bar {X}_1 - \bar{X}_2}{s_{X_1X_2} \cdot \sqrt{\frac{2}{n}}}$
 
 $W = \frac{(N-k)}{(k-1)} \frac{\sum_{i=1}^k N_i (Z_{i\cdot}-Z_{\cdot\cdot})^2} {\sum_{i=1}^k \sum_{j=1}^{N_i} (Z_{ij}-Z_{i\cdot})^2}$
 
-#### 2.2.1. 호르몬이 닭 성장에 미치는 영향
+### 호르몬이 닭 성장에 미치는 영향
 
 두가지 호르몬이 있고 두 호르몬 차이가 닭 성장에 유의적인 영향을 미치는지 검정한다.
 기술통계량을 통해 평균, 분산, 분위수 등을 확인하고 바이올린/상자 그림을 통해 호르몬간 닭성장에 차이가 있는지 살펴본다.
@@ -283,6 +294,8 @@ $t-$검정을 회귀분석이나 분산분석을 통해 효과크기를 측정�
 `tibble` 데이터프레임을 통해 일관성을 갖고 편하게 회귀분석에서 나온 결과물을 통한 잔차 분석이 가능하다.
 
 ``` {r two-sample-t-lm, warning=FALSE}
+library(broom)
+
 ## 3. 모형--------------------------------------------------
 
 lm_fit <- lm(gain ~ hormone, data = hormones) 
@@ -314,7 +327,7 @@ print(ggp)
 | Huge             |  2.0   | Sawilowsky, 2009              |
 
 
-### 1.4. 쌍체 $t-$검정
+## 쌍체 $t-$검정
 
 독립 $t-$검정과 비교하여 종속 $t-$검정이라고 하고 동일한 사용자가 반복해서 특정 요인에 차이가 있는지 검정할 때 사용된다.
 각 사용자마다 전후 평균 차이를 검정한다.
@@ -384,7 +397,7 @@ cohensD(x=carctl$Car_A, y=carctl$Car_B, method = "paired")
 ```
 
 
-## 3. A/B검정에 활용되는 일반적 통계량 
+# A/B검정에 활용되는 일반적 통계량 
 
 
 |      가정한 분포      |        사례           |      일반적 검정      |
@@ -396,17 +409,16 @@ cohensD(x=carctl$Car_A, y=carctl$Car_B, method = "paired")
 |   분포 가정 없음      |                       |   만-위트니 U 검정    |
 
 
-### 3.1. 피셔의 정확검정을 통한 광고 연결률 효과 분석 [^fisher-exact-ctr]
+## 피셔의 정확검정을 통한 광고 연결률 효과 분석 [^fisher-exact-ctr]
 
 [^fisher-exact-ctr]: [The Only* Statistical Significance Test You Need](http://www.lunametrics.com/blog/2014/07/01/statistical-significance-test/)
 
-광고 A [광고 연결률(CTR, click through rates)](http://terms.naver.com/entry.nhn?docId=819411&cid=42344&categoryId=42344)이 1.1%, 광고 B 클릭율이 1.3% 으로 나왔다면 
-1.3% > 1.1% 로직으로 광고 A가 더 좋을까? 그럴수도 그렇지 않을 수도 있다.
+광고 A [광고 연결률(CTR, click through rates)](http://terms.naver.com/entry.nhn?docId=819411&cid=42344&categoryId=42344)이 1.1%, 광고 B 클릭율이 1.3% 으로 나왔다면 1.3% > 1.1% 로직으로 광고 A가 더 좋을까? 그럴수도 그렇지 않을 수도 있다.
 
 사용자 1,000명 대상 광고 효과를 A/B 검정하면 유의적이지 않지만, 100,000 명 대상으로 광고효과를 검정하면 유의적으로 파악된다.
 동일한 1.3%, 1.1% 광고 연결률이지만 사용대상자 숫자에 따라 통계적 추론을 달라진다.
 
-``` {r}
+``` {r fisher-exact-testing}
 # 1. 피셔의 정확검정(Fisher's exact test)--------------------------
 ## 1,000 번 사례
 ad_1000 <-  matrix(c(11, 13, 989, 987), nrow = 2,
@@ -422,4 +434,59 @@ ad_100000 <-  matrix(c(1100, 1300, 98900, 98700), nrow = 2,
 ad_100000
 fisher.test(ad_100000, alternative = "two.sided")
 ```
+
+
+## 비율 검정
+
+| 표본 | 반응 범주 |                     검정                                 |
+|------|-----------|----------------------------------------------------------|
+|  1   |     2     | 단일 표본 $\chi^2$ 검정, 이항 검정(Binomial Test)    |
+|  1   |   2 이상  | 단일 표본 $\chi^2$ 검정, 다항 검정(multinomial Test)     |
+| 1이상|   2 이상  | $N$ 표본 $\chi^2$ 검정, G-검정, 피셔의 정확검정      |
+
+
+## 분산 분석과 일반화 선형모형
+
+| 요인  |   수준  | 군간(B)/군내(W) |     모수 검정      |          비모수 검정                 |
+|-------|---------|-----------|--------------------------|--------------------------------------|
+|  1    |   2     | 군간(B)   | 독립표본 $t-$검정        | 만-위트니 $U$ 검정(Mann-Whitney)     |
+|  1    |  2 이상 | 군간(B)   | 일원 분산분석            | 크루스칼-왈리스 검정(Kruskal-Wallis) |
+|  1    |    2    | 군간(W)   | 쌍체 $t-$ 검정            | 윌콕슨 부호순위 검정(Wilcoxon signed-rank test)|
+|  1    |  2 이상 | 군간(W)   | 일원 반복측정 분산분석   | 프리드만의 검정 (Friedman test)    |
+| 1이상 |  2 이상 | 군간(B)   | 요인 분산분석, 선형모형  | Aligned Rank Transform(ART), 일반화선형모형(GLM)|
+| 1이상 |  2 이상 | 군간(W)   | 요인 반복측정 분산분석, 선형혼합모형  | Aligned Rank Transform(ART), 일반화선형혼합모형(GLMM)|
+
+
+# 통계검정활용 사례
+
+## 사용자 선호도(User Preference) 
+
+* 단일 표본 비율 검정(One-Sample Test of Proportions)
+* 단일표본 비율검정 (More One-Sample Tests of Proportions)
+* 이표본 비율검정(Two-Sample Tests of Proportions)
+
+
+## A/B 테스트 -- $t-$검정
+
+* $t-$검정
+
+## 작업 완수 시간 -- 분산분석
+
+* 일원 분산분석 (One-way Analysis of Variance)
+    * 군간(Between) 요인 분석
+
+## 사용자 검색 -- 반복 측정
+
+* 반복측정 분산분석(Repeated Measures ANOVA)
+    * 군내(Within) 요인 분석
+
+## 핸드폰 자판 입력 -- 요인 실험 설계 
+
+* 요인 실험 설계 (Factorial Design of Experiment)
+    * 한가지 이상 요인에 대한 실험 설계
+
+## 일반화 선형 (혼합) 모형
+
+* 일반화 선형 모형(Generalized Linear Models, GLM)
+* 일반화 선형 혼합 모형(Generalized Linear Mixed Models, GLMM)
 
