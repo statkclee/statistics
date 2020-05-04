@@ -49,6 +49,11 @@ title: 데이터 과학 -- 기초 통계
     + [A/B 검정(A/B Testing)](stat-ab-testing.html)
     + [A/B 검정 -- A안 혹은 B안 선정](ab-testing-in-practice.html)
         + [기호 2번과 3번, 기호 4번과 5번 순위가 의미가 있나?](ab-testing-presidential-election.html)
+    + [베이지안 A/B 검정](bayesian-ab-testing-in-practice.html)
+        + [올해(2017년) 최고수위 타자는 4할을 넘길 수 있을까?](bayesian-best-hitter-2017.html)
+        + [올해(2017년) 최고수위 타자 타율은?](bayesian-best-hitter-ci.html)
+        + [1타수 1안타, 2타수 무안타... 타율은?](bayesian-empirical-bayes.html)
+        + [장효조, 김태균 누가 더 타율이 높은가?](bayesian-ab-testing.html)    
 1. [통계 모형(Statistical models)](stat-modeling.html)
     - [통계모형 시각화](stat-model-visualization.html) 
     - [로지스틱 회귀모형(logistic regression)](stat-logistic-regression.html) 
@@ -59,11 +64,7 @@ title: 데이터 과학 -- 기초 통계
 1. [채팅 로그](stat-chatting-log.html)
 1. [디지털 경제와 작업장(Gold Farming)](stat-gold-farming.html)
     * [작업장 탐지](stat-gold-farming-detection.html)
-1. [베이지안 A/B 검정](bayesian-ab-testing-in-practice.html)
-    + [올해(2017년) 최고수위 타자는 4할을 넘길 수 있을까?](bayesian-best-hitter-2017.html)
-    + [올해(2017년) 최고수위 타자 타율은?](bayesian-best-hitter-ci.html)
-    + [1타수 1안타, 2타수 무안타... 타율은?](bayesian-empirical-bayes.html)
-    + [장효조, 김태균 누가 더 타율이 높은가?](bayesian-ab-testing.html)    
+
 
 ### [xwMOOC 오픈 교재](https://statkclee.github.io/xwMOOC/)
 
