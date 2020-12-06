@@ -1,4 +1,15 @@
-# 데이터 과학 -- 기초 통계
+---
+layout: page
+title: 데이터 과학 -- 기초 통계
+subtitle: 금융공학을 위한 R 언어 기초
+output:
+  html_document: 
+    keep_md: yes
+    toc: yes
+  pdf_document:
+    latex_engine: xelatex
+mainfont: NanumGothic
+---
 
 
 
@@ -126,7 +137,7 @@ levels(eval_f) <- c("매우 낮음", "낮음", "높음", "매우 높음")
 plot(eval_f)
 ~~~
 
-<img src="fig/fe-factor-cut-1.png" style="display: block; margin: auto;" />
+<img src="fig/fe-factor-cut-1.png" title="plot of chunk fe-factor-cut" alt="plot of chunk fe-factor-cut" style="display: block; margin: auto;" />
 
 [기업신용등급](https://ko.wikipedia.org/wiki/신용등급)을 보게되면 우수, 높은 등급부터 시작해서 채무불이행까지 쭉 나열되어 있다.
 이런 경우 요인에 대해 순서가 있게 되고 이를 표현하게 되는 방식 `factor`에 `ordered=TRUE`를 반영하면 순서를 자료형에 담백하게 담아낼 수 있다.
@@ -152,7 +163,7 @@ bond_rating_f <- factor(bond_rating_v, ordered=TRUE, levels=c("AAA", "AA", "BB",
 plot(bond_rating_f)
 ~~~
 
-<img src="fig/fe-factor-order-1.png" style="display: block; margin: auto;" />
+<img src="fig/fe-factor-order-1.png" title="plot of chunk fe-factor-order" alt="plot of chunk fe-factor-order" style="display: block; margin: auto;" />
 
 #### 리스트
 
@@ -349,36 +360,36 @@ lapply(portfolio, FUN = summary)
 
 ~~~{.output}
 $apple
-     Index              AAPL.Open       AAPL.High        AAPL.Low    
- Min.   :2017-05-01   Min.   :142.9   Min.   :143.5   Min.   :142.2  
- 1st Qu.:2017-06-15   1st Qu.:149.7   1st Qu.:150.4   1st Qu.:148.5  
- Median :2017-08-02   Median :154.2   Median :155.1   Median :153.5  
- Mean   :2017-08-02   Mean   :154.2   Mean   :155.3   Mean   :153.0  
- 3rd Qu.:2017-09-19   3rd Qu.:158.7   3rd Qu.:160.0   3rd Qu.:157.9  
- Max.   :2017-11-03   Max.   :174.0   Max.   :174.3   Max.   :171.1  
-   AAPL.Close     AAPL.Volume       AAPL.Adjusted  
- Min.   :142.3   Min.   :14258300   Min.   :141.7  
- 1st Qu.:149.9   1st Qu.:20460875   1st Qu.:149.3  
- Median :154.2   Median :25265550   Median :154.0  
- Mean   :154.2   Mean   :28327274   Mean   :153.9  
- 3rd Qu.:158.6   3rd Qu.:32488975   3rd Qu.:158.4  
- Max.   :172.5   Max.   :72307300   Max.   :172.5  
+     Index              AAPL.Open        AAPL.High         AAPL.Low     
+ Min.   :2017-05-01   Min.   : 35.73   Min.   : 35.88   Min.   : 35.50  
+ 1st Qu.:2018-03-25   1st Qu.: 42.89   1st Qu.: 43.26   1st Qu.: 42.51  
+ Median :2019-02-19   Median : 49.79   Median : 50.20   Median : 49.51  
+ Mean   :2019-02-16   Mean   : 58.90   Mean   : 59.57   Mean   : 58.25  
+ 3rd Qu.:2020-01-13   3rd Qu.: 67.16   3rd Qu.: 68.21   3rd Qu.: 66.46  
+ Max.   :2020-12-04   Max.   :137.59   Max.   :137.98   Max.   :130.53  
+   AAPL.Close      AAPL.Volume        AAPL.Adjusted   
+ Min.   : 35.55   Min.   : 20197800   Min.   : 33.70  
+ 1st Qu.: 42.83   1st Qu.: 87686200   1st Qu.: 41.20  
+ Median : 49.84   Median :113493800   Median : 48.53  
+ Mean   : 58.95   Mean   :128637895   Mean   : 57.62  
+ 3rd Qu.: 67.68   3rd Qu.:153649500   3rd Qu.: 66.56  
+ Max.   :134.18   Max.   :426884800   Max.   :133.95  
 
 $google
-     Index              GOOG.Open        GOOG.High         GOOG.Low     
- Min.   :2017-05-01   Min.   : 901.8   Min.   : 913.0   Min.   : 894.8  
- 1st Qu.:2017-06-15   1st Qu.: 926.1   1st Qu.: 931.6   1st Qu.: 919.6  
- Median :2017-08-02   Median : 937.8   Median : 943.2   Median : 929.7  
- Mean   :2017-08-02   Mean   : 946.7   Mean   : 953.0   Mean   : 940.1  
- 3rd Qu.:2017-09-19   3rd Qu.: 968.0   3rd Qu.: 973.1   3rd Qu.: 960.0  
- Max.   :2017-11-03   Max.   :1022.1   Max.   :1048.4   Max.   :1020.3  
+     Index              GOOG.Open        GOOG.High       GOOG.Low     
+ Min.   :2017-05-01   Min.   : 901.8   Min.   : 913   Min.   : 894.8  
+ 1st Qu.:2018-03-25   1st Qu.:1052.8   1st Qu.:1065   1st Qu.:1040.9  
+ Median :2019-02-19   Median :1150.1   Median :1170   Median :1143.0  
+ Mean   :2019-02-16   Mean   :1195.6   Mean   :1208   Mean   :1184.0  
+ 3rd Qu.:2020-01-13   3rd Qu.:1301.1   3rd Qu.:1312   3rd Qu.:1294.6  
+ Max.   :2020-12-04   Max.   :1824.5   Max.   :1847   Max.   :1822.7  
    GOOG.Close      GOOG.Volume      GOOG.Adjusted   
- Min.   : 898.7   Min.   : 835000   Min.   : 898.7  
- 1st Qu.: 927.0   1st Qu.:1124600   1st Qu.: 927.0  
- Median : 940.1   Median :1304050   Median : 940.1  
- Mean   : 947.2   Mean   :1543254   Mean   : 947.2  
- 3rd Qu.: 968.2   3rd Qu.:1675675   3rd Qu.: 968.2  
- Max.   :1032.5   Max.   :5167700   Max.   :1032.5  
+ Min.   : 898.7   Min.   : 347500   Min.   : 898.7  
+ 1st Qu.:1053.2   1st Qu.:1209125   1st Qu.:1053.2  
+ Median :1155.6   Median :1458200   Median :1155.6  
+ Mean   :1196.5   Mean   :1650866   Mean   :1196.5  
+ 3rd Qu.:1303.5   3rd Qu.:1856425   3rd Qu.:1303.5  
+ Max.   :1828.0   Max.   :6207000   Max.   :1828.0  
 
 ~~~
 
@@ -462,13 +473,13 @@ lapply(portfolio_return_lst, sharpe_ratio)
 
 ~~~{.output}
 [[1]]
-[1] 0.6442919
+[1] 0.881135
 
 [[2]]
 [1] NA
 
 [[3]]
-[1] 0.3723017
+[1] 0.3634502
 
 ~~~
 
@@ -476,23 +487,25 @@ lapply(portfolio_return_lst, sharpe_ratio)
 
 ~~~{.r}
 library(PerformanceAnalytics)
+~~~
+
+
+
+~~~{.output}
+Error in library(PerformanceAnalytics): there is no package called 'PerformanceAnalytics'
+
+~~~
+
+
+
+~~~{.r}
 lapply(portfolio_return_lst, SharpeRatio.annualized, Rf=.0003, geometric=FALSE) 
 ~~~
 
 
 
 ~~~{.output}
-[[1]]
-                                yearly.returns
-Annualized Sharpe Ratio (Rf=0%)      0.6442919
-
-[[2]]
-                                yearly.returns
-Annualized Sharpe Ratio (Rf=0%)      0.5672228
-
-[[3]]
-                                yearly.returns
-Annualized Sharpe Ratio (Rf=0%)      0.3723017
+Error in match.fun(FUN): 객체 'SharpeRatio.annualized'를 찾을 수 없습니다
 
 ~~~
 
@@ -514,13 +527,13 @@ lapply(portfolio_return_lst, max)
 
 ~~~{.output}
 [[1]]
-[1] 0.7901659
+[1] 5.292966
 
 [[2]]
 [1] NA
 
 [[3]]
-[1] 2.092932
+[1] 2.092933
 
 ~~~
 
@@ -533,7 +546,7 @@ sapply(portfolio_return_lst, max)
 
 
 ~~~{.output}
-[1] 0.7901659        NA 2.0929318
+[1] 5.292966       NA 2.092933
 
 ~~~
 
@@ -547,6 +560,6 @@ vapply(portfolio_return_lst, FUN = function(x) {max(x)},
 
 
 ~~~{.output}
-[1] 0.7901659        NA 2.0929318
+[1] 5.292966       NA 2.092933
 
 ~~~

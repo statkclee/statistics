@@ -42,11 +42,11 @@ reg_ts_dat
 
 ~~~{.output}
      Qtr1 Qtr2 Qtr3 Qtr4
-1998   12    3   11    2
-1999   17    1    8   18
-2000    6    9   16   15
-2001   20   19   10    4
-2002   13    7    5   14
+1998    1   14   12   17
+1999   20   16   13    3
+2000    9   10   19   15
+2001    6   18    2    5
+2002    7    4   11    8
 
 ~~~
 
@@ -220,10 +220,10 @@ arima(x = white_noise_mean_sd)
 
 Coefficients:
       intercept
-         4.9933
-s.e.     0.1286
+         5.1300
+s.e.     0.1153
 
-sigma^2 estimated as 4.136:  log likelihood = -532.21,  aic = 1068.41
+sigma^2 estimated as 3.324:  log likelihood = -504.88,  aic = 1013.75
 
 ~~~
 
@@ -272,10 +272,10 @@ arima(x = diff_rw_yt)
 
 Coefficients:
       intercept
-         0.0915
-s.e.     0.0595
+        -0.0038
+s.e.     0.0638
 
-sigma^2 estimated as 0.8854:  log likelihood = -339.52,  aic = 683.04
+sigma^2 estimated as 1.016:  log likelihood = -356.77,  aic = 717.55
 
 ~~~
 

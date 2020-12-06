@@ -15,16 +15,15 @@
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-59802572-23"></script>
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    
-      ga('create', 'UA-59802572-17', 'auto');
-      ga('send', 'pageview');
-    
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-59802572-23');
     </script>
   </head>
   <body class="lesson">
@@ -40,9 +39,9 @@
                     <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
           <h2 class="subtitle">탐색적 시계열 데이터 분석</h2>
           <section class="objectives panel panel-warning">
-<div class="panel-heading">
-<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
-</div>
+<section id="학습-목표" class="panel-heading">
+<h2><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</section>
 <div class="panel-body">
 <ul>
 <li>시계열 데이터 유형을 파악한다.</li>
@@ -58,34 +57,34 @@
 <li>등간격 규칙을 갖으나 결측값이 포함된 시계열 데이터</li>
 </ul>
 <p>다음에 나와 있는 시계열 데이터는 이를 특성을 잘 나타내고 있다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(zoo)
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))
-
-<span class="co"># 규칙을 갖는 시계열 데이터 ---------------------------------</span>
-reg_ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(<span class="kw">sample</span>(<span class="dv">20</span>), <span class="dt">frequency =</span> <span class="dv">4</span> , <span class="dt">start=</span> <span class="dv">1998</span>)
-reg_ts_dat</code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(zoo)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">1</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a><span class="co"># 규칙을 갖는 시계열 데이터 ---------------------------------</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>reg_ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(<span class="kw">sample</span>(<span class="dv">20</span>), <span class="dt">frequency =</span> <span class="dv">4</span> , <span class="dt">start=</span> <span class="dv">1998</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a>reg_ts_dat</span></code></pre></div>
 <pre class="output"><code>     Qtr1 Qtr2 Qtr3 Qtr4
-1998   12    3   11    2
-1999   17    1    8   18
-2000    6    9   16   15
-2001   20   19   10    4
-2002   13    7    5   14
+1998    1   14   12   17
+1999   20   16   13    3
+2000    9   10   19   15
+2001    6   18    2    5
+2002    7    4   11    8
 </code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(reg_ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.8</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)
-
-<span class="co"># 불규칙 시계열 데이터 --------------------------------------</span>
-## 불균등 관측점을 갖는 시계열 데이터 -----------------------
-dat_date &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;2016-12-05&quot;</span>, <span class="st">&quot;2016-11-30&quot;</span>, <span class="st">&quot;2016-12-7&quot;</span> ,<span class="st">&quot;2016-12-17&quot;</span> ,<span class="st">&quot;2016-11-15&quot;</span>, <span class="st">&quot;2016-12-31&quot;</span>, <span class="st">&quot;2016-12-28&quot;</span>)
-dat_value &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">7</span>)
-dat_zoo &lt;-<span class="st"> </span><span class="kw">zoo</span>(dat_value, <span class="kw">as.Date</span>(dat_date))
-
-<span class="kw">plot</span>(dat_zoo, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.7</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)
-
-## 규칙을 갖는 시계열이나 결측값이 있는 시계열 데이터 -------
-dat &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sample</span>(<span class="dv">3</span>),<span class="ot">NA</span>,<span class="kw">sample</span>(<span class="dv">3</span>), <span class="ot">NA</span>, <span class="kw">sample</span>(<span class="dv">4</span>))
-ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(dat, <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">2016</span>, <span class="dv">1</span>), <span class="dt">frequency=</span><span class="dv">12</span>)
-
-<span class="kw">plot</span>(ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.7</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">plot</span>(reg_ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.8</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a><span class="co"># 불규칙 시계열 데이터 --------------------------------------</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">## 불균등 관측점을 갖는 시계열 데이터 -----------------------</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true"></a>dat_date &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;2016-12-05&quot;</span>, <span class="st">&quot;2016-11-30&quot;</span>, <span class="st">&quot;2016-12-7&quot;</span> ,<span class="st">&quot;2016-12-17&quot;</span> ,<span class="st">&quot;2016-11-15&quot;</span>, <span class="st">&quot;2016-12-31&quot;</span>, <span class="st">&quot;2016-12-28&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true"></a>dat_value &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">7</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true"></a>dat_zoo &lt;-<span class="st"> </span><span class="kw">zoo</span>(dat_value, <span class="kw">as.Date</span>(dat_date))</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true"></a><span class="kw">plot</span>(dat_zoo, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.7</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true"></a><span class="co">## 규칙을 갖는 시계열이나 결측값이 있는 시계열 데이터 -------</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true"></a>dat &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">sample</span>(<span class="dv">3</span>),<span class="ot">NA</span>,<span class="kw">sample</span>(<span class="dv">3</span>), <span class="ot">NA</span>, <span class="kw">sample</span>(<span class="dv">4</span>))</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true"></a>ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(dat, <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">2016</span>, <span class="dv">1</span>), <span class="dt">frequency=</span><span class="dv">12</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true"></a><span class="kw">plot</span>(ts_dat, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>, <span class="dt">lty=</span><span class="dv">5</span>, <span class="dt">lwd=</span><span class="fl">0.7</span>, <span class="dt">pch=</span><span class="st">&quot;O&quot;</span>, <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">xlab=</span><span class="st">&quot;&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;&quot;</span>)</span></code></pre></div>
 <p><img src="fig/time-series-eda-1.png" title="plot of chunk time-series-eda" alt="plot of chunk time-series-eda" style="display: block; margin: auto;" /></p>
 <h2 id="시계열-데이터-기본-가정-및-시계열-모형">시계열 데이터 기본 가정 및 시계열 모형</h2>
 <p>시계열 데이터에 대한 기본 가정은 다음과 같다.</p>
@@ -106,83 +105,83 @@ ts_dat &lt;-<span class="st"> </span><span class="kw">ts</span>(dat, <span class
 <li>이동평균 (Moving Average)</li>
 </ul>
 <aside class="callout panel panel-info">
-<div class="panel-heading">
-<h3 id="월드-분해정리-wolds-decomposition-theorem"><span class="glyphicon glyphicon-pushpin"></span>월드 분해정리 (Wold’s decomposition theorem)</h3>
-</div>
+<section id="월드-분해정리-wolds-decomposition-theorem" class="panel-heading">
+<h3><span class="glyphicon glyphicon-pushpin"></span>월드 분해정리 (Wold’s decomposition theorem)</h3>
+</section>
 <div class="panel-body">
 <p>월드는 정상성을 갖는 모든 시계열 데이터는 백색잡음의 선형결합으로 표현될 수 있다는 것을 증명하여 노벨상을 수상했다.</p>
 <p><span class="math inline">\(X_t = W_t + a_1 W_{t-1} + a_2 W_{t-2} + \cdots\)</span></p>
 <p><span class="math inline">\(W_i\)</span>는 백색잡음, ARMA 모형은 월드 분해정리에 따라 시계열 데이터를 모형화하기 적합하다.</p>
 </div>
 </aside>
-<h2 id="시계열-데이터-분석-흐름-time-series-concept-example">시계열 데이터 분석 흐름 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h2>
+<h2 id="시계열-데이터-분석-흐름-time-series-concept-example">시계열 데이터 분석 흐름 <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></h2>
 <p>시계열 데이터를 분석하기 위해서 가장 먼저 문자형과 숫자형으로 준비된 데이터프레임을 시간자료구조를 포함한 적절한 데이터프레임으로 변환하는 과정이 필요하다. 시계열 데이터프레임이 준비되면 시각화를 통해 시계열 데이터 상태를 파악하고 정상 시계열 데이터로 변화하는 과정에 전념한다.</p>
 <p><img src="fig/stat-time-series-workflow.png" alt="시계열 데이터 분석 흐름" width="77%" /></p>
 <p>시계열 데이터는 백색잡음 시계열, 증가 혹은 감소하는 추세를 갖는 시계열, 분산이 변화하는 시계열, 평균이 변화하는 시계열, 계절성 주기를 갖는 시계열등 다양하다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>))
-
-<span class="co"># 백색잡음 시계열 -----------------------------------------------------------</span>
-y_t &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dt">mean=</span><span class="dv">0</span>, <span class="dt">sd=</span><span class="dv">1</span>)
-
-<span class="kw">ts.plot</span>(y_t, <span class="dt">main=</span><span class="st">&quot;백색잡음(White Noise)&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;시간(time)&quot;</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">lwd=</span><span class="dv">2</span>)
-<span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>)
-
-<span class="co"># 추세를 갖는 시계열--------------------------------------------------</span>
-e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>, <span class="dv">10</span>)
-trend_yt &lt;-<span class="st"> </span><span class="fl">0.5</span>*<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">100</span>) +<span class="st"> </span>e
-
-<span class="kw">ts.plot</span>(trend_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;추세를 갖는 시계열&quot;</span>)
-<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="fl">0.5</span>)
-
-<span class="co"># 랜덤워크 시계열 -----------------------------------------------------------</span>
-
-e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>)
-rw_yt &lt;-<span class="st"> </span><span class="kw">cumsum</span>(e)
-<span class="kw">ts.plot</span>(rw_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;랜덤워크 시계열&quot;</span>)
-<span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>)
-
-<span class="co"># 분산이 커지는 시계열 -----------------------------------------------------------</span>
-e &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span>:<span class="dv">100</span>, function(x) <span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">2</span>*x/<span class="dv">100</span>))
-var_yt &lt;-<span class="st"> </span><span class="fl">0.1</span>*<span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">100</span>) +<span class="st"> </span>e
-
-<span class="kw">ts.plot</span>(var_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;추세와 분산이 커지는 시계열&quot;</span>)
-<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="fl">0.1</span>)
-
-<span class="co"># 평균이 증가하는 시계열 -----------------------------------------------------------</span>
-mean_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">50</span>), <span class="kw">rnorm</span>(<span class="dv">50</span>, <span class="dv">5</span>))
-
-<span class="kw">ts.plot</span>(mean_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;평균이 변화하는 시계열&quot;</span>)
-<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>) 
-<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">5</span>, <span class="dt">b=</span><span class="dv">0</span>)
-
-
-<span class="co"># 분산이 변화하는 시계열 -----------------------------------------------------------</span>
-var_change_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="kw">rnorm</span>(<span class="dv">200</span>,<span class="dv">0</span>,<span class="dv">10</span>), <span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>))
-
-<span class="kw">ts.plot</span>(var_change_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;분산이 변화하는 시계열&quot;</span>)
-<span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>)  </code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">3</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co"># 백색잡음 시계열 -----------------------------------------------------------</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>y_t &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dt">mean=</span><span class="dv">0</span>, <span class="dt">sd=</span><span class="dv">1</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="kw">ts.plot</span>(y_t, <span class="dt">main=</span><span class="st">&quot;백색잡음(White Noise)&quot;</span>,<span class="dt">xlab=</span><span class="st">&quot;시간(time)&quot;</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true"></a><span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true"></a><span class="co"># 추세를 갖는 시계열--------------------------------------------------</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true"></a>e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>, <span class="dv">0</span>, <span class="dv">10</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true"></a>trend_yt &lt;-<span class="st"> </span><span class="fl">0.5</span><span class="op">*</span><span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">100</span>) <span class="op">+</span><span class="st"> </span>e</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true"></a><span class="kw">ts.plot</span>(trend_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;추세를 갖는 시계열&quot;</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true"></a><span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="fl">0.5</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true"></a><span class="co"># 랜덤워크 시계열 -----------------------------------------------------------</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true"></a>e &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dv">100</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true"></a>rw_yt &lt;-<span class="st"> </span><span class="kw">cumsum</span>(e)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true"></a><span class="kw">ts.plot</span>(rw_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;랜덤워크 시계열&quot;</span>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true"></a><span class="kw">abline</span>(<span class="dt">h=</span><span class="dv">0</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true"></a><span class="co"># 분산이 커지는 시계열 -----------------------------------------------------------</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true"></a>e &lt;-<span class="st"> </span><span class="kw">sapply</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">100</span>, <span class="cf">function</span>(x) <span class="kw">rnorm</span>(<span class="dv">1</span>, <span class="dt">sd =</span> <span class="dv">2</span><span class="op">*</span>x<span class="op">/</span><span class="dv">100</span>))</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true"></a>var_yt &lt;-<span class="st"> </span><span class="fl">0.1</span><span class="op">*</span><span class="kw">seq</span>(<span class="dv">1</span>,<span class="dv">100</span>) <span class="op">+</span><span class="st"> </span>e</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true"></a></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true"></a><span class="kw">ts.plot</span>(var_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;추세와 분산이 커지는 시계열&quot;</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true"></a><span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="fl">0.1</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true"></a></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true"></a><span class="co"># 평균이 증가하는 시계열 -----------------------------------------------------------</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true"></a>mean_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">50</span>), <span class="kw">rnorm</span>(<span class="dv">50</span>, <span class="dv">5</span>))</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true"></a></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true"></a><span class="kw">ts.plot</span>(mean_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;평균이 변화하는 시계열&quot;</span>)</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true"></a><span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>) </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true"></a><span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">5</span>, <span class="dt">b=</span><span class="dv">0</span>)</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true"></a></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true"></a><span class="co"># 분산이 변화하는 시계열 -----------------------------------------------------------</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true"></a>var_change_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="kw">rnorm</span>(<span class="dv">200</span>,<span class="dv">0</span>,<span class="dv">10</span>), <span class="kw">rnorm</span>(<span class="dv">150</span>,<span class="dv">0</span>,<span class="dv">1</span>))</span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true"></a></span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true"></a><span class="kw">ts.plot</span>(var_change_yt, <span class="dt">lwd=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;blue&quot;</span>, <span class="dt">main=</span><span class="st">&quot;분산이 변화하는 시계열&quot;</span>)</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true"></a><span class="kw">abline</span>(<span class="dt">a=</span><span class="dv">0</span>, <span class="dt">b=</span><span class="dv">0</span>)  </span></code></pre></div>
 <p><img src="fig/time-series-concept-1.png" title="plot of chunk time-series-concept" alt="plot of chunk time-series-concept" style="display: block; margin: auto;" /></p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">백색잡음</th>
-<th align="left">추세를 갖는 시계열</th>
-<th align="left">랜덤워크 시계열</th>
+<th>백색잡음</th>
+<th>추세를 갖는 시계열</th>
+<th>랜덤워크 시계열</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">추세와 분산이 커지는 시계열</td>
-<td align="left">평균이 변화하는 시계열</td>
-<td align="left">분산이 변화하는 시계열</td>
+<td>추세와 분산이 커지는 시계열</td>
+<td>평균이 변화하는 시계열</td>
+<td>분산이 변화하는 시계열</td>
 </tr>
 </tbody>
 </table>
 <h3 id="정상성stationarity-확보">정상성(Stationarity) 확보</h3>
 <aside class="callout panel panel-info">
-<div class="panel-heading">
-<h3 id="정상성stationarity과-약정상성weak-stationarity"><span class="glyphicon glyphicon-pushpin"></span>정상성(Stationarity)과 약정상성(Weak Stationarity)</h3>
-</div>
+<section id="정상성stationarity과-약정상성weak-stationarity" class="panel-heading">
+<h3><span class="glyphicon glyphicon-pushpin"></span>정상성(Stationarity)과 약정상성(Weak Stationarity)</h3>
+</section>
 <div class="panel-body">
 <p>정상성을 갖는 시계열 데이터는 랜덤한 움직임을 갖지만 시점마다 유사하게 동작하는 특징이 있어 시간에 따라 안정된 분포를 갖는다. 약정상성은 시간에 따라 일정한 평균, 분산, 공분산을 갖는 확률과정으로 정의된다. 즉, 시계열 데이터 $Y_1 , Y_2 , $이 다음을 세가지 조건을 충족하면 된다.</p>
 <ul>
@@ -201,25 +200,25 @@ var_change_yt &lt;-<span class="st"> </span><span class="kw">c</span>(<span clas
 </ul>
 <h3 id="백색잡음white-noise">백색잡음(White Noise)</h3>
 <p>백색잡음(White Noise)은 백색잡음은 고정된 평균, 분산을 갖고 시계열 상관은 없는 시계열 데이터로 <code>arima.sim()</code> 함수를 통해 모수를 조절해서 백색잡음 시계열을 추출할 수 있다. <span class="math inline">\(\mu=0, \sigma=1\)</span>인 백색잡음 시계열과 <span class="math inline">\(\mu=5, \sigma=4\)</span>인 백색잡음 시계열은 다음과 같은 형태를 띈다. <code>arima</code> 모형을 적합시키면 <span class="math inline">\(\mu=5, \sigma=4\)</span> 값에 가깝게 추정한 것을 확인할 수 있다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 백색잡음 시계열 -----------------------------------------------------------</span>
-white_noise_zero &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>)
-white_noise_mean_sd &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>, <span class="dt">mean =</span><span class="dv">5</span>, <span class="dt">sd =</span><span class="dv">2</span>)
-
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
-<span class="kw">ts.plot</span>(white_noise_zero, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>))
-<span class="kw">ts.plot</span>(white_noise_mean_sd, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>))</code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="co"># 백색잡음 시계열 -----------------------------------------------------------</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a>white_noise_zero &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a>white_noise_mean_sd &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>, <span class="dt">mean =</span><span class="dv">5</span>, <span class="dt">sd =</span><span class="dv">2</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true"></a><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="kw">ts.plot</span>(white_noise_zero, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">10</span>,<span class="dv">10</span>))</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="kw">ts.plot</span>(white_noise_mean_sd, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">10</span>,<span class="dv">10</span>))</span></code></pre></div>
 <p><img src="fig/time-series-white-noise-1.png" title="plot of chunk time-series-white-noise" alt="plot of chunk time-series-white-noise" style="display: block; margin: auto;" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">arima</span>(white_noise_mean_sd)</code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">arima</span>(white_noise_mean_sd)</span></code></pre></div>
 <pre class="output"><code>
 Call:
 arima(x = white_noise_mean_sd)
 
 Coefficients:
       intercept
-         4.9933
-s.e.     0.1286
+         5.1300
+s.e.     0.1153
 
-sigma^2 estimated as 4.136:  log likelihood = -532.21,  aic = 1068.41
+sigma^2 estimated as 3.324:  log likelihood = -504.88,  aic = 1013.75
 </code></pre>
 <h3 id="랜덤워크random-walk">랜덤워크(Random Walk)</h3>
 <p>랜덤워크는 다음과 같은 재귀식으로 표현된다.</p>
@@ -230,32 +229,32 @@ sigma^2 estimated as 4.136:  log likelihood = -532.21,  aic = 1068.41
 <p><span class="math inline">\(Y_t - Y_{t-1} = \epsilon_t\)</span></p>
 <p>차분(<code>diff()</code>)을 하게 되면 백색잡음 과정으로 환원된다.</p>
 <p><code>arima.sim()</code> 함수에 차분 모수를 1로 설정하면 랜덤워크 시계열을 모의추출할 수 있다. 이를 차분하면 백색잡음과정이 되고 이를 <code>arima</code> 모형으로 추정하면 평균과 분산이 처음 모의시험에서 설정한 모수에 근접함이 확인된다.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 랜덤워크 시계열 -----------------------------------------------------------</span>
-rw_yt &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>)
-diff_rw_yt &lt;-<span class="st"> </span><span class="kw">diff</span>(rw_yt)
-
-<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
-<span class="kw">ts.plot</span>(rw_yt, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>))
-<span class="kw">ts.plot</span>(diff_rw_yt, <span class="dt">ylim=</span><span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>))</code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="co"># 랜덤워크 시계열 -----------------------------------------------------------</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>rw_yt &lt;-<span class="st"> </span><span class="kw">arima.sim</span>(<span class="dt">model =</span> <span class="kw">list</span>(<span class="dt">order =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)), <span class="dt">n =</span> <span class="dv">250</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>diff_rw_yt &lt;-<span class="st"> </span><span class="kw">diff</span>(rw_yt)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a><span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="kw">ts.plot</span>(rw_yt, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">10</span>,<span class="dv">10</span>))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true"></a><span class="kw">ts.plot</span>(diff_rw_yt, <span class="dt">ylim=</span><span class="kw">c</span>(<span class="op">-</span><span class="dv">10</span>,<span class="dv">10</span>))</span></code></pre></div>
 <p><img src="fig/time-series-random-walk-1.png" title="plot of chunk time-series-random-walk" alt="plot of chunk time-series-random-walk" style="display: block; margin: auto;" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">arima</span>(diff_rw_yt)</code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">arima</span>(diff_rw_yt)</span></code></pre></div>
 <pre class="output"><code>
 Call:
 arima(x = diff_rw_yt)
 
 Coefficients:
       intercept
-         0.0915
-s.e.     0.0595
+        -0.0038
+s.e.     0.0638
 
-sigma^2 estimated as 0.8854:  log likelihood = -339.52,  aic = 683.04
+sigma^2 estimated as 1.016:  log likelihood = -356.77,  aic = 717.55
 </code></pre>
-<div class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="http://stackoverflow.com/questions/33522442/stationarity-tests-in-r-checking-mean-variance-and-covariance">Stationarity Tests in R, checking mean, variance and covariance</a><a href="#fnref1">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p><a href="http://stackoverflow.com/questions/33522442/stationarity-tests-in-r-checking-mean-variance-and-covariance">Stationarity Tests in R, checking mean, variance and covariance</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</div>
+</section>
         </div>
       </div>
       </article>

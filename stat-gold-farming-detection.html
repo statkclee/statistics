@@ -15,16 +15,15 @@
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-59802572-23"></script>
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    
-      ga('create', 'UA-59802572-17', 'auto');
-      ga('send', 'pageview');
-    
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-59802572-23');
     </script>
   </head>
   <body class="lesson">
@@ -40,9 +39,9 @@
                     <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
           <h2 class="subtitle">작업장 탐지</h2>
           <section class="objectives panel panel-warning">
-<div class="panel-heading">
-<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
-</div>
+<section id="학습-목표" class="panel-heading">
+<h2><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</section>
 <div class="panel-body">
 <ul>
 <li>온라인 게임 부정행위에 대해 살펴본다.</li>
@@ -51,7 +50,7 @@
 </ul>
 </div>
 </section>
-<h3 id="mmorpg-역사-mmorpg-type">1. MMORPG 역사 <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a></h3>
+<h3 id="mmorpg-역사-mmorpg-type">1. MMORPG 역사 <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></h3>
 <p>MMORPG 게임은 Ultima Online이 대표적인 게임으로 클라이언트 프로그램을 보통 만원 ~ 5만원을 내고 구매해야 하고, 매월 게임에 접속하는데 접속료를 지불하는 형태를 띄고 있다. 경우에 따라서는 클라이언트 프로그램은 무료로 다운로드 받아 설치하고 나서 접속료를 매월 내는 비즈니스 모형과 접속도 무료로 하지만, 게임을 좀더 즐겁게 즐기려면 아이템을 구매해야 하는 사업모형으로 나타나고 있다.</p>
 <ul>
 <li>연필과 종이 RPG : Dungeons &amp; Dragons, 1974</li>
@@ -63,7 +62,7 @@
 </iframe>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/UMim_pYf3Hc" frameborder="0" allowfullscreen>
 </iframe>
-<h3 id="온라인-게임-부정행위-detect-bot">1. 온라인 게임 부정행위 <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></h3>
+<h3 id="온라인-게임-부정행위-detect-bot">1. 온라인 게임 부정행위 <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></h3>
 <p>MMORPG 온라인 게임에서 부정행위는 크게 <strong>게임봇</strong> 과 <strong>사설서버</strong> 로 나눌 수 있다.</p>
 <ul>
 <li><strong>게임 봇</strong> : 사람을 대신하여 게임을 수행하는 소프트웨어
@@ -130,22 +129,22 @@
 <li>시도 응답 방법</li>
 </ul></li>
 </ul>
-<h3 id="mmorpg-사용자-유형-mmorpg-type">4. MMORPG 사용자 유형 <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a></h3>
+<h3 id="mmorpg-사용자-유형-mmorpg-type">4. MMORPG 사용자 유형 <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></h3>
 <ul>
 <li><strong>탐험(Exploration)</strong> : 훈련, 치료, 미션 또는 퀘스트 수행, 재료 수집, 경험치 포인트 획득</li>
-<li><strong>결투(Combat)</strong> : 몬스터 사냥, 사용자간 일대일 결투 (player-versus-player, ‘PvP’), 혹은 ‘player-killing’(‘PK’), 결투 후에 부활 <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></li>
+<li><strong>결투(Combat)</strong> : 몬스터 사냥, 사용자간 일대일 결투 (player-versus-player, ‘PvP’), 혹은 ‘player-killing’(‘PK’), 결투 후에 부활 <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></li>
 <li><strong>제작(Craft)</strong> : 무에서 아이템이 생성되거나 재료를 조합해서 새로운 아이템을 생성한다. 에버퀘스트(EverQuest)에서 <code>metal bits</code> → <code>files</code> → <code>studs</code> → <code>studded armor</code></li>
 <li><strong>사회활동(Socializing)</strong> : 텍스트 메시지를 사용한 커뮤니케이션, 거래, 흥정, 논쟁, 파티, 길드, 종족 등의 그룹 결성, 친구 맺기.</li>
 </ul>
-<div class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="http://www.anthemion.org/playtime_over.html">Play Time: An Overview of the MMORPG Genre</a><a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p><a href="http://ocean.kisti.re.kr/downfile/volume/kiisc/JBBHCB/2012/v22n2/JBBHCB_2012_v22n2_225.pdf">강아름, et al. “온라인 게임 봇 탐지를 위한 사용자 행위 분석.” 정보보호학회논문지 22.2 (2012): 225-238.</a><a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p><a href="http://www.anthemion.org/playtime_over.html">Play Time: An Overview of the MMORPG Genre</a><a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p><a href="http://kin.naver.com/openkr/detail.nhn?docId=64566">Player-Kill의 줄임말. 통신 게임상에서 이용자끼리의 공격이 가능할 경우, 서로 싸워 죽이는 행위를 뜻함</a><a href="#fnref4">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p><a href="http://www.anthemion.org/playtime_over.html">Play Time: An Overview of the MMORPG Genre</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p><a href="http://ocean.kisti.re.kr/downfile/volume/kiisc/JBBHCB/2012/v22n2/JBBHCB_2012_v22n2_225.pdf">강아름, et al. “온라인 게임 봇 탐지를 위한 사용자 행위 분석.” 정보보호학회논문지 22.2 (2012): 225-238.</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p><a href="http://www.anthemion.org/playtime_over.html">Play Time: An Overview of the MMORPG Genre</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p><a href="http://kin.naver.com/openkr/detail.nhn?docId=64566">Player-Kill의 줄임말. 통신 게임상에서 이용자끼리의 공격이 가능할 경우, 서로 싸워 죽이는 행위를 뜻함</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</div>
+</section>
         </div>
       </div>
       </article>

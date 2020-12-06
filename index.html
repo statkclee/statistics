@@ -15,16 +15,15 @@
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-59802572-23"></script>
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    
-      ga('create', 'UA-59802572-17', 'auto');
-      ga('send', 'pageview');
-    
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-59802572-23');
     </script>
   </head>
   <body class="lesson">
@@ -39,9 +38,9 @@
         <div class="col-md-10 col-md-offset-1">
                     <h1 class="title">데이터 과학 – 기초 통계</h1>
           <aside class="callout panel panel-info">
-<div class="panel-heading">
-<h3 id="ai-is-a-superpower"><span class="glyphicon glyphicon-pushpin"></span>AI is a Superpower</h3>
-</div>
+<section id="ai-is-a-superpower" class="panel-heading">
+<h3><span class="glyphicon glyphicon-pushpin"></span>AI is a Superpower</h3>
+</section>
 <div class="panel-body">
 <p>“AI is a superpower!!!”, 인공지능을 체득하면 슈퍼파워를 손에 쥘 것이다. <a href="https://twitter.com/andrewyng/status/728986380638916609">Andrew Ng</a></p>
 <p>금수저, 은수저 슈퍼파워를 받은 사람과 기계학습을 통달한 흑수저들간의 무한경쟁이 드뎌 시작되었다. 물론, 금수저를 입에 물고 기계학습을 통달한 사람이 가장 유리한 출발을 시작한 것도 사실이다.</p>
@@ -69,7 +68,7 @@
 <li><strong><a href="stat-distribution.html">분포(Distribution)</a></strong></li>
 <li><strong>표본추출(Sampling) &amp; 설문조사(Survey)</strong>
 <ul>
-<li><a href="survey-sampling-basic.html">설문조사 기초</a></li>
+<li><a href="survey-sampling-basic.html">통계 표본 추출 (Statistical Sampling) - 커피</a></li>
 <li><a href="tidycensus-basic.html"><code>tidycensus</code> 기초</a></li>
 <li><a href="tidycensus-kosis-comparison.html">kosis와 tidycensus 비교</a></li>
 </ul></li>

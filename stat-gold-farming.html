@@ -15,16 +15,15 @@
     <!--[if lt IE 9]>
       <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-59802572-23"></script>
     <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-    
-      ga('create', 'UA-59802572-17', 'auto');
-      ga('send', 'pageview');
-    
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-59802572-23');
     </script>
   </head>
   <body class="lesson">
@@ -40,9 +39,9 @@
                     <a href="index.html"><h1 class="title">데이터 과학 – 기초 통계</h1></a>
           <h2 class="subtitle">디지털 경제와 작업장(Gold Farming)</h2>
           <section class="objectives panel panel-warning">
-<div class="panel-heading">
-<h2 id="학습-목표"><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
-</div>
+<section id="학습-목표" class="panel-heading">
+<h2><span class="glyphicon glyphicon-certificate"></span>학습 목표</h2>
+</section>
 <div class="panel-body">
 <ul>
 <li>MMORPG 게임에서 경제 시스템과 작업장을 이해한다.</li>
@@ -58,30 +57,30 @@
 <table>
 <thead>
 <tr class="header">
-<th align="left">계층 구분</th>
-<th align="left">제공 서비스 상세</th>
-<th align="left">부가가치</th>
-<th align="left">안정성</th>
+<th>계층 구분</th>
+<th>제공 서비스 상세</th>
+<th>부가가치</th>
+<th>안정성</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">ICT 인프라</td>
-<td align="left">광대역 네트워크와 무선 네트워크</td>
-<td align="left">낮음</td>
-<td align="left">높음</td>
+<td>ICT 인프라</td>
+<td>광대역 네트워크와 무선 네트워크</td>
+<td>낮음</td>
+<td>높음</td>
 </tr>
 <tr class="even">
-<td align="left">디지털 경제</td>
-<td align="left">온라인 서비스, 커뮤니티, 게임, 온라인 쇼핑, 전자상거래, 전자 정부</td>
-<td align="left">중간</td>
-<td align="left">중간</td>
+<td>디지털 경제</td>
+<td>온라인 서비스, 커뮤니티, 게임, 온라인 쇼핑, 전자상거래, 전자 정부</td>
+<td>중간</td>
+<td>중간</td>
 </tr>
 <tr class="odd">
-<td align="left">가상 경제</td>
-<td align="left">가상 재화 거래, 링크, 디지털 노동</td>
-<td align="left">높음</td>
-<td align="left">낮음</td>
+<td>가상 경제</td>
+<td>가상 재화 거래, 링크, 디지털 노동</td>
+<td>높음</td>
+<td>낮음</td>
 </tr>
 </tbody>
 </table>
@@ -93,7 +92,7 @@
 <li>마이크로 노동(Microwork): 아마존 M’Turk 크라우드 소싱(Crowdsourcing) 혹은 작업장 노동</li>
 </ul>
 <p><img src="fig/stat-mmorpg.png" alt="MMORPG 골드파밍 개요" width="77%" /></p>
-<h3 id="글로벌-작업장gold-farming-gf-geography-gf-china-gf-play-money-gf-virtual-economy">2. 글로벌 작업장(Gold Farming) <a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> <a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a> <a href="#fn3" class="footnoteRef" id="fnref3"><sup>3</sup></a> <a href="#fn4" class="footnoteRef" id="fnref4"><sup>4</sup></a></h3>
+<h3 id="글로벌-작업장gold-farming-gf-geography-gf-china-gf-play-money-gf-virtual-economy">2. 글로벌 작업장(Gold Farming) <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> <a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> <a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> <a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></h3>
 <p>2009년 기준 약 40만명 중국인이 작업장에 종사하는 것으로 추정되고 있으며 경우에 따라서는 50만명에서 백만명까지도 보고 있다. 매년 $10조 달러 매출이 발생되는 것으로 추산된다. 중국 대도시에 상당수 거점을 운영하고 있으며 브로커가 약 6만으로 보고 있다.</p>
 <p><img src="fig/stat-gold-farmer-broker.png" alt="골드 파머와 브로커" width="77%" /></p>
 <p>작업장(gold farm)은 여러 브로커 회사에 재화를 공급하고, 브로커도 직영 작업장을 운영하기도 하지만 다양한 작업장을 통해 고객에게 제공할 재화를 공급받는다. 브로커 회사는 재화 판매를 위해 광고 마케팅, 스팸 전자우편을 전문으로 보내는 조직, 고객서비스를 전담하는 조직, IT 전산을 담당하는 조직, 재화를 고객에게 조달하는 조직으로 나눠져서 분업을 통해 효율성을 극대화한 기업이다. 특히, 고객서비스는 주로 여성이 담당하고, 나머지 업무는 남성이 담당한다. 합법적인 고객서비스 사업으로 대도시에 위치하고 전세계 고객을 대상으로 영어회화가 가능한 직원이 상주하며 회계/현금거래/목표설정 등의 기능을 담당하고 있다.</p>
@@ -101,31 +100,31 @@
 <table>
 <thead>
 <tr class="header">
-<th align="left">역할</th>
-<th align="left">월급</th>
+<th>역할</th>
+<th>월급</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">골드파머</td>
-<td align="left">$140</td>
+<td>골드파머</td>
+<td>$140</td>
 </tr>
 <tr class="even">
-<td align="left">고객서비스</td>
-<td align="left">$350</td>
+<td>고객서비스</td>
+<td>$350</td>
 </tr>
 <tr class="odd">
-<td align="left">도시근로자</td>
-<td align="left">$190</td>
+<td>도시근로자</td>
+<td>$190</td>
 </tr>
 <tr class="even">
-<td align="left">시골근로자</td>
-<td align="left">$58</td>
+<td>시골근로자</td>
+<td>$58</td>
 </tr>
 </tbody>
 </table>
 <p>중국 도시근로자 월급이 $190, 시골근로자 월급이 $58달러임을 고려하면, 숙식이 제공되고 원하는 게임을 돈들이지 않고 얼마든지 할 수 있는 골드파머 직업은 10대 후반 20대 초반 젊은이들에게 매력적일 수도 있다.</p>
-<h4 id="국제분업-gf-global-division-of-labor">2.1. 국제분업 <a href="#fn5" class="footnoteRef" id="fnref5"><sup>5</sup></a></h4>
+<h4 id="국제분업-gf-global-division-of-labor">2.1. 국제분업 <a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></h4>
 <p>고객이 $100 달러 재화를 매입하는 경우 재화를 공급한 공급업자에 대한 가치사슬(Value Chain)은 WoW(World of Warcraft) 게임을 예를 들어 저자(Dr. Vili Lehdonvirta &amp; Dr. Mirko Ernkvis, 2011) 보고서에 따라 추산된다.</p>
 <p><img src="fig/stat-gf-value-chain.png" alt="WoW 재화 배분" width="30%" /></p>
 <p>또한, 미국을 비롯한 서양 국가들이 작업장에서 생산된 재화를 소비하는 국가이며, 대표적으로 미국을 들 수 있다. PlayerAuctions 과 Lehdonvirta 연구결과를 보면 중국이 제품중심 재화를 게임유저에게 판매를 하고 있으며 영어 의사소통이 가능하고 전력이 공급되어 고속 인터넷 서비스가 제공되는 국가는 용역 서비스를 게임유저에게 판매하고 브로커 고객서비스를 통해 매출을 올리는 국제적 분업을 통해 MMORPG가 만들어 놓은 가상경제를 영위하고 있다.</p>
@@ -134,153 +133,153 @@
 <table>
 <thead>
 <tr class="header">
-<th align="left">순</th>
-<th align="left">구매 국가</th>
-<th align="left">구매율</th>
-<th align="left">판매 국가</th>
-<th align="left">판매율</th>
+<th>순</th>
+<th>구매 국가</th>
+<th>구매율</th>
+<th>판매 국가</th>
+<th>판매율</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">1</td>
-<td align="left">미국</td>
-<td align="left">100.0%</td>
-<td align="left">India</td>
-<td align="left">100.0%</td>
+<td>1</td>
+<td>미국</td>
+<td>100.0%</td>
+<td>India</td>
+<td>100.0%</td>
 </tr>
 <tr class="even">
-<td align="left">2</td>
-<td align="left">Australia</td>
-<td align="left">14.6%</td>
-<td align="left">Philippines</td>
-<td align="left">68.5%</td>
+<td>2</td>
+<td>Australia</td>
+<td>14.6%</td>
+<td>Philippines</td>
+<td>68.5%</td>
 </tr>
 <tr class="odd">
-<td align="left">3</td>
-<td align="left">Canada</td>
-<td align="left">9.0%</td>
-<td align="left">United States</td>
-<td align="left">58.6%</td>
+<td>3</td>
+<td>Canada</td>
+<td>9.0%</td>
+<td>United States</td>
+<td>58.6%</td>
 </tr>
 <tr class="even">
-<td align="left">4</td>
-<td align="left">영국</td>
-<td align="left">8.0%</td>
-<td align="left">Ukraine</td>
-<td align="left">37.1%</td>
+<td>4</td>
+<td>영국</td>
+<td>8.0%</td>
+<td>Ukraine</td>
+<td>37.1%</td>
 </tr>
 <tr class="odd">
-<td align="left">5</td>
-<td align="left">UAE</td>
-<td align="left">4.5%</td>
-<td align="left">Pakistan</td>
-<td align="left">24.5%</td>
+<td>5</td>
+<td>UAE</td>
+<td>4.5%</td>
+<td>Pakistan</td>
+<td>24.5%</td>
 </tr>
 <tr class="even">
-<td align="left">6</td>
-<td align="left">Germany</td>
-<td align="left">2.0%</td>
-<td align="left">Bangladesh</td>
-<td align="left">21.4%</td>
+<td>6</td>
+<td>Germany</td>
+<td>2.0%</td>
+<td>Bangladesh</td>
+<td>21.4%</td>
 </tr>
 <tr class="odd">
-<td align="left">7</td>
-<td align="left">Netherlands</td>
-<td align="left">1.8%</td>
-<td align="left">Russia</td>
-<td align="left">21.2%</td>
+<td>7</td>
+<td>Netherlands</td>
+<td>1.8%</td>
+<td>Russia</td>
+<td>21.2%</td>
 </tr>
 <tr class="even">
-<td align="left">8</td>
-<td align="left">Israel</td>
-<td align="left">1.5%</td>
-<td align="left">China</td>
-<td align="left">18.2%</td>
+<td>8</td>
+<td>Israel</td>
+<td>1.5%</td>
+<td>China</td>
+<td>18.2%</td>
 </tr>
 <tr class="odd">
-<td align="left">9</td>
-<td align="left">France</td>
-<td align="left">1.5%</td>
-<td align="left">Poland</td>
-<td align="left">8.5%</td>
+<td>9</td>
+<td>France</td>
+<td>1.5%</td>
+<td>Poland</td>
+<td>8.5%</td>
 </tr>
 <tr class="even">
-<td align="left">10</td>
-<td align="left">Sweden</td>
-<td align="left">1.1%</td>
-<td align="left">Canada</td>
-<td align="left">7.0%</td>
+<td>10</td>
+<td>Sweden</td>
+<td>1.1%</td>
+<td>Canada</td>
+<td>7.0%</td>
 </tr>
 <tr class="odd">
-<td align="left">11</td>
-<td align="left">Norway</td>
-<td align="left">1.0%</td>
-<td align="left">영국</td>
-<td align="left">6.3%</td>
+<td>11</td>
+<td>Norway</td>
+<td>1.0%</td>
+<td>영국</td>
+<td>6.3%</td>
 </tr>
 <tr class="even">
-<td align="left">12</td>
-<td align="left">Denmark</td>
-<td align="left">0.9%</td>
-<td align="left">Belarus</td>
-<td align="left">6.1%</td>
+<td>12</td>
+<td>Denmark</td>
+<td>0.9%</td>
+<td>Belarus</td>
+<td>6.1%</td>
 </tr>
 <tr class="odd">
-<td align="left">13</td>
-<td align="left">Switzerland</td>
-<td align="left">0.8%</td>
-<td align="left">Romania</td>
-<td align="left">4.4%</td>
+<td>13</td>
+<td>Switzerland</td>
+<td>0.8%</td>
+<td>Romania</td>
+<td>4.4%</td>
 </tr>
 <tr class="even">
-<td align="left">14</td>
-<td align="left">Belgium</td>
-<td align="left">0.7%</td>
-<td align="left">Egypt</td>
-<td align="left">3.6%</td>
+<td>14</td>
+<td>Belgium</td>
+<td>0.7%</td>
+<td>Egypt</td>
+<td>3.6%</td>
 </tr>
 <tr class="odd">
-<td align="left">15</td>
-<td align="left">Malaysia</td>
-<td align="left">0.7%</td>
-<td align="left">Argentina</td>
-<td align="left">2.9%</td>
+<td>15</td>
+<td>Malaysia</td>
+<td>0.7%</td>
+<td>Argentina</td>
+<td>2.9%</td>
 </tr>
 <tr class="even">
-<td align="left">16</td>
-<td align="left">Spain</td>
-<td align="left">0.6%</td>
-<td align="left">Moldova</td>
-<td align="left">2.9%</td>
+<td>16</td>
+<td>Spain</td>
+<td>0.6%</td>
+<td>Moldova</td>
+<td>2.9%</td>
 </tr>
 <tr class="odd">
-<td align="left">17</td>
-<td align="left">Ireland</td>
-<td align="left">0.6%</td>
-<td align="left">Armenia</td>
-<td align="left">2.9%</td>
+<td>17</td>
+<td>Ireland</td>
+<td>0.6%</td>
+<td>Armenia</td>
+<td>2.9%</td>
 </tr>
 <tr class="even">
-<td align="left">18</td>
-<td align="left">Singapore</td>
-<td align="left">0.5%</td>
-<td align="left">Australia</td>
-<td align="left">2.9%</td>
+<td>18</td>
+<td>Singapore</td>
+<td>0.5%</td>
+<td>Australia</td>
+<td>2.9%</td>
 </tr>
 <tr class="odd">
-<td align="left">19</td>
-<td align="left">India</td>
-<td align="left">0.5%</td>
-<td align="left">Serbia</td>
-<td align="left">2.8%</td>
+<td>19</td>
+<td>India</td>
+<td>0.5%</td>
+<td>Serbia</td>
+<td>2.8%</td>
 </tr>
 <tr class="even">
-<td align="left">20</td>
-<td align="left">New Zealand</td>
-<td align="left">0.5%</td>
-<td align="left">Italy</td>
-<td align="left">2.7%</td>
+<td>20</td>
+<td>New Zealand</td>
+<td>0.5%</td>
+<td>Italy</td>
+<td>2.7%</td>
 </tr>
 </tbody>
 </table>
@@ -290,48 +289,48 @@
 <table>
 <thead>
 <tr class="header">
-<th align="left">국가</th>
-<th align="left">현금</th>
-<th align="left">아이템</th>
-<th align="left">계정거래</th>
-<th align="left">레벨업</th>
+<th>국가</th>
+<th>현금</th>
+<th>아이템</th>
+<th>계정거래</th>
+<th>레벨업</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">중국</td>
-<td align="left">60.3 %</td>
-<td align="left">63.5 %</td>
-<td align="left">5.7 %</td>
-<td align="left">50.6 %</td>
+<td>중국</td>
+<td>60.3 %</td>
+<td>63.5 %</td>
+<td>5.7 %</td>
+<td>50.6 %</td>
 </tr>
 <tr class="even">
-<td align="left">미국</td>
-<td align="left">12.8 %</td>
-<td align="left">10.8 %</td>
-<td align="left">79.0 %</td>
-<td align="left">41.2 %</td>
+<td>미국</td>
+<td>12.8 %</td>
+<td>10.8 %</td>
+<td>79.0 %</td>
+<td>41.2 %</td>
 </tr>
 <tr class="odd">
-<td align="left">캐나다</td>
-<td align="left">8.9 %</td>
-<td align="left">4.4 %</td>
-<td align="left">1.7 %</td>
-<td align="left">0.9 %</td>
+<td>캐나다</td>
+<td>8.9 %</td>
+<td>4.4 %</td>
+<td>1.7 %</td>
+<td>0.9 %</td>
 </tr>
 <tr class="even">
-<td align="left">영국</td>
-<td align="left">7.9 %</td>
-<td align="left">0.7 %</td>
-<td align="left">0.6 %</td>
-<td align="left">0.6 %</td>
+<td>영국</td>
+<td>7.9 %</td>
+<td>0.7 %</td>
+<td>0.6 %</td>
+<td>0.6 %</td>
 </tr>
 <tr class="odd">
-<td align="left">싱가폴</td>
-<td align="left">1.5 %</td>
-<td align="left">11.1 %</td>
-<td align="left">0.0 %</td>
-<td align="left">2.6 %</td>
+<td>싱가폴</td>
+<td>1.5 %</td>
+<td>11.1 %</td>
+<td>0.0 %</td>
+<td>2.6 %</td>
 </tr>
 </tbody>
 </table>
@@ -344,7 +343,7 @@
 </ul>
 <p>온라인 게임 및 아이템 중개시장 활성화는 고용확대, 콘텐츠 제작과 수출등의 장점도 있지만, 장시간 게임 중독, 작업장, 개인정보 도용, 계정거래 사기 등 문제점도 함께 내포하고 있다.</p>
 <h4 id="작업장-문제점">3.1. 작업장 문제점</h4>
-<p>현금거래(RMT,Real Money Trading)는 MMORPG 제작사, 운영사업자, 게임사용자 모두에게 다양한 문제를 야기한다. <a href="#fn6" class="footnoteRef" id="fnref6"><sup>6</sup></a></p>
+<p>현금거래(RMT,Real Money Trading)는 MMORPG 제작사, 운영사업자, 게임사용자 모두에게 다양한 문제를 야기한다. <a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a></p>
 <ul>
 <li>가상경제 불균형 심화: 현금거래의 증가는 가상경제 인플레이션을 심화시켜, 일반보통 게임사용자가 게임생태계에서 정상적인 경제활동을 영위하지 못하게 방해한다.</li>
 <li>게임사용자에 직접적인 피해: 게임머니와 아이템 확보를 위해 특정 위치를 선점하고 통행을 방해하거나, 심지어 게임캐릭터를 공격하여 아이템을 빼앗기도 한다.</li>
@@ -366,99 +365,99 @@
 <table>
 <thead>
 <tr class="header">
-<th align="left">Gross revenues</th>
-<th align="left">$3,023</th>
-<th align="left">총매출</th>
+<th>Gross revenues</th>
+<th>$3,023</th>
+<th>총매출</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">…Gross revenues from currency and items (85%)</td>
-<td align="left">$2,570</td>
-<td align="left">제품매출</td>
+<td>…Gross revenues from currency and items (85%)</td>
+<td>$2,570</td>
+<td>제품매출</td>
 </tr>
 <tr class="even">
-<td align="left">……Producers’ share of revenues (65%)</td>
-<td align="left">$1,670</td>
-<td align="left"></td>
+<td>……Producers’ share of revenues (65%)</td>
+<td>$1,670</td>
+<td></td>
 </tr>
 <tr class="odd">
-<td align="left">………Manual gold farm revenues (30%)</td>
-<td align="left">$501</td>
-<td align="left">사람투입 매출</td>
+<td>………Manual gold farm revenues (30%)</td>
+<td>$501</td>
+<td>사람투입 매출</td>
 </tr>
 <tr class="even">
-<td align="left">…………Amount spent on game laborers’ wages (33%)</td>
-<td align="left">$165</td>
-<td align="left"></td>
+<td>…………Amount spent on game laborers’ wages (33%)</td>
+<td>$165</td>
+<td></td>
 </tr>
 <tr class="odd">
-<td align="left">………Bot farm revenues (50%)</td>
-<td align="left">$835</td>
-<td align="left">봇 투입 매출</td>
+<td>………Bot farm revenues (50%)</td>
+<td>$835</td>
+<td>봇 투입 매출</td>
 </tr>
 <tr class="even">
-<td align="left">…………Amount spent on game laborers’ wages (3%)</td>
-<td align="left">$25</td>
-<td align="left"></td>
+<td>…………Amount spent on game laborers’ wages (3%)</td>
+<td>$25</td>
+<td></td>
 </tr>
 <tr class="odd">
-<td align="left">……Hacker groups’ criminal revenues (20%)</td>
-<td align="left">$334</td>
-<td align="left">해커 투입 매출</td>
+<td>……Hacker groups’ criminal revenues (20%)</td>
+<td>$334</td>
+<td>해커 투입 매출</td>
 </tr>
 <tr class="even">
-<td align="left">…Gross revenues from powerleveling (15%)</td>
-<td align="left">$453</td>
-<td align="left">용역 매출</td>
+<td>…Gross revenues from powerleveling (15%)</td>
+<td>$453</td>
+<td>용역 매출</td>
 </tr>
 <tr class="odd">
-<td align="left">……Producers’ share of revenues (70%)</td>
-<td align="left">$317</td>
-<td align="left"></td>
+<td>……Producers’ share of revenues (70%)</td>
+<td>$317</td>
+<td></td>
 </tr>
 <tr class="even">
-<td align="left">………Manual powerleveling (100%)</td>
-<td align="left">$317</td>
-<td align="left"></td>
+<td>………Manual powerleveling (100%)</td>
+<td>$317</td>
+<td></td>
 </tr>
 <tr class="odd">
-<td align="left">…………Amount spent on game laborers’ wages (33%)</td>
-<td align="left">$105</td>
-<td align="left"></td>
+<td>…………Amount spent on game laborers’ wages (33%)</td>
+<td>$105</td>
+<td></td>
 </tr>
 <tr class="even">
-<td align="left">Total spent on game laborers’ wages:</td>
-<td align="left">$295</td>
-<td align="left"></td>
+<td>Total spent on game laborers’ wages:</td>
+<td>$295</td>
+<td></td>
 </tr>
 </tbody>
 </table>
 <h3 id="현금거래-대응">5. 현금거래 대응</h3>
 <p>MMORPG 가상경제 생태계를 건강하게 하고, 게임사용자에게 게임을 통해 쾌적한 환경을 제공하고자 게임운영추제는 다음과 같은 작업을 수행한다.</p>
-<ol style="list-style-type: decimal">
+<ol type="1">
 <li><strong>용의자 식별:</strong> 게임로그를 포함한 이력 및 게임활동을 지속적으로 모니터링하여 현금거래 판매자 및 구매자를 모니터링한다.</li>
 <li><strong>용의자 검증:</strong> 게임서버에 쌓여있는 로그 및 활동이력을 바탕으로 현금거래 판매자 혹은 구매자인지를 검증한다.</li>
 <li><strong>계정 중지:</strong> 현금거래 판매자 혹은 구매자로 확인되면 지체없이 연관된 계정을 모두 정지시킨다.</li>
 </ol>
 <h3 id="참고-문헌">참고 문헌</h3>
 <ul>
-<li><a href="https://www.internetsociety.org/sites/default/files/blogs-media/you-are-game-bot-uncovering-game-bots-mmorpgs-via-self-similarity-wild.pdf">Lee, Eunjo, et al. “You are a game bot!: uncovering game bots in MMORPGs via self-similarity in the wild.” NDSS, 2016.</a></li>
-<li><a href="https://jvwr-ojs-utexas.tdl.org/jvwr/index.php/jvwr/article/download/868/633">Heeks, Richard. “Understanding” gold farming&quot; and real-money trading as the intersection of real and virtual economies.&quot; Journal For Virtual Worlds Research 2.4 (2009).</a></li>
+<li><a href="https://www.internetsociety.org/sites/default/files/blogs-media/you-are-game-bot-uncovering-game-bots-mmorpgs-via-self-similarity-wild.pdf">Lee, Eunjo, et al. “You are a game bot!: uncovering game bots in MMORPGs via self-similarity in the wild.” NDSS, 2016.</a></li>
+<li><a href="https://jvwr-ojs-utexas.tdl.org/jvwr/index.php/jvwr/article/download/868/633">Heeks, Richard. “Understanding” gold farming" and real-money trading as the intersection of real and virtual economies." Journal For Virtual Worlds Research 2.4 (2009).</a></li>
 <li><a href="http://kdfs.or.kr/?module=file&amp;act=procFileDownload&amp;file_srl=6203&amp;sid=eb144323371eba519c1a0a96c4d8c852&amp;module_srl=6199">심상은, 게임 아이템 거래를 통한 자금세탁 기법 고찰 및 방지방법에 대한 연구, Journal of Digital Forensics 2015 Dec.: 9(2)</a></li>
 <li><a href="https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002024918">강성욱, 이진, 이재혁 , 김휘강, MMORPG에서 GFG 쇠퇴를 위한 현금거래 구매자 탐지 방안에 관한 연구, 정보보호학회논문지, 2015, vol.25, no.4, pp. 849-861</a></li>
 </ul>
-<div class="footnotes">
+<section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1"><p><a href="http://cii.oii.ox.ac.uk/2014/10/29/geographies-of-gold-farming-new-research-on-the-third-party-gaming-services-industry/">Geographies of gold farming: New research on the third-party gaming services industry</a><a href="#fnref1">↩</a></p></li>
-<li id="fn2"><p><a href="https://virtualeconomyresearchnetwork.wordpress.com/2009/05/05/update_on_chinese_gold_farming/">Update on Chinese Gold Farming</a><a href="#fnref2">↩</a></p></li>
-<li id="fn3"><p><a href="http://www.playmoneyfilm.com/">PLAY MONEY A DOCUMENTARY ABOUT MAKING REAL MONEY IN UNREAL PLACES</a><a href="#fnref3">↩</a></p></li>
-<li id="fn4"><p><a href="http://www.infodev.org/infodev-files/resource/InfodevDocuments_1056.pdf">ECONOMY, TUAL. “KNOWLEDGE MAP OF THE VIRTUAL ECONOMY.”</a><a href="#fnref4">↩</a></p></li>
-<li id="fn5"><p><a href="http://ipp.oii.ox.ac.uk/sites/ipp/files/documents/IPP2014_Lehdonvirta_0.pdf">Lehdonvirta, Vili, et al. “Online labour markets–leveling the playing field for international service markets?.” (2015)</a><a href="#fnref5">↩</a></p></li>
-<li id="fn6"><p><a href="http://paraphrasing.org/~fujita/publications/fujita-AIIDE2011.pdf">Fujita, Atsushi, Hiroshi Itsuki, and Hitoshi Matsubara. “Detecting Real Money Traders in MMORPG by Using Trading Network.” AIIDE. 2011.</a><a href="#fnref6">↩</a></p></li>
+<li id="fn1" role="doc-endnote"><p><a href="http://cii.oii.ox.ac.uk/2014/10/29/geographies-of-gold-farming-new-research-on-the-third-party-gaming-services-industry/">Geographies of gold farming: New research on the third-party gaming services industry</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p><a href="https://virtualeconomyresearchnetwork.wordpress.com/2009/05/05/update_on_chinese_gold_farming/">Update on Chinese Gold Farming</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p><a href="http://www.playmoneyfilm.com/">PLAY MONEY A DOCUMENTARY ABOUT MAKING REAL MONEY IN UNREAL PLACES</a><a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p><a href="http://www.infodev.org/infodev-files/resource/InfodevDocuments_1056.pdf">ECONOMY, TUAL. “KNOWLEDGE MAP OF THE VIRTUAL ECONOMY.”</a><a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5" role="doc-endnote"><p><a href="http://ipp.oii.ox.ac.uk/sites/ipp/files/documents/IPP2014_Lehdonvirta_0.pdf">Lehdonvirta, Vili, et al. “Online labour markets–leveling the playing field for international service markets?.” (2015)</a><a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6" role="doc-endnote"><p><a href="http://paraphrasing.org/~fujita/publications/fujita-AIIDE2011.pdf">Fujita, Atsushi, Hiroshi Itsuki, and Hitoshi Matsubara. “Detecting Real Money Traders in MMORPG by Using Trading Network.” AIIDE. 2011.</a><a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
-</div>
+</section>
         </div>
       </div>
       </article>
