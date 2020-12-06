@@ -36,7 +36,7 @@ title: 데이터 과학 -- 기초 통계
     - [독일 V2로켓 영국 폭격 - 포아송 분포](stat-flying-bomb-poisson.html)
 1. **[분포(Distribution)](stat-distribution.html)**
 1. **표본추출(Sampling) & 설문조사(Survey)**
-    - [설문조사 기초](survey-sampling-basic.html)
+    - [통계 표본 추출 (Statistical Sampling) - 커피](survey-sampling-basic.html)
     - [`tidycensus` 기초](tidycensus-basic.html)
     - [kosis와 tidycensus 비교](tidycensus-kosis-comparison.html)
 1. [코딩 기반 통계적 추론(Statistical Inference)](stat-inference.html)    
