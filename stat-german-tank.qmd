@@ -1,0 +1,117 @@
+---
+title: "기계학습"
+description: "독일 탱크 문제"
+date: today # 날짜 설정: now, last-modified
+lang: kr
+author:
+  - name: 이광춘
+    affiliation: 한국R사용자회
+title-block-banner: false
+format:
+  html:
+    theme: 
+      - flatly
+      - css/quarto-fonts.css
+    code-fold: false
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    highlight-style: github    
+    self-contained: false
+editor_options: 
+  chunk_output_type: console
+filters:
+  - lightbox
+lightbox: auto    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = F, 
+                      warning = F, comment = "",
+                      fig.height = 4)
+```
+
+
+# 독일 탱크 생산
+
+제2차 세계대전에서 연합국은 독일의 탱크 생산대수에 큰 관심이 있었다. 
+정확히 생산된 탱크 생산대수를 파악하게 되면 이후 전쟁에서 이길 수 있는 
+후속 전략을 세워 전쟁을 세우는데 매우 중요한 정보가 되기 때문이다.
+
+[Wikipeida German tank Problem, <https://en.wikipedia.org/wiki/German_tank_problem>]{.aside}
+
+
+# 문제 정의
+
+탱크에 생산 일련번호가 `1` (1번 생산 탱크) 부터 `m` (가장 최근 생산 m번째 탱크) 일련번호를 갖고 생산된다고 가정한다. 파괴되거나 노획된 독일 탱크를 `k` 대 관측했고 이중 가장 큰 일련번호를 갖는 탱크가 `m` 일련번호를 갖는다고 표본을 획득했다. 이와 같은 상황에서 최대값 `N`을 추정하는 문제로 둘 수 있다.
+
+$$\hat{N} = \hat{N}(m, k)$$
+
+## 빈도주의 추정
+
+빈도주의 추정은 다음 수식을 사용해서 추정할 수 있다.
+
+$$N \approx m + \frac{m}{k} - 1$$
+
+## 베이지안 추정
+
+베이지안 추정은 다음 수식을 사용해서 추정할 수 있다.
+
+$$\Pr(N=n) \approx  \begin{cases}
+   0 &\text{if } n < m \\
+    (k-1)m^{k-1}n^{-k}  &\text{if } n \ge m,
+ \end{cases}$$
+
+베이지안 평균은 다음과 같이 추정할 수 있다.
+
+$$N_{av} \approx (m - 1)\frac{k - 1}{k - 2}$$
+
+# 독일 탱크 데이터
+
+
+## 빈도주의자 추정
+
+다음과 같이 4대의 독일 탱크를 전투에서 파괴했고 이를 통해서 얻은 탱크 생산 일련번호는 다음과 같다. 즉, 최대 일련번호는 60, 총 4대를 관측했다. 이를 바탕으로 독일 탱크 생산대수를 추정한다.
+
+```{r}
+obs_tanks <- c(19, 40, 42, 60)
+
+estimate_tanks <- function(tanks) {
+	 max(tanks) + max(tanks) / length(tanks) - 1
+}
+
+estimate_tanks(obs_tanks)
+```
+
+
+## 베이지안 추정
+
+동일한 데이터를 바탕으로 베이지안 추정 작업을 수행한다.
+
+```{r}
+bayesian_tanks <- function(tanks) {
+	 k <- length(tanks)
+	 m <- max(tanks)
+	 
+	 max_tank <- (m - 1) * (k-1) / (k-2)
+	 
+	 return(ceiling(max_tank))
+}
+
+bayesian_tanks(obs_tanks)
+```
+
+
+# 탱크 생산 검증
+
+미국과 영국이 주축이 된 정보부에서 추정한 월별 독일 탱크 생산대수는 실제 독일 생산대수와 큰차이가 나지만, 통계추정값은 1942년 8월 거의 정확하게 추정한 것을 확인할 수 있다.
+
+
+|  년월     |	통계추정	| 정보부추정 |	독일생산량 |
+|:---------:|:---------:|:----------:|:-----------:|
+|1940년 6월	| 169       |	 1,000     |	122        |
+|1941년 6월	| 244       |	 1,550     |	271        |
+|1942년 8월	| 327       |	 1,550     |	342        |
+
+
+

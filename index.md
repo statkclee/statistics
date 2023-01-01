@@ -34,6 +34,7 @@ title: 데이터 과학 -- 기초 통계
     - [확률 법칙(law of probability)](stat-law-of-probability.html)
     - [이항분포 근사 - 정규분포, 포아송 분포](stat-approx-normal-poisson.html)
     - [독일 V2로켓 영국 폭격 - 포아송 분포](stat-flying-bomb-poisson.html)
+    - [독일 탱크 문제](stat-german-tank.html)    
 1. **[분포(Distribution)](stat-distribution.html)**
 1. **표본추출(Sampling) & 설문조사(Survey)**
     - [통계 표본 추출 (Statistical Sampling) - 커피](survey-sampling-basic.html)
